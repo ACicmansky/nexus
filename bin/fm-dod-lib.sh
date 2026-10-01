@@ -107,11 +107,17 @@
 
 fm_brief_worker_role() {  # <state-dir> <task-id>
   local state=$1 task_id=$2
-  cat <<'EOF'
+  local theme_script="$(d=${BASH_SOURCE[0]%/*}; [ "$d" != "${BASH_SOURCE[0]}" ] || d=.; cd "${d:-/}" && pwd)/fm-theme.sh"
+  local worker_role="crewmate" supervisor_role="firstmate"
+  if [ -f "$theme_script" ]; then
+    worker_role=$("$theme_script" worker-role ship 2>/dev/null || echo "crewmate")
+    supervisor_role=$("$theme_script" supervisor-role 2>/dev/null || echo "firstmate")
+  fi
+  cat <<EOF
 # Current worker role contract
-You are a crewmate: an autonomous worker agent managed by firstmate.
+You are a $worker_role: an autonomous worker agent managed by $supervisor_role.
 This section establishes your current identity before every project or task instruction below and supersedes any conflicting role identity in those instructions.
-Do the assigned work yourself and report only to firstmate; do not adopt a firstmate or secondmate supervisor identity, delegate the task, run fleet supervision, or address the captain.
+Do the assigned work yourself and report only to $supervisor_role; do not adopt a supervisor identity, delegate the task, run fleet supervision, or address the captain.
 EOF
   printf "Your steering inbox is \`%s/%s.inbox\`; this exact path belongs to your current task even when it is outside the worktree or under the supervising firstmate home, so read and acknowledge its messages and do not reject it as another home's state.\n" "$state" "$task_id"
   cat <<'EOF'
