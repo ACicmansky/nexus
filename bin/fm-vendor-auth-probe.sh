@@ -4,7 +4,7 @@
 #
 # This script collects a FACT and renders no verdict. It takes no harness, model,
 # or provider, reads no quota, and never decides whether a dispatch candidate is
-# eligible. The dispatching first mate owns that judgment from `quota-axi`'s data
+# eligible. The dispatching supervisor (Nexus) owns that judgment from `quota-axi`'s data
 # plus each harness's authoritative model catalog; the decision procedure is
 # owned once by .agents/skills/quota-array-dispatch/SKILL.md.
 #
@@ -70,7 +70,7 @@ usage() {
 fm-vendor-auth-probe.sh - one hard-bounded, non-destructive authentication probe
 of a named vendor CLI. It collects a fact and renders no verdict: it takes no
 harness, model, or provider, reads no quota, and never decides dispatch
-eligibility. The dispatching first mate owns that judgment.
+eligibility. The dispatching supervisor (Nexus) owns that judgment.
 
 Usage:
   fm-vendor-auth-probe.sh <probe>
