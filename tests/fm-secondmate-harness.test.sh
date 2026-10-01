@@ -468,13 +468,13 @@ SH
   printf '%s\n' "$fakebin"
 }
 
-# A minimal seeded secondmate home (validate_firstmate_home_for_spawn needs the
+# A minimal seeded secondmate home (validate_nexus_home_for_spawn needs the
 # seed marker, AGENTS.md, bin/, and a charter to launch). config/ is intentionally
 # left absent so the spawn's propagation is what creates it.
 make_seeded_home() {
   local home=$1 id=$2
   mkdir -p "$home/bin" "$home/data"
-  printf '# Firstmate\n' > "$home/AGENTS.md"
+  printf '# Nexus\n' > "$home/AGENTS.md"
   printf '%s\n' "$id" > "$home/.fm-secondmate-home"
   printf 'charter\n' > "$home/data/charter.md"
   printf '%s\n' 'projects/' 'state/' 'data/' 'config/' '.no-mistakes/' > "$home/.gitignore"
@@ -688,7 +688,7 @@ case "$*" in
   *"#{pane_current_path}"*) printf '%s\n' "${FM_FAKE_PANE_PATH:-}"; exit 0 ;;
 esac
 case "${1:-}" in
-  display-message) printf 'firstmate\n'; exit 0 ;;
+  display-message) printf 'nexus\n'; exit 0 ;;
   list-windows) exit 0 ;;
   has-session|new-session|new-window|kill-window) exit 0 ;;
   send-keys)
@@ -966,7 +966,7 @@ test_spawned_secondmate_uses_its_harness_supervision_model() {
     printf '%s\n' "$harness" > "$w/home/config/secondmate-harness"
     make_seeded_home "$sm" sm
     spawn_secondmate_capture "$w" sm "$sm" "$launchlog" >/dev/null 2>&1
-    fm_write_meta "$sm/state/task.meta" "window=firstmate:fm-task" "kind=ship"
+    fm_write_meta "$sm/state/task.meta" "window=nexus:fm-task" "kind=ship"
     touch "$sm/state/.last-watcher-beat"
     fakebin="$w/tmux-sm/fakebin"
     # Point the guard at the fixture home, not at whatever checkout this suite
@@ -1031,7 +1031,7 @@ test_spawn_fallback_chain_and_crew_scout_unaffected() {
 ## Captain's intent
 Exercise an ordinary crew launch.
 
-## Firstmate spec
+## Nexus spec
 Verify secondmate harness settings do not affect it.
 EOF
   : > "$launchlog"
@@ -1058,7 +1058,7 @@ EOF
 # status).
 # ===========================================================================
 
-# A PRIMARY firstmate repo on main with one commit + a home dir, mirroring the
+# A PRIMARY nexus repo on main with one commit + a home dir, mirroring the
 # real gitignore (config/crew-harness ignored, so a propagated value never dirties
 # the secondmate worktree on a later sweep). Echoes the world dir.
 new_world() {
@@ -1102,7 +1102,7 @@ add_sm_worktree() {
   git -C "$w/main" worktree add -q --detach "$w/$id" "$commit"
   printf '%s\n' "$id" > "$w/$id/.fm-secondmate-home"
   {
-    printf 'window=firstmate:fm-%s\n' "$id"
+    printf 'window=nexus:fm-%s\n' "$id"
     printf 'kind=secondmate\n'
     printf 'home=%s/%s\n' "$w" "$id"
   } > "$w/home/state/$id.meta"
@@ -1728,7 +1728,7 @@ test_config_push_propagates_reports_without_ff_or_nudge() {
   assert_contains "$(cat "$instruction")" $'-----BEGIN config/backend-----\ntmux\n-----END config/backend-----' \
     "config-push reread must include exact backend bytes"
   [ ! -s "$err" ] || fail "clean config push wrote unexpected stderr: $(cat "$err")"
-  assert_contains "$(inbox_stream "$w/home/state" sm)" "[fm-from-firstmate]" \
+  assert_contains "$(inbox_stream "$w/home/state" sm)" "[fm-from-nexus]" \
     "config reread must use the marked routed secondmate path"
 
   : > "$log"
@@ -1767,7 +1767,7 @@ test_config_push_reports_skips_dirty_and_invalid_home() {
   bad_home="$w/not-secondmate"
   mkdir -p "$bad_home"
   {
-    printf 'window=firstmate:fm-bad\n'
+    printf 'window=nexus:fm-bad\n'
     printf 'kind=secondmate\n'
     printf 'home=%s\n' "$bad_home"
   } > "$w/home/state/bad.meta"
@@ -1854,9 +1854,9 @@ shared_captain_header_for_tests() {
   cat <<'EOF'
 # Shared captain preferences
 
-This file is main-authoritative in the main firstmate home.
+This file is main-authoritative in the main nexus home.
 In secondmate homes it is read-only in secondmate homes and must not be edited there.
-Route new captain-preference discoveries to the main firstmate through marked status or a document pointer.
+Route new captain-preference discoveries to the main nexus through marked status or a document pointer.
 EOF
 }
 
@@ -1960,11 +1960,11 @@ test_config_reread_per_home_changed_sets_and_exact_bytes() {
   assert_not_contains "$(cat "$instr_b")" $'pi\n' \
     "beta instruction must not leak alpha-only stale harness bytes as a standalone scalar block incorrectly"
 
-  # Routed send used the from-firstmate marker and carried only the pointer,
+  # Routed send used the from-nexus marker and carried only the pointer,
   # read from alpha's durable steer records (the typed channel now carries only
   # the constant doorbell, which never inlines message content).
   pointer="CONFIG_REREAD: $(reread_instruction_path "$w/alpha")"
-  assert_contains "$(inbox_stream "$w/home/state" alpha)" "[fm-from-firstmate]" "reread send must be marked"
+  assert_contains "$(inbox_stream "$w/home/state" alpha)" "[fm-from-nexus]" "reread send must be marked"
   assert_contains "$(inbox_stream "$w/home/state" alpha)" "$pointer" "reread send must point to the durable instruction file"
   assert_not_contains "$(inbox_stream "$w/home/state" alpha)" '"harness": "grok"' "sent message must not inline multiline JSON"
   assert_not_contains "$(inbox_stream "$w/home/state" alpha)" "Default worker" "sent message must not summarize"
@@ -2562,7 +2562,7 @@ test_config_reread_bootstrap_path_and_spawn_flexibility() {
   [ "$(cat "$w/sm/config/crew-harness")" = codex ] || fail "bootstrap did not push harness"
   instr=$(reread_instruction_path "$w/sm") || fail "bootstrap reread instruction missing"
   assert_present "$instr" "bootstrap must write a config reread instruction when config changed"
-  assert_contains "$(inbox_stream "$w/home/state" sm)" "[fm-from-firstmate]" \
+  assert_contains "$(inbox_stream "$w/home/state" sm)" "[fm-from-nexus]" \
     "bootstrap config reread must use routed secondmate send"
   assert_contains "$(cat "$instr")" \
     $'-----BEGIN config/crew-harness-----\ncodex\n-----END config/crew-harness-----' \

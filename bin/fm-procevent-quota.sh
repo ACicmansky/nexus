@@ -9,7 +9,7 @@
 #   fm-procevent-quota.sh source-id
 #   fm-procevent-quota.sh retire [--provider <provider>]
 #
-# arm        Register a recurring quota-axi --json poll that wakes firstmate
+# arm        Register a recurring quota-axi --json poll that wakes nexus
 #            when the tracked provider's effectivePercentRemaining drops below
 #            <threshold> (default 10%) or when its runway.status becomes
 #            exhausted_now. The condition is deterministic, the action is only

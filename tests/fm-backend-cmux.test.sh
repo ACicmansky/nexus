@@ -126,10 +126,10 @@ cmux_expected_home_label() {  # [home] [root]
     if [ -n "$id" ]; then
       prefix="2ndmate-$id"
     else
-      prefix="firstmate"
+      prefix="nexus"
     fi
   else
-    prefix="firstmate"
+    prefix="nexus"
   fi
   printf '%s-%s' "$prefix" "$(cmux_expected_root_hash "$root")"
 }
@@ -272,7 +272,7 @@ test_normalize_key() {
     [ "$(fm_backend_cmux_normalize_key Esc)" = escape ] || { echo "Esc failed" >&2; exit 1; }
     [ "$(fm_backend_cmux_normalize_key C-c)" = ctrl-c ] || { echo "C-c failed" >&2; exit 1; }
     [ "$(fm_backend_cmux_normalize_key ctrl+c)" = ctrl-c ] || { echo "ctrl+c failed" >&2; exit 1; }
-  ) || fail "fm_backend_cmux_normalize_key did not map firstmate's key vocabulary to cmux's verified names"
+  ) || fail "fm_backend_cmux_normalize_key did not map nexus's key vocabulary to cmux's verified names"
   pass "fm_backend_cmux_normalize_key: Enter/Escape/C-c map to cmux's verified enter/escape/ctrl-c"
 }
 
@@ -282,7 +282,7 @@ test_scoped_title_uses_primary_home_label() {
   expected=$(cmux_expected_scoped_title fm-task1 "$dir")
   out=$( FM_HOME="$dir" bash -c '. "$0/bin/backends/cmux.sh"; fm_backend_cmux_scoped_title fm-task1' "$ROOT" )
   [ "$out" = "$expected" ] || fail "primary scoped title should be $expected, got '$out'"
-  pass "fm_backend_cmux_scoped_title: scopes a primary task title with firstmate plus root hash"
+  pass "fm_backend_cmux_scoped_title: scopes a primary task title with nexus plus root hash"
 }
 
 test_scoped_title_uses_secondmate_home_label() {

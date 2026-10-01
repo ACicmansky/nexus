@@ -165,7 +165,7 @@ rewakes_since() {  # <lab> <epoch>
   [ -n "$t" ] || return 0
   jq -r --argjson since "$2" '
     select(.type == "queue-operation" and .operation == "enqueue")
-    | select((.content // "" | tostring) | contains("firstmate watcher wake"))
+    | select((.content // "" | tostring) | contains("nexus watcher wake"))
     | (.timestamp | sub("\\.[0-9]+Z$"; "Z") | fromdateiso8601) as $at
     | select($at >= $since) | $at' "$t" 2>/dev/null
 }
@@ -248,7 +248,7 @@ choose() {  # <socket> <screen> <option>
 start_primary() {  # <lab>
   local lab=$1 sock screen i started prompt
   sock="$SOCKET-$(basename "$lab")"
-  prompt='This is an isolated Firstmate test lab, not a real fleet. Reply with exactly READY now and use no tools. Later, whenever a "Stop hook feedback" message wakes you, do exactly this and nothing else: run `bin/fm-wake-drain.sh` once with the Bash tool, then run the exact `bin/fm-wake-drain.sh --ack-through ...` command that its WAKE_ACK_REQUIRED line prints, then reply with exactly ACKED. Never run any other command, never run bin/fm-watch-arm.sh, and never use any other tool.'
+  prompt='This is an isolated Nexus test lab, not a real fleet. Reply with exactly READY now and use no tools. Later, whenever a "Stop hook feedback" message wakes you, do exactly this and nothing else: run `bin/fm-wake-drain.sh` once with the Bash tool, then run the exact `bin/fm-wake-drain.sh --ack-through ...` command that its WAKE_ACK_REQUIRED line prints, then reply with exactly ACKED. Never run any other command, never run bin/fm-watch-arm.sh, and never use any other tool.'
   started=$(date +%s)
   tmux -L "$sock" new-session -d -s primary -x 220 -y 50 -c "$lab/fm" \
     "sh -c '. \"$lab/env\"; printf \"%s\\n\" \"\$\$\" > state/.lock; exec claude --model $MODEL --effort low --dangerously-skip-permissions'" \

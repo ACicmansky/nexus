@@ -2,7 +2,7 @@
 # tests/fm-watch-triage.test.sh - the always-on wake triage built into
 # bin/fm-watch.sh and the shared classifier (bin/fm-classify-lib.sh). The watcher
 # now absorbs the benign majority of wakes in bash and exits ONLY on an actionable
-# wake, so firstmate's LLM re-arms once per actionable event instead of once per
+# wake, so nexus's LLM re-arms once per actionable event instead of once per
 # wake. These tests cover the classifier predicates as pure functions, then drive
 # a real fm-watch.sh subprocess to assert the behavioral contract:
 # provably-working no-verb wakes absorbed (no exit, no queue entry, suppressor
@@ -649,7 +649,7 @@ test_crew_worktree_written_since_classifier() {
   # A missing anchor cannot be compared against: no evidence.
   ! crew_worktree_written_since c "$state" "$state/absent-anchor" \
     || fail "a missing anchor reported write evidence"
-  # Only .git churn (what firstmate's own read-only git commands touch): pruned.
+  # Only .git churn (what nexus's own read-only git commands touch): pruned.
   printf 'pack\n' > "$wt/.git/objects/fresh"
   printf 'ref\n' > "$wt/.git/index"
   ! crew_worktree_written_since c "$state" "$anchor" \
@@ -661,7 +661,7 @@ test_crew_worktree_written_since_classifier() {
   # An empty id is never evidence.
   ! crew_worktree_written_since "" "$state" "$anchor" || fail "an empty id reported write evidence"
 
-  # A secondmate records a provisioned firstmate home, not a code tree, and such a
+  # A secondmate records a provisioned nexus home, not a code tree, and such a
   # home supervises itself: its own watcher beacon, pane hashes, and heartbeats keep
   # its state/ churning whether or not the mate produced anything.
   mkdir -p "$home/state"
@@ -673,7 +673,7 @@ test_crew_worktree_written_since_classifier() {
   # The home marker alone is enough, even when the record does not say secondmate.
   printf 'window=test:fm-sm2\nkind=ship\nworktree=%s\n' "$home" > "$state/sm2.meta"
   ! crew_worktree_written_since sm2 "$state" "$anchor" \
-    || fail "a marked firstmate home reported crew write evidence"
+    || fail "a marked nexus home reported crew write evidence"
   # But an ordinary worktree that merely holds a directory named state is real
   # work: only the home is excluded, never a source directory of that name.
   mkdir -p "$statedir_wt/state"
@@ -924,7 +924,7 @@ test_turn_ended_not_working_surfaced() {
 # --- bare turn-end, unverifiable harness: pane churn is the third proof --------
 # A harness whose semantic busy state has no verified source (codex) can never
 # report working, so the two proofs above are unreachable for it and EVERY worker
-# turn boundary woke firstmate. Pane content that changed since the previous poll
+# turn boundary woke nexus. Pane content that changed since the previous poll
 # is harness-independent positive evidence the crew is still executing - the same
 # liveness input the stale backbone already trusts - so a bare turn-end from a
 # churning pane is benign. The pane going quiet afterwards is still caught by that
@@ -2287,7 +2287,7 @@ test_terminal_stale_surfaced() {
 
 # --- stale pane, STALE terminal status overridden by an active run: absorbed ---
 # Regression for the 2026-07 herdr false-surface incidents: a crew's own status
-# log gets no new entry once firstmate hands it to a no-mistakes validation
+# log gets no new entry once nexus hands it to a no-mistakes validation
 # (AGENTS.md's sparse status-reporting contract), so the log keeps showing its
 # pre-validation "done:" line as the LAST line for the run's entire (possibly
 # many-minutes) duration. stale_is_terminal alone has no run-step awareness and
@@ -2302,7 +2302,7 @@ test_stale_terminal_status_overridden_by_active_run() {
   window="test:fm-validating"
   printf 'no-mistakes axi run: validating...' > "$capture_file"
   printf 'window=%s\nkind=ship\n' "$window" > "$state/validating.meta"
-  # The crew reported done BEFORE firstmate triggered no-mistakes validation;
+  # The crew reported done BEFORE nexus triggered no-mistakes validation;
   # this line never gets superseded by a newer status-log entry while the
   # pipeline itself runs.
   printf 'done: implementation complete, ready to validate\n' > "$state/validating.status"
@@ -2774,7 +2774,7 @@ test_absorbed_replacement_wait_does_not_inherit_the_old_throttle() {
 
 # Run one watcher round against a parked-worker fixture, so a round differs only
 # in the pane contents the case just wrote. Armed the way fm-watch-arm.sh arms a
-# successor after firstmate handled a wake, because that is what a supervision
+# successor after nexus handled a wake, because that is what a supervision
 # turn actually does and it is the only arm that stays in the poll loop instead of
 # re-announcing the previous round's downtime - without it a round exits on
 # `check: rearm-resurface` before it ever reaches the stale path, and every
@@ -2814,7 +2814,7 @@ parked_watch_round() {  # <state> <fakebin> <out> <capture> <window> <exit|absor
 # a decision is never silenced; first sight of each distinct stale hash therefore
 # reaches surface_nonterminal_stale. An idle parked pane still churns its hash (a
 # clock, a token counter), so every tick used to re-enter that first-sight path and
-# wake firstmate - the throttle was written by the very wake it should have
+# wake nexus - the throttle was written by the very wake it should have
 # prevented, and the hash-change path cleared it again before it was ever read.
 # The contract pinned here: the FIRST sight still surfaces, further sights inside
 # PAUSE_RESURFACE_SECS are absorbed, and the window's end still re-surfaces once,
@@ -2837,7 +2837,7 @@ test_live_declared_wait_churn_honors_the_resurface_throttle() {
     throttle="$state/.paused-resurfaced-$key"
 
     # First sight of a parked-but-live worker must still surface: the state is
-    # inconclusive and firstmate has to look at it.
+    # inconclusive and nexus has to look at it.
     text='parked, elapsed 1s'
     printf '%s' "$text" > "$capture_file"
     printf '%s' "$(hash_text "$text")" > "$state/.hash-$key"
@@ -2948,7 +2948,7 @@ test_live_paused_until_controls_recheck_time() {
 }
 
 # --- the wedge threshold consults the worker's own declared wait ------------
-# Upstream kunchenguid/firstmate#3909 and #2614: wedge_timer_check escalated on
+# Upstream ACicmansky/nexus#3909 and #2614: wedge_timer_check escalated on
 # elapsed idle time alone, without ever asking whether the worker had already
 # said why its pane was quiet. Nothing re-consulted that declaration once the
 # timer was running, so the ladder climbed for as long as the wait lasted and
@@ -3255,7 +3255,7 @@ test_wedge_threshold_recheck_names_the_captain_for_a_held_lane() {
 }
 
 # --- the wedge threshold reads the crew's own parked-gate state --------------
-# Upstream kunchenguid/firstmate#3055: a lane parked at a validation gate that is
+# Upstream ACicmansky/nexus#3055: a lane parked at a validation gate that is
 # waiting on a HUMAN is correctly quiet, but nothing in the status LINE says so -
 # the evidence is the pipeline's gate state, not anything the worker wrote. One
 # such lane reached 671 consecutive escalations on a single home. Neither landed
@@ -3313,12 +3313,12 @@ working: still parked at that gate'
     || fail "a gate awaiting a human was never rechecked at the threshold: $(cat "$out")"
   grep -F 'verified wait at a parked gate' "$out" >/dev/null \
     || fail "the parked-gate recheck did not name its evidence: $(cat "$out")"
-  grep -F "awaiting firstmate's ask-user decision" "$out" >/dev/null \
-    || fail "the parked-gate recheck did not name firstmate as the one the wait is on: $(cat "$out")"
+  grep -F "awaiting nexus's ask-user decision" "$out" >/dev/null \
+    || fail "the parked-gate recheck did not name nexus as the one the wait is on: $(cat "$out")"
   grep -F "decide the gate's ask-user finding and relay the decision to the crewmate" "$out" >/dev/null \
     || fail "the parked-gate recheck did not name the action that clears the lane: $(cat "$out")"
   grep -F 'awaiting the captain' "$out" >/dev/null \
-    && fail "the parked-gate recheck named the captain for a decision firstmate owns: $(cat "$out")"
+    && fail "the parked-gate recheck named the captain for a decision nexus owns: $(cat "$out")"
   grep -F 'confirm the wait still holds' "$out" >/dev/null \
     && fail "a parked gate borrowed the external-wait action, which does not clear it: $(cat "$out")"
   grep -F 'possible wedge' "$out" >/dev/null \
@@ -3364,7 +3364,7 @@ working: still parked at that gate'
   grep -F 'verified wait at a parked gate' "$out" >/dev/null \
     && fail "a gate awaiting the crewmate was deferred as a wait on a human: $(cat "$out")"
 
-  # The wait is owed by firstmate, not the captain, so the captain-away silence
+  # The wait is owed by nexus, not the captain, so the captain-away silence
   # does not apply: under away posture the supervision branch is the actor
   # allowed to answer it, and it keeps the long recheck cadence throughout.
   dir=$(wedge_threshold_fixture parked-gate-away "$escalated" 2000)
@@ -3372,13 +3372,13 @@ working: still parked at that gate'
   state="$dir/state"; fakebin="$dir/fakebin"; out="$dir/watch.out"; capture="$dir/pane.txt"
   write_away_record "$state"
   wedge_threshold_round "$state" "$fakebin" "$out" "$capture" "$window" "$human" exit \
-    || fail "a parked gate owed firstmate's decision was silenced while the away-posture record existed: $(cat "$out")"
-  grep -F "awaiting firstmate's ask-user decision" "$out" >/dev/null \
-    || fail "the away-posture parked-gate recheck did not name firstmate: $(cat "$out")"
+    || fail "a parked gate owed nexus's decision was silenced while the away-posture record existed: $(cat "$out")"
+  grep -F "awaiting nexus's ask-user decision" "$out" >/dev/null \
+    || fail "the away-posture parked-gate recheck did not name nexus: $(cat "$out")"
   grep -F 'possible wedge' "$out" >/dev/null \
     && fail "an away-posture parked gate was reported as a possible wedge: $(cat "$out")"
   grep -F 'never rechecked while the away-posture record exists' "$state/.watch-triage.log" >/dev/null \
-    && fail "a parked gate owed firstmate took the captain-away silence: $(cat "$state/.watch-triage.log")"
+    && fail "a parked gate owed nexus took the captain-away silence: $(cat "$state/.watch-triage.log")"
   ack_stopped_cycle "$state" || fail "could not acknowledge the away-posture parked-gate recheck"
   queued=$(wedge_stale_wakes "$state" "$window")
   n=1
@@ -3421,7 +3421,7 @@ working: still parked at that gate'
   ack_stopped_cycle "$state" || fail "could not acknowledge the runless-gate escalation"
   grep -F 'possible wedge, escalation 1' "$out" >/dev/null \
     || fail "a runless human-owed gate did not take the unchanged ladder: $(cat "$out")"
-  pass "a gate awaiting firstmate's decision for its own run is rechecked on the long cadence in either posture, while a crewmate-owed gate, an unrelated open decision and a runless verdict keep the unchanged ladder"
+  pass "a gate awaiting nexus's decision for its own run is rechecked on the long cadence in either posture, while a crewmate-owed gate, an unrelated open decision and a runless verdict keep the unchanged ladder"
 }
 
 # --- an unconfigured home behaves exactly as it did before this evidence -----
@@ -3494,7 +3494,7 @@ working: still parked at that gate'
 # the run stays parked, and the row stays in the table, until the CREWMATE relays
 # the decision with `axi respond`. So a lane that is quiet because the crewmate
 # wedged before relaying an answer it already has would read exactly like a lane
-# waiting on firstmate - and would lose the ladder for the one failure the
+# waiting on nexus - and would lose the ladder for the one failure the
 # ladder exists to catch.
 # The task's own decision fold is the record that closes that hole, because it is
 # written at ANSWER time rather than at relay time: `fm-send --resolve-key`
@@ -3513,7 +3513,7 @@ test_wedge_threshold_parked_gate_needs_an_unanswered_decision() {
   # non-terminal route into the wedge timer as that one.
   dir=$(wedge_threshold_fixture parked-gate-decided \
     'needs-decision [key=nm-01RUNGATE-review]: the gate raised an authority question
-resolved [key=nm-01RUNGATE-review]: firstmate chose the second fix' 2000)
+resolved [key=nm-01RUNGATE-review]: nexus chose the second fix' 2000)
   arm_parked_gate "$dir"
   state="$dir/state"; fakebin="$dir/fakebin"; out="$dir/watch.out"; capture="$dir/pane.txt"
   n=1
@@ -5518,7 +5518,7 @@ test_write_deferral_resurfaces_on_the_bounded_cadence() {
   pass "a write deferral re-surfaces once on the bounded pause cadence, so a churning worktree cannot stay invisible"
 }
 
-# The worktree recorded for a secondmate is a provisioned firstmate home, and that
+# The worktree recorded for a secondmate is a provisioned nexus home, and that
 # home runs its OWN supervision inside itself: its watcher beacon, pane hashes and
 # heartbeats keep state/ churning whether or not the mate produced anything. Reading
 # that as crew progress would quietly relax the kind-agnostic busy-turn backstop from
@@ -5892,7 +5892,7 @@ test_procevent_marker_keys_are_injective() {
   pass "complete process-event queue keys map to distinct seen markers"
 }
 
-# The reason line is the headline firstmate reads before the payload. Every
+# The reason line is the headline nexus reads before the payload. Every
 # procevent:* key used to surface as "process-event result captured", which
 # presents a source that is collecting NOTHING as a healthy capture - the exact
 # shape of the incident these wakes exist to expose. These assertions read the
@@ -5938,7 +5938,7 @@ test_procevent_headlines_classify_queue_keys() {
 }
 
 # Delivery, not queue rows, is what proves a launch-failure episode reaches
-# firstmate. The watcher remembers every procevent key it has surfaced for
+# nexus. The watcher remembers every procevent key it has surfaced for
 # good, so reconcile keys each episode with a fresh suffix beyond the
 # registration identity: this test would fail if a second episode reused the
 # first one's key, because the watcher would keep polling and never wake.
@@ -6191,7 +6191,7 @@ test_heartbeat_backstop_surfaces_unsurfaced_status() {
   # A captain-relevant status whose .seen-* signature ALREADY matches (so the
   # per-poll signal scan stays quiet) but which was never surfaced (no
   # .hb-surfaced-* marker). This stands in for a per-wake-path miss; the heartbeat
-  # fleet-scan backstop must catch it and wake firstmate.
+  # fleet-scan backstop must catch it and wake nexus.
   printf 'done: PR https://example.test/pr/5\n' > "$state/miss.status"
   sig=$(seen_sig "$state/miss.status"); printf '%s' "$sig" > "$state/.seen-miss_status"
   PATH="$fakebin:$PATH" FM_STATE_OVERRIDE="$state" FM_POLL=1 FM_SIGNAL_GRACE=1 \

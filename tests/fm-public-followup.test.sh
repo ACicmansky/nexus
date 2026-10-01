@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # End-to-end and regression tests for the deterministic public-followup consumer.
 #
-# The failure this suite pins: firstmate promises a public final reply in an X or
+# The failure this suite pins: nexus promises a public final reply in an X or
 # Discord thread, routes the work out, and then the session compacts or restarts.
 # Nothing in memory survives. The promise is only kept if a terminal work result
 # reconciles the typed obligation from DISK and the final reply lands in the
@@ -36,7 +36,7 @@ write_promotion_brief() {  # <home> <id>
 ## Captain's intent
 Promote the selected scout.
 
-## Firstmate spec
+## Nexus spec
 Verify promotion preserves the behavior under test.
 EOF
 }
@@ -109,9 +109,9 @@ SH
   printf '%s\n' "$fakebin"
 }
 
-# make_home <name> [relay-on|relay-off]: a firstmate home with its own backlog.
+# make_home <name> [relay-on|relay-off]: a nexus home with its own backlog.
 # relay-off omits .env entirely, which is exactly what a home that never opted
-# into the myfirstmate relay looks like.
+# into the mynexus relay looks like.
 make_home() {  # <name> [relay-on|relay-off]
   local home="$TMP_ROOT/$1" relay=${2:-relay-on}
   mkdir -p "$home/data" "$home/state" "$home/config" "$home/projects"
@@ -169,7 +169,7 @@ seed_commitment() {
       received_at:"2026-07-30T10:00:00Z",
       followup_expires_at:"2026-08-06T10:00:00Z",
       reservation_expires_at:"2026-08-06T10:00:00Z"}' > "$home/request.json"
-  jq -n '{type:"pr-merged", project:"firstmate",
+  jq -n '{type:"pr-merged", project:"nexus",
           required_deliverables:["pr_url"], completion_policy:"all-required"}' \
     > "$home/expected.json"
   jq -n --arg h "$work_home" --arg w "$work_id" \
@@ -211,7 +211,7 @@ seed_repro_commitment() {   # <home> <obligation> <request> <work-home> <work-id
       received_at:"2026-08-21T01:12:00Z",
       followup_expires_at:"2026-08-28T01:12:00Z",
       reservation_expires_at:"2026-08-28T01:12:00Z"}' > "$home/request.json"
-  jq -n '{type:"report-ready", project:"firstmate",
+  jq -n '{type:"report-ready", project:"nexus",
           required_deliverables:["report_path"], completion_policy:"all-required"}' \
     > "$home/expected.json"
   jq -n --arg h "$work_home" --arg w "$work_id" \
@@ -292,7 +292,7 @@ test_ambient_tasks_axi_env_never_reaches_a_real_backlog() {
           received_at:"2026-07-30T10:00:00Z",
           followup_expires_at:"2026-08-06T10:00:00Z",
           reservation_expires_at:"2026-08-06T10:00:00Z"}' > "$home/request.json"
-  jq -n '{type:"pr-merged", project:"firstmate",
+  jq -n '{type:"pr-merged", project:"nexus",
           required_deliverables:["pr_url"], completion_policy:"all-required"}' \
     > "$home/expected.json"
 
@@ -710,7 +710,7 @@ test_outward_delivery_stays_with_the_owning_home() {
     FM_STATE_OVERRIDE="$child/state" FAKE_CURL_LOG="$log" \
     expect_failure "a home without relay consent must not deliver a public reply" \
     "$PF" deliver pf-own
-  assert_contains "$EXPECT_OUT" "has not opted into the myfirstmate relay" \
+  assert_contains "$EXPECT_OUT" "has not opted into the mynexus relay" \
     "the refusal must name the missing relay consent"
   [ "$(followup_posts "$log")" -eq 0 ] || fail "the refused delivery must post nothing"
   FAKE_CURL_LOG="$log" run_pf "$owner" deliver pf-own >/dev/null \
@@ -751,7 +751,7 @@ test_secondmate_teardown_requires_parent_binding() {
   seed_commitment "$parent" pf-teardown req-teardown x secondmate:mate work-child
   fm_write_meta "$parent/state/mate.meta" "kind=secondmate" "home=$child"
   fm_write_meta "$child/state/work-child.meta" \
-    "window=firstmate:fm-work-child" "endpoint_task_id=work-child" \
+    "window=nexus:fm-work-child" "endpoint_task_id=work-child" \
     "worktree=$child" "project=$child" "kind=ship" "mode=local-only" "spawn_gen=public-followup-fixture"
 
   PATH="$child/fakebin:$PATH" FM_ROOT_OVERRIDE="$ROOT" FM_HOME="$child" \
@@ -775,7 +775,7 @@ test_secondmate_teardown_requires_parent_binding() {
   seed_commitment "$parent" pf-teardown-valid req-teardown-valid x secondmate:mate work-child
   fm_write_meta "$parent/state/mate.meta" "kind=secondmate" "home=$child"
   fm_write_meta "$child/state/work-child.meta" \
-    "window=firstmate:fm-work-child" "endpoint_task_id=work-child" \
+    "window=nexus:fm-work-child" "endpoint_task_id=work-child" \
     "worktree=$child" "project=$child" "kind=ship" "mode=local-only" "spawn_gen=public-followup-fixture"
   assert_absent "$child/.fm-secondmate-parent" \
     "the legacy env-only binding case must not gain a durable parent record"
@@ -884,7 +884,7 @@ test_secondmate_teardown_resolves_parent_from_durable_record_when_env_lost() {
   seed_commitment "$parent" pf-durable req-durable x secondmate:mate work-child
   fm_write_meta "$parent/state/mate.meta" "kind=secondmate" "home=$child"
   fm_write_meta "$child/state/work-child.meta" \
-    "window=firstmate:fm-work-child" "endpoint_task_id=work-child" \
+    "window=nexus:fm-work-child" "endpoint_task_id=work-child" \
     "worktree=$child" "project=$child" "kind=ship" "mode=local-only" "spawn_gen=public-followup-fixture"
 
   # No FM_PUBLIC_FOLLOWUP_PRIMARY_HOME at all here: a restart of the secondmate
@@ -917,7 +917,7 @@ test_secondmate_teardown_durable_record_missing_parent_registration_still_refuse
   fm_fake_exit0 "$child/fakebin" tmux treehouse no-mistakes gh gh-axi
   assert_local_secondmate_parent_record "$child" "$parent_resolved"
   fm_write_meta "$child/state/work-child.meta" \
-    "window=firstmate:fm-work-child" "endpoint_task_id=work-child" \
+    "window=nexus:fm-work-child" "endpoint_task_id=work-child" \
     "worktree=$child" "project=$child" "kind=ship" "mode=local-only" "spawn_gen=public-followup-fixture"
   # No parent/state/mate.meta at all: the parent never recorded this secondmate's
   # own agent, so its side of the binding is genuinely missing. A durable LOCAL
@@ -954,7 +954,7 @@ test_secondmate_teardown_durable_record_with_unknown_field_succeeds() {
   fm_git_init_commit "$child/projects/worktree"
   printf 'manual\n' > "$child/config/backlog-backend"
   fm_write_meta "$child/state/work-clean.meta" \
-    "window=firstmate:fm-work-clean" "endpoint_task_id=work-clean" \
+    "window=nexus:fm-work-clean" "endpoint_task_id=work-clean" \
     "worktree=$child/projects/worktree" "project=$child/projects/worktree" \
     "kind=ship" "mode=local-only" "spawn_gen=public-followup-fixture"
 
@@ -986,7 +986,7 @@ test_secondmate_teardown_rejects_conflicting_live_and_durable_parent_bindings() 
   fm_git_init_commit "$child/projects/worktree"
   printf 'manual\n' > "$child/config/backlog-backend"
   fm_write_meta "$child/state/work-conflict.meta" \
-    "window=firstmate:fm-work-conflict" "endpoint_task_id=work-conflict" \
+    "window=nexus:fm-work-conflict" "endpoint_task_id=work-conflict" \
     "worktree=$child/projects/worktree" "project=$child/projects/worktree" \
     "kind=ship" "mode=local-only" "spawn_gen=public-followup-fixture"
 
@@ -1014,7 +1014,7 @@ test_secondmate_teardown_rejects_unsafe_durable_parent_records() {
     make_fake_curl "$child" >/dev/null
     fm_fake_exit0 "$child/fakebin" tmux treehouse no-mistakes gh gh-axi
     fm_write_meta "$child/state/work-child.meta" \
-      "window=firstmate:fm-work-child" "endpoint_task_id=work-child" \
+      "window=nexus:fm-work-child" "endpoint_task_id=work-child" \
       "worktree=$child" "project=$child" "kind=ship" "mode=local-only" "spawn_gen=public-followup-fixture"
     parent_record="$child/.fm-secondmate-parent"
     case "$case_name" in
@@ -1080,7 +1080,7 @@ test_secondmate_teardown_rejects_nul_bearing_durable_parent_record() {
   fm_git_init_commit "$child/projects/worktree"
   printf 'manual\n' > "$child/config/backlog-backend"
   fm_write_meta "$child/state/work-child.meta" \
-    "window=firstmate:fm-work-child" "endpoint_task_id=work-child" \
+    "window=nexus:fm-work-child" "endpoint_task_id=work-child" \
     "worktree=$child/projects/worktree" "project=$child/projects/worktree" \
     "kind=ship" "mode=local-only" "spawn_gen=public-followup-fixture"
   pre=${parent_resolved%??????}
@@ -1118,7 +1118,7 @@ exit 99
 SH
   chmod +x "$home/fakebin/tasks-axi"
   fm_write_meta "$home/state/work-disabled.meta" \
-    "window=firstmate:fm-work-disabled" "endpoint_task_id=work-disabled" \
+    "window=nexus:fm-work-disabled" "endpoint_task_id=work-disabled" \
     "worktree=$home/projects/worktree" "project=$home/projects/worktree" \
     "kind=ship" "mode=local-only" "spawn_gen=public-followup-fixture"
 
@@ -1154,7 +1154,7 @@ exit 99
 SH
   chmod +x "$child/fakebin/tasks-axi"
   fm_write_meta "$child/state/work-disabled.meta" \
-    "window=firstmate:fm-work-disabled" "endpoint_task_id=work-disabled" \
+    "window=nexus:fm-work-disabled" "endpoint_task_id=work-disabled" \
     "worktree=$child/projects/worktree" "project=$child/projects/worktree" \
     "kind=ship" "mode=local-only" "spawn_gen=public-followup-fixture"
 
@@ -1183,7 +1183,7 @@ test_secondmate_parent_binding_matches_literal_id() {
   seed_commitment "$parent" pf-teardown-literal req-teardown-literal x secondmate:mate.id work-literal
   fm_write_meta "$parent/state/mate.id.meta" "kind=secondmate" "home=$child"
   fm_write_meta "$child/state/work-literal.meta" \
-    "window=firstmate:fm-work-literal" "endpoint_task_id=work-literal" \
+    "window=nexus:fm-work-literal" "endpoint_task_id=work-literal" \
     "worktree=$child" "project=$child" "kind=ship" "mode=local-only" "spawn_gen=public-followup-fixture"
 
   PATH="$child/fakebin:$PATH" FM_ROOT_OVERRIDE="$ROOT" FM_HOME="$child" \
@@ -1274,7 +1274,7 @@ test_cleanup_refuses_while_a_public_reply_is_owed() {
   tasks_in "$home" start ship-task >/dev/null \
     || fail "could not mark the guarded ship In flight"
   fm_write_meta "$home/state/ship-task.meta" \
-    "window=firstmate:fm-ship-task" \
+    "window=nexus:fm-ship-task" \
     "worktree=$home/projects/gone" \
     "project=$home/projects/sample" \
     "harness=codex" \
@@ -1305,7 +1305,7 @@ test_cleanup_refuses_while_a_public_reply_is_owed() {
 
 # --- 7. zero overhead for homes that do not use the relay ----------------------
 
-# The hard acceptance criterion. A home that never opted into the myfirstmate
+# The hard acceptance criterion. A home that never opted into the mynexus
 # relay must see no process, no tasks-axi call, no scan, no output, and no file.
 test_relay_disabled_home_pays_nothing() {
   local home tasks_log out rc before after cmd
@@ -1442,7 +1442,7 @@ test_relay_poll_stays_inert_and_surfaces_once() {
   second=$(PATH="$on/fakebin:$PATH" FM_ROOT_OVERRIDE="$ROOT" FM_HOME="$on" \
     FM_STATE_OVERRIDE="$on/state" "$POLL" 2>&1)
   assert_not_contains "$second" "public-followup" \
-    "an unchanged pending set must not wake firstmate again every cycle"
+    "an unchanged pending set must not wake nexus again every cycle"
   pass "the relay poll stays inert without a token, silent with no commitments, and surfaces a new result once"
 }
 
@@ -1524,7 +1524,7 @@ test_dropped_baton_now_surfaces_open_loop() {
     "delivery must retain the registration"
 
   fm_write_meta "$child/state/pi-rearm-loop-fix-r1.meta" \
-    "window=firstmate:fm-pi-rearm-loop-fix-r1" "endpoint_task_id=pi-rearm-loop-fix-r1" \
+    "window=nexus:fm-pi-rearm-loop-fix-r1" "endpoint_task_id=pi-rearm-loop-fix-r1" \
     "worktree=$child" "project=$child" "kind=ship" "mode=local-only" "spawn_gen=public-followup-fixture"
 
   PATH="$parent/fakebin:$PATH" FM_ROOT_OVERRIDE="$ROOT" FM_HOME="$parent" \
@@ -1560,7 +1560,7 @@ test_control_registered_followon_is_guarded() {
     secondmate:mate pi-rearm-loop-fix-r1
   fm_write_meta "$parent/state/mate.meta" "kind=secondmate" "home=$child"
   fm_write_meta "$child/state/pi-rearm-loop-fix-r1.meta" \
-    "window=firstmate:fm-pi-rearm-loop-fix-r1" "endpoint_task_id=pi-rearm-loop-fix-r1" \
+    "window=nexus:fm-pi-rearm-loop-fix-r1" "endpoint_task_id=pi-rearm-loop-fix-r1" \
     "worktree=$child" "project=$child" "kind=ship" "mode=local-only" "spawn_gen=public-followup-fixture"
   PATH="$child/fakebin:$PATH" FM_ROOT_OVERRIDE="$ROOT" FM_HOME="$child" \
     FM_STATE_OVERRIDE="$child/state" FM_DATA_OVERRIDE="$child/data" \
@@ -1783,7 +1783,7 @@ test_first_register_succeeds_with_empty_lock_list_under_bash32() {
       received_at:"2026-07-30T10:00:00Z",
       followup_expires_at:"2026-08-06T10:00:00Z",
       reservation_expires_at:"2026-08-06T10:00:00Z"}' > "$home/request.json"
-  jq -n '{type:"pr-merged", project:"firstmate",
+  jq -n '{type:"pr-merged", project:"nexus",
           required_deliverables:["pr_url"], completion_policy:"all-required"}' \
     > "$home/expected.json"
   jq -n '{relation_id:"rel-code", work_ref:{home_id:"main", task_id:"work-empty-locks"},
@@ -2007,7 +2007,7 @@ test_rechain_refuses_unclaimed_existing_destination() {
   FAKE_CURL_LOG="$log" run_pf "$home" deliver public-final-existing-a >/dev/null \
     || fail "deliver failed"
 
-  jq -n '{type:"pr-merged", project:"firstmate", required_deliverables:["pr_url"],
+  jq -n '{type:"pr-merged", project:"nexus", required_deliverables:["pr_url"],
       completion_policy:"all-required"}' > "$home/collision-expected.json"
   tasks_in "$home" public-followup add public-final-existing-b \
     --request-context-file "$home/request.json" --purpose promised-final \
@@ -2149,7 +2149,7 @@ test_retention_creates_no_false_teardown_refusal() {
   tasks_in "$home" start ship-retain >/dev/null \
     || fail "could not mark the retained-registration ship In flight"
   fm_write_meta "$home/state/ship-retain.meta" \
-    "window=firstmate:fm-ship-retain" \
+    "window=nexus:fm-ship-retain" \
     "worktree=$home/projects/gone" \
     "project=$home/projects/sample" \
     "harness=codex" \
@@ -2309,7 +2309,7 @@ test_x_request_teardown_warns_when_final_unposted() {
   tasks_in "$home" start linked-task >/dev/null \
     || fail "could not mark the legacy-link ship In flight"
   fm_write_meta "$home/state/linked-task.meta" \
-    "window=firstmate:fm-linked-task" \
+    "window=nexus:fm-linked-task" \
     "worktree=$home/projects/gone" \
     "project=$home/projects/sample" \
     "kind=ship" \
@@ -2349,7 +2349,7 @@ test_secondmate_promotion_uses_teardown_parent_resolution() {
     "$stale/state/public-followup/registry/pf-stale"
 
   fm_write_meta "$child/state/promote-conflict.meta" \
-    "window=firstmate:fm-promote-conflict" "kind=scout"
+    "window=nexus:fm-promote-conflict" "kind=scout"
   write_promotion_brief "$child" promote-conflict
   out=$(PATH="$child/fakebin:$PATH" FM_ROOT_OVERRIDE="$ROOT" FM_HOME="$child" \
     FM_STATE_OVERRIDE="$child/state" FM_PUBLIC_FOLLOWUP_PRIMARY_HOME="$parent" \
@@ -2364,7 +2364,7 @@ test_secondmate_promotion_uses_teardown_parent_resolution() {
 
   rm -f "$child/.fm-secondmate-parent"
   fm_write_meta "$child/state/promote-legacy.meta" \
-    "window=firstmate:fm-promote-legacy" "kind=scout"
+    "window=nexus:fm-promote-legacy" "kind=scout"
   write_promotion_brief "$child" promote-legacy
   out=$(PATH="$child/fakebin:$PATH" FM_ROOT_OVERRIDE="$ROOT" FM_HOME="$child" \
     FM_STATE_OVERRIDE="$child/state" FM_PUBLIC_FOLLOWUP_PRIMARY_HOME="$parent" \
@@ -2381,7 +2381,7 @@ test_secondmate_promotion_uses_teardown_parent_resolution() {
     > "$remote_child/.fm-secondmate-parent"
   printf 'FMX_PAIRING_TOKEN=child-local-token\n' > "$remote_child/.env"
   fm_write_meta "$remote_child/state/promote-remote.meta" \
-    "window=firstmate:fm-promote-remote" "kind=scout"
+    "window=nexus:fm-promote-remote" "kind=scout"
   write_promotion_brief "$remote_child" promote-remote
   out=$(PATH="$remote_child/fakebin:$PATH" FM_ROOT_OVERRIDE="$ROOT" FM_HOME="$remote_child" \
     FM_STATE_OVERRIDE="$remote_child/state" \
@@ -2470,7 +2470,7 @@ make_remote_route() {  # <home> <secondmate-id>
   mkdir -p "$remote_home/state" "$remote_home/data"
   remote_home=$(cd "$remote_home" && pwd -P)
   cat > "$home/data/secondmates.md" <<EOF
-- $id - remote lane (host: remote-mac; root: $REMOTE_FIXTURE_ROOT; home: $remote_home; scope: relay work; projects: firstmate; added 2026-08-02)
+- $id - remote lane (host: remote-mac; root: $REMOTE_FIXTURE_ROOT; home: $remote_home; scope: relay work; projects: nexus; added 2026-08-02)
 EOF
   fm_write_meta "$home/state/$id.meta" "kind=secondmate" "home=$remote_home" \
     "remote_host=remote-mac" "remote_root=$REMOTE_FIXTURE_ROOT"
@@ -2636,7 +2636,7 @@ test_remote_retire_refuses_reassigned_route() {
   mkdir -p "$replacement/state" "$replacement/data"
   replacement=$(cd "$replacement" && pwd -P)
   cat > "$home/data/secondmates.md" <<EOF
-- mate - replacement lane (host: remote-mac; root: $REMOTE_FIXTURE_ROOT; home: $replacement; scope: relay work; projects: firstmate; added 2026-08-03)
+- mate - replacement lane (host: remote-mac; root: $REMOTE_FIXTURE_ROOT; home: $replacement; scope: relay work; projects: nexus; added 2026-08-03)
 EOF
   fm_write_meta "$home/state/mate.meta" "kind=secondmate" "home=$replacement" \
     "remote_host=remote-mac" "remote_root=$REMOTE_FIXTURE_ROOT"
@@ -2942,7 +2942,7 @@ test_remote_collection_is_idempotent() {
 }
 
 # The two home flags answer different questions, so mixing them is refused rather
-# than resolved by argument order, and a staging path that is not a firstmate
+# than resolved by argument order, and a staging path that is not a nexus
 # home is refused rather than swallowing the result.
 test_stage_in_refuses_ambiguous_or_unusable_homes() {
   local home unrelated
@@ -2964,7 +2964,7 @@ test_stage_in_refuses_ambiguous_or_unusable_homes() {
     --relation rel-code --source-home secondmate:mate --work-id work-stage --generation 1 \
     --outcome report-ready --deliverable report_path=data/work-stage/report.md \
     --outcome-text 'Nowhere to be collected from.'
-  assert_contains "$EXPECT_OUT" "firstmate home" \
+  assert_contains "$EXPECT_OUT" "nexus home" \
     "the refusal must name what --stage-in has to point at"
   assert_absent "$unrelated/state/public-followup" \
     "a refused staging path must gain no outbox"
@@ -2977,7 +2977,7 @@ test_stage_in_refuses_ambiguous_or_unusable_homes() {
     --outcome-text 'Wrong home.'
   assert_absent "$unrelated/state/public-followup" \
     "an identity mismatch must gain no outbox"
-  pass "staging requires the matching secondmate firstmate home"
+  pass "staging requires the matching secondmate nexus home"
 }
 
 # The owning home must never quietly report "nothing waiting" when it simply
@@ -3150,7 +3150,7 @@ test_remote_brief_rejects_traversal_route_paths() {
   seed_repro_commitment "$home" pf-route-paths req-route-paths secondmate:mini-default work-paths
 
   cat > "$home/data/secondmates.md" <<EOF
-- mini-default - remote lane (host: remote-mac; root: $REMOTE_FIXTURE_ROOT/../remote-root; home: $remote; scope: relay work; projects: firstmate; added 2026-08-02)
+- mini-default - remote lane (host: remote-mac; root: $REMOTE_FIXTURE_ROOT/../remote-root; home: $remote; scope: relay work; projects: nexus; added 2026-08-02)
 EOF
   expect_failure "brief must reject a traversal component in the remote root" \
     run_pf "$home" brief pf-route-paths
@@ -3158,7 +3158,7 @@ EOF
     "a traversal route must use the route-record refusal"
 
   cat > "$home/data/secondmates.md" <<EOF
-- mini-default - remote lane (host: remote-mac; root: $REMOTE_FIXTURE_ROOT; home: //$remote; scope: relay work; projects: firstmate; added 2026-08-02)
+- mini-default - remote lane (host: remote-mac; root: $REMOTE_FIXTURE_ROOT; home: //$remote; scope: relay work; projects: nexus; added 2026-08-02)
 EOF
   expect_failure "brief must reject an empty component in the remote home" \
     run_pf "$home" brief pf-route-paths
@@ -3209,7 +3209,7 @@ seed_typed_commitment() {
       followup_expires_at:"2026-08-28T01:12:00Z",
       reservation_expires_at:"2026-08-28T01:12:00Z"}' > "$home/request.json"
   jq -n --arg t "$expected" --argjson k "$keys" \
-    '{type:$t, project:"firstmate", required_deliverables:$k, completion_policy:"all-required"}' \
+    '{type:$t, project:"nexus", required_deliverables:$k, completion_policy:"all-required"}' \
     > "$home/expected.json"
   jq -n --arg h "$work_home" --arg w "$work_id" \
     '{relation_id:"rel-code", work_ref:{home_id:$h, task_id:$w},

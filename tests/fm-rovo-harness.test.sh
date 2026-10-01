@@ -62,7 +62,7 @@ case "$*" in
   *"#{cursor_y}"*) fake_cursor_y; exit 0 ;;
 esac
 case "${1:-}" in
-  display-message) printf 'firstmate\n'; exit 0 ;;
+  display-message) printf 'nexus\n'; exit 0 ;;
   list-windows) exit 0 ;;
   has-session|new-session|new-window|kill-window) exit 0 ;;
   send-keys)
@@ -146,7 +146,7 @@ make_spawn_case() {
 ## Captain's intent
 Exercise Rovo dispatch.
 
-## Firstmate spec
+## Nexus spec
 Verify launch and delivery behavior.
 EOF
   printf 'rovo\n' > "$home/config/crew-harness"

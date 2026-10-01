@@ -299,7 +299,7 @@ test_build_refuses_malformed_payloads_before_touching_the_board() {
     "id": "sample-landed",
     "repo": "sample",
     "what": "Landed work",
-    "owner": "firstmate",
+    "owner": "nexus",
     "pr_url": "data:text/html,unsafe"
   }]' "$data" > "$data.tmp" && mv "$data.tmp" "$data"
   set +e; out=$(run_board "$home" build "$data" 2>&1); rc=$?; set -e

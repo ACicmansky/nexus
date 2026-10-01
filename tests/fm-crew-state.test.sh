@@ -1887,7 +1887,7 @@ EOF
   out=$(FM_HOME="$d" run_crew_state "$d" cancelled)
   assert_contains "$out" 'state: working' 'fixture begins with active validation'
   # Deliberately transition the external instrument fixture to cancelled.
-  # This executes Firstmate end to end; it does not cancel a real daemon run.
+  # This executes Nexus end to end; it does not cancel a real daemon run.
   FM_FAKE_AXI_STATUS="$(run_failed fm/cancelled)"
   FM_FAKE_AXI_STATUS=${FM_FAKE_AXI_STATUS//failed/cancelled}
   FM_FAKE_AXI_STATUS=${FM_FAKE_AXI_STATUS/status: completed/status: cancelled}
@@ -1903,7 +1903,7 @@ branch: fm/cancelled
 status: cancelled
 head: ${FM_FAKE_RUN_HEAD:0:8}
 head_sha: $FM_FAKE_RUN_HEAD
-pr: "https://github.com/kunchenguid/firstmate/pull/4818"
+pr: "https://github.com/ACicmansky/nexus/pull/4818"
 findings: 2 awaiting
 steps[9]{step,status,findings,duration_ms}:
 intent,completed,0,32

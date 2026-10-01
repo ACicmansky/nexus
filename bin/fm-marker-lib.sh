@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# fm-marker-lib.sh - compatibility entry point for from-firstmate routing.
+# fm-marker-lib.sh - compatibility entry point for from-nexus routing.
 #
 # bin/fm-operational-input.sh owns current operational-input construction,
-# parsing, marker bytes, and the established from-firstmate compatibility
+# parsing, marker bytes, and the established from-nexus compatibility
 # carrier. Existing callers source this path so they do not need a flag-day
 # migration. No side effects on source. set -u / set -e safe.
 

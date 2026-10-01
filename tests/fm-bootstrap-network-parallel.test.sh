@@ -365,9 +365,9 @@ test_remote_inheritance_failure_names_its_own_error_not_an_unchanged_item() {
   cat > "$home/data/captain-shared.md" <<'EOF'
 # Shared captain preferences
 
-This file is main-authoritative in the main firstmate home.
+This file is main-authoritative in the main nexus home.
 In secondmate homes it is read-only in secondmate homes.
-Route new captain-preference discoveries to the main firstmate through marked status or a document pointer.
+Route new captain-preference discoveries to the main nexus through marked status or a document pointer.
 EOF
 
   out=$(

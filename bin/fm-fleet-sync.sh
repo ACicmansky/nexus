@@ -17,7 +17,7 @@
 # than synced under a guessed posture.
 # A candidate under projects/ must be the root of its own work tree: git discovery
 # walks up, so a plain nested directory would otherwise resolve to the enclosing
-# repository (the firstmate checkout) and be synced under that directory's label.
+# repository (the nexus checkout) and be synced under that directory's label.
 # Anything else is reported as "skipped: not a clone root" naming the repository
 # that would have been touched.
 # Pruning never deletes the checked-out branch or a branch that still has a
@@ -309,8 +309,8 @@ sync_project() {
   fi
   # Git repository discovery walks UP from $PROJ, so a plain directory merely
   # nested inside a repository - a worktree container left under projects/, say -
-  # resolves to the ENCLOSING repository, which in a firstmate home is the
-  # firstmate checkout itself. Every later `git -C "$PROJ"` would then read, prune
+  # resolves to the ENCLOSING repository, which in a nexus home is the
+  # nexus checkout itself. Every later `git -C "$PROJ"` would then read, prune
   # and fast-forward that repository under this project's label, turning a routine
   # refresh into an unrequested self-update reported as a project sync. Require
   # $PROJ to be the root of its own work tree before any other git command runs.

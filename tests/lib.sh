@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# tests/lib.sh - shared primitives for firstmate behavior tests.
+# tests/lib.sh - shared primitives for nexus behavior tests.
 #
 # Source this from a test file:
 #   # shellcheck source=tests/lib.sh
@@ -14,7 +14,7 @@
 # that encode a single test's terminal or lifecycle assumptions still belong
 # with the tests that own them.
 #
-# ROOT is exported as the firstmate repo root (this file lives in tests/), so a
+# ROOT is exported as the nexus repo root (this file lives in tests/), so a
 # sourcing test can use "$ROOT/bin/..." without recomputing it.
 
 # Idempotent guard: behavior-area helper files (secondmate-helpers.sh,
@@ -26,7 +26,7 @@ if [ -n "${FM_TEST_LIB_SOURCED:-}" ]; then
 fi
 FM_TEST_LIB_SOURCED=1
 
-# Pin the fixture umask. Firstmate's state-root and process-event contracts
+# Pin the fixture umask. Nexus's state-root and process-event contracts
 # refuse group- or world-writable state directories, and a permissive ambient
 # umask (e.g. 0002) makes every `mkdir state` fixture fail that contract before
 # the behavior under test can even run. 022 is the conventional default this
@@ -38,11 +38,11 @@ umask 022
 # shellcheck source=tests/git-config-helpers.sh
 . "$(dirname "${BASH_SOURCE[0]}")/git-config-helpers.sh"
 
-# Exempt firstmate's own test suite from the gate-lifecycle refusal
+# Exempt nexus's own test suite from the gate-lifecycle refusal
 # (bin/fm-gate-refuse-lib.sh). The no-mistakes gate runs this suite FROM a gate
 # worktree - the exact environment that guard refuses - so without this every
 # test that drives the real fm-spawn/fm-send/fm-teardown would be refused during
-# firstmate's own validation. A confused gate agent never sources this helper, so
+# nexus's own validation. A confused gate agent never sources this helper, so
 # the boundary against the real hazard is unaffected. tests/fm-gate-refuse.test.sh
 # strips this to verify real refusal.
 export FM_GATE_REFUSE_BYPASS=1
@@ -256,7 +256,7 @@ trap 'fm_test_cleanup; exit 131' QUIT
 # prior run that was killed hard enough to skip the traps above (e.g. a
 # SIGKILL timeout). Only removes directories carrying the .fm-test-fixture
 # marker fm_test_tmproot writes, so it never touches unrelated fm-* tmp dirs
-# from real (non-test) firstmate commands. The marker identifies the owning
+# from real (non-test) nexus commands. The marker identifies the owning
 # shell across PID reuse, so the same live owner always wins over the age
 # fallback for dead or unowned roots.
 FM_TEST_ORPHAN_MAX_AGE_SECONDS=${FM_TEST_ORPHAN_MAX_AGE_SECONDS:-3600}
@@ -504,7 +504,7 @@ SH
 # Drops a claude stub that models the 2.1.257 outside-read gate instead of
 # answering like a generic exit-0 tool: it resolves its own cwd and every
 # --add-dir argument to real paths, then fails with "would prompt" unless each
-# required Firstmate channel path lies within one of them - the launch record
+# required Nexus channel path lies within one of them - the launch record
 # its own doorbell argument names, plus every path listed one per line in the
 # file FM_FAKE_CLAUDE_REQUIREMENTS names (absent file or unset var: doorbell
 # record only). Paths need not exist; a nonexistent leaf resolves through its
@@ -551,7 +551,7 @@ EOF2
   return 1
 }
 failures=
-record=$(printf '%s' "$last" | sed -n "s/.*: Firstmate operational input waiting: read '\([^']*\)'.*/\1/p")
+record=$(printf '%s' "$last" | sed -n "s/.*: Nexus operational input waiting: read '\([^']*\)'.*/\1/p")
 while IFS= read -r need; do
   [ -n "$need" ] || continue
   covered "$need" || failures="$failures$need
@@ -625,7 +625,7 @@ fm_git_init_commit() {
   git -C "$dir" init -q -b main
   printf '# %s\n' "$(basename "$dir")" > "$dir/README.md"
   git -C "$dir" add README.md
-  git -C "$dir" -c user.name='Firstmate Tests' -c user.email='tests@example.invalid' commit -qm initial
+  git -C "$dir" -c user.name='Nexus Tests' -c user.email='tests@example.invalid' commit -qm initial
 }
 
 # fm_git_add_origin <repo> <bare>: clone <repo> bare into <bare> and register it
@@ -661,12 +661,12 @@ fm_write_meta() {
 
 # fm_write_secondmate_meta <file> <home> [window] [projects] [harness]: write the
 # standard kind=secondmate meta block used across the secondmate suites. Window
-# defaults to firstmate:fm-<id>, projects defaults to alpha, and harness defaults
+# defaults to nexus:fm-<id>, projects defaults to alpha, and harness defaults
 # to echo to match the common case.
 fm_write_secondmate_meta() {
   local file=$1 home=$2 id window projects=${4:-alpha} harness=${5:-echo}
   id=$(basename "$file" .meta)
-  window=${3:-firstmate:fm-$id}
+  window=${3:-nexus:fm-$id}
   fm_write_meta "$file" \
     "window=$window" \
     "endpoint_task_id=$id" \

@@ -74,7 +74,7 @@ case $- in *u*) _fm_classify_nounset=on ;; *) _fm_classify_nounset=off ;; esac
 unset _fm_classify_nounset
 
 # Captain-relevant status verbs. A status line carrying any of these is work
-# firstmate must see. Lines without these verbs are no-verb signals: the watcher
+# nexus must see. Lines without these verbs are no-verb signals: the watcher
 # absorbs them only with positive provably-working evidence, while the daemon uses
 # its away-mode classification. FM_CAPTAIN_RE overrides the whole set when a home
 # needs a custom verb vocabulary; absent, this default applies.
@@ -92,13 +92,13 @@ unset _fm_classify_nounset
 # classification below.
 FM_CLASSIFY_CAPTAIN_RE_DEFAULT='done:|needs-decision:|blocked:|failed:|PR ready|checks green|ready in branch|merged'
 
-# The declared-wait verb. A crew (or firstmate steering it) appends
+# The declared-wait verb. A crew (or nexus steering it) appends
 #   paused: <reason>
 # to declare a known wait expected to clear on its own. The legacy "external
 # wait" name and "awaiting external" reason also cover the worker's own work;
 # they do not identify a separate classification or liveness source.
 # bin/fm-brief.sh owns worker-facing declaration and resolution instructions.
-# Unlike `blocked:` (stuck, firstmate must help), an idle `paused:` pane is EXPECTED, so
+# Unlike `blocked:` (stuck, nexus must help), an idle `paused:` pane is EXPECTED, so
 # the stale path bounds repeats instead of escalating a possible wedge; a live
 # idle worker can still surface a first-sight stale alert. It is
 # deliberately NOT in the captain-relevant set above: a pause is a "stop
@@ -357,7 +357,7 @@ status_is_paused_or_captain_held() {  # <status-line>
 
 # The status line that holds a crew in a declared wait, or nothing when it is in
 # none. Supervisors decide the wait from this line, never from the raw latest
-# event: a resolved line is also how firstmate answers a decision (fm-send
+# event: a resolved line is also how nexus answers a decision (fm-send
 # --resolve-key), and one that lands after a pause for a different phase key -
 # including the stated default key a keyless decision shares - does not end the
 # pause. Only a resolved line for the pause's own phase key (the keyed
@@ -572,7 +572,7 @@ status_event_recorded() {  # <status-file> <new-status-line>
 # captain-held backlog transfer referencing that key CLOSES it.
 # Ship/scout terminal declarations supersede stale log decisions; a secondmate's
 # terminal event may describe other work and cannot close an unrelated decision.
-# Who WRITES the closing line is owned elsewhere: the answering firstmate closes
+# Who WRITES the closing line is owned elsewhere: the answering nexus closes
 # at answer time through fm-send's --resolve-key (bin/fm-send.sh header), and a
 # worker self-closes only a blocker that cleared without an answer (bin/fm-brief.sh
 # rule 6), so closure never depends on a busy worker's discipline.
@@ -627,7 +627,7 @@ status_event_recorded() {  # <status-file> <new-status-line>
 # free-text word carrying an equals sign ("resolved x=1 [key=k]: ...") reduce to
 # a bare verb and impersonate a transition, which is the takeover the strict
 # parse and _fm_decision_key_transition_allowed exist to prevent. Recognising
-# only what a firstmate library actually writes costs one more line here each
+# only what a nexus library actually writes costs one more line here each
 # time a real new token shape is introduced, and that is the intended trade: a
 # new shape is a deliberate, reviewed edit rather than a silent widening. A line
 # whose token is malformed, wrong-length, or merely mentioned in prose keeps its
@@ -953,7 +953,7 @@ status_own_open_decisions() {  # <status-file>
 # Given a <run-id>, only a decision whose key is exactly `nm-<run-id>-<step>` for
 # a non-empty step counts - the key shape the brief mandates for a gate
 # escalation - so an unrelated question left open earlier in the same task is
-# never read as firstmate being told about THIS run's gate.
+# never read as nexus being told about THIS run's gate.
 status_has_open_needs_decision() {  # <status-file> [<run-id>]
   local run=${2-} open line key verb
   open=$(status_open_decisions "$1")
@@ -2566,7 +2566,7 @@ crew_gate_awaits_human_decision() {  # <id> -> <run-id> on stdout
 
 # Directories excluded from the worktree write probe below, and the depth it walks.
 # The excluded set is everything a supervisor read or a package manager can write
-# without the crew doing any work - .git first, so firstmate's own read-only git
+# without the crew doing any work - .git first, so nexus's own read-only git
 # commands against the worktree can never make the probe self-fulfilling - plus the
 # large generated trees that would make the walk expensive. Both are overridable so
 # a home with an unusual layout can widen or narrow the probe. The list is a skip
@@ -2606,7 +2606,7 @@ FM_WORKTREE_WRITE_TIMEOUT=${FM_WORKTREE_WRITE_TIMEOUT:-10}
 # evidence therefore always leaves the caller's existing escalation schedule
 # untouched, so a crew that writes nothing still escalates exactly as before.
 #
-# A kind=secondmate task records a provisioned firstmate home, not a code tree, and
+# A kind=secondmate task records a provisioned nexus home, not a code tree, and
 # such a home runs its OWN supervision inside it: its state/ directory churns a
 # watcher beacon, pane hashes, and heartbeats whether or not the mate is producing
 # anything, so a walk there would report liveness for a mate that has done nothing.

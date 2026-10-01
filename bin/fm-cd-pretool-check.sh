@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Stable PreToolUse transport for the cd-guard command policy.
 #
-# A stray persistent top-level `cd projects/<clone>` in the PRIMARY firstmate
-# shell silently relocates the shell, so a later firstmate-owned command (a
+# A stray persistent top-level `cd projects/<clone>` in the PRIMARY nexus
+# shell silently relocates the shell, so a later nexus-owned command (a
 # backlog write, an fm-* lifecycle call, tasks-axi) runs inside a project clone
 # instead of the home. This seatbelt denies such a command before it runs.
 # bin/fm-cd-command-policy.mjs is the sole owner of the block/allow decision; it
@@ -29,7 +29,7 @@
 #   DENY, --cursor - exit 0 and Cursor's own decision object on stdout. Cursor
 #          reads the returned object rather than the exit status.
 #   INERT - not the real primary checkout (a crewmate/scout task worktree or a
-#           non-firstmate repo): exit 0 with no output, exactly like ALLOW.
+#           non-nexus repo): exit 0 with no output, exactly like ALLOW.
 #   FAIL OPEN - malformed or empty stdin, missing jq for stdin transport,
 #               missing Node or policy owner, or an invalid policy response.
 #
@@ -51,8 +51,8 @@ Usage: fm-cd-pretool-check.sh [--command <cmd>] [--claude|--cursor]
 
 With no --command, reads a PreToolUse-style JSON payload on stdin (Grok
 toolInput.command, or Claude/Codex tool_input.command).
-Fires only in the real primary firstmate checkout; it is a silent no-op in a
-crewmate/scout task worktree or any non-firstmate repo.
+Fires only in the real primary nexus checkout; it is a silent no-op in a
+crewmate/scout task worktree or any non-nexus repo.
 Exits 0 to allow and 2 to deny a persistent top-level cwd change.
 The deny reason is written to stderr, with a Grok decision object on stdout
 unless --claude is supplied.
@@ -143,7 +143,7 @@ esac
 SCRIPT_DIR=$(CDPATH='' cd -- "$(dirname -- "${BASH_SOURCE[0]}")" 2>/dev/null && pwd -P) || exit 0
 FM_ROOT=${FM_ROOT_OVERRIDE:-$(CDPATH='' cd -- "$SCRIPT_DIR/.." 2>/dev/null && pwd -P)} || exit 0
 
-# Scope to a plain, non-worktree firstmate checkout, where git-dir equals
+# Scope to a plain, non-worktree nexus checkout, where git-dir equals
 # git-common-dir. A crewmate/scout task worktree - the shape bin/fm-spawn.sh
 # always hands out - is a linked git worktree where the two differ. This guard
 # does not inspect .fm-secondmate-home, so it applies in a git-cloned secondmate

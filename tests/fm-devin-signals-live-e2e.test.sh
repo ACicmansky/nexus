@@ -3,7 +3,7 @@
 # FM_DEVIN_MODEL chooses an account-listed model (default swe-2-medium).
 # Runs the real fm-spawn launch command in a private tmux server; only worktree
 # allocation and initial endpoint delivery use fixtures. All later steering,
-# interrupt and exit operations use the real Firstmate control plane.
+# interrupt and exit operations use the real Nexus control plane.
 # The isolated home carries a user Claude Code hook that must never fire, and
 # the worker's own commit must carry no Devin attribution.
 set -u
@@ -61,7 +61,7 @@ git -C "$WT" config user.email devin-live-guard@example.invalid
 jq -n --arg cmd "cat >> '$LAB/events.jsonl'; printf '\n' >> '$LAB/events.jsonl'" \
   '{hooks: {SessionStart: [{hooks: [{type: "command", command: $cmd}]}], PreToolUse: [{hooks: [{type: "command", command: $cmd}]}]}}' \
   > "$H/user-home/.config/devin/config.json"
-fm_test_spawn_brief "$H" "$ID" "Runtime verification only: compute 12345 plus 67890 using your shell tool and write only the result into answer.txt, then commit answer.txt with git using a commit message you write yourself. Also run '$ROOT/bin/fm-harness.sh' and write its output to harness.txt. Do no other work and do not delegate. Later read and acknowledge Firstmate's instruction inbox when the doorbell arrives."
+fm_test_spawn_brief "$H" "$ID" "Runtime verification only: compute 12345 plus 67890 using your shell tool and write only the result into answer.txt, then commit answer.txt with git using a commit message you write yourself. Also run '$ROOT/bin/fm-harness.sh' and write its output to harness.txt. Do no other work and do not delegate. Later read and acknowledge Nexus's instruction inbox when the doorbell arrives."
 fakebin=$(make_spawn_fakebin "$LAB/fake" claude)
 ln -s "$DEVIN_BIN" "$fakebin/devin"
 FM_FAKE_LAUNCH_LOG="$LAB/launch.sh" fm_test_run_spawn "$H" "$WT" "$fakebin" "$ID" "$PROJ" \
@@ -72,8 +72,8 @@ printf '#!/bin/sh\nexec "%s" -S "%s" "$@"\n' "$REAL_TMUX" "$SOCKET" > "$LAB/bin/
 chmod +x "$LAB/bin/tmux"
 export PATH="$LAB/bin:$PATH" FM_HOME="$H"
 unset FM_ROOT_OVERRIDE FM_STATE_OVERRIDE FM_DATA_OVERRIDE FM_CONFIG_OVERRIDE FM_PROJECTS_OVERRIDE
-TARGET="firstmate:fm-$ID"
-"$REAL_TMUX" -S "$SOCKET" new-session -d -s firstmate -n "fm-$ID" -x 120 -y 40 -c "$WT" \
+TARGET="nexus:fm-$ID"
+"$REAL_TMUX" -S "$SOCKET" new-session -d -s nexus -n "fm-$ID" -x 120 -y 40 -c "$WT" \
   "HOME='$H/user-home' /bin/sh '$LAB/launch.sh'; exec /bin/bash --noprofile --norc" || fail 'could not start pane'
 capture() { "$REAL_TMUX" -S "$SOCKET" capture-pane -p -e -t "$TARGET"; }
 screen_text() { "$REAL_TMUX" -S "$SOCKET" capture-pane -p -t "$TARGET"; }

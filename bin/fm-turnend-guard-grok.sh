@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Grok Stop-hook adapter for the firstmate PRIMARY turn-end guard.
+# Grok Stop-hook adapter for the nexus PRIMARY turn-end guard.
 #
 # The exact running Stop payload selects one path. A typed native capability
 # field delegates the shared guard's exit status and stderr directly back to

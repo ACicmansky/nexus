@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Execute one tracked Firstmate command in a configured remote secondmate home.
+# Execute one tracked Nexus command in a configured remote secondmate home.
 #
 # Usage:
 #   fm-on.sh [--stdin] <secondmate-id|unambiguous-ssh-alias> <fm-command> [args...]
 #
 # Routes come only from remote records in data/secondmates.md. A record names an
-# SSH config alias, remote Firstmate code root, and remote FM_HOME. A host alias
+# SSH config alias, remote Nexus code root, and remote FM_HOME. A host alias
 # may be used directly only when exactly one record selects it; an ambiguous
 # alias is refused. The command must be a genuine executable in this checkout's
 # bin/fm-*.sh namespace. No per-command table exists.
@@ -69,9 +69,9 @@ esac
 case "$COMMAND" in */*|*..*) die "remote command must not contain a path or traversal: $COMMAND" ;; esac
 LOCAL_COMMAND="$FM_ROOT/bin/$COMMAND"
 [ -f "$LOCAL_COMMAND" ] && [ ! -L "$LOCAL_COMMAND" ] && [ -x "$LOCAL_COMMAND" ] \
-  || die "remote command is not a genuine tracked executable in this Firstmate checkout: $COMMAND"
+  || die "remote command is not a genuine tracked executable in this Nexus checkout: $COMMAND"
 git -C "$FM_ROOT" ls-files --error-unmatch "bin/$COMMAND" >/dev/null 2>&1 \
-  || die "remote command is not tracked by this Firstmate checkout: $COMMAND"
+  || die "remote command is not tracked by this Nexus checkout: $COMMAND"
 [ -f "$REG" ] && [ ! -L "$REG" ] || die "no safe secondmate registry at $REG"
 
 MATCHES=0

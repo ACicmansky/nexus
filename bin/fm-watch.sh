@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Firstmate watcher.
+# Nexus watcher.
 # Classifies supervision wakes in bash. In normal mode it absorbs benign wakes
 # and keeps blocking; it queues and exits only for actionable wakes.
 # The no-verb signal and stale path is absorb-only-on-positive-evidence: a wake
@@ -25,7 +25,7 @@
 #                          timer) regardless of what the status log says - an active
 #                          run-step or busy pane outranks even a captain-relevant log
 #                          line, since the crew's own log gets no new entry once
-#                          firstmate hands it to a no-mistakes validation. A declared
+#                          nexus hands it to a no-mistakes validation. A declared
 #                          external-wait pause or verified captain-held transfer is
 #                          absorbed instead with its own long re-surface cadence,
 #                          never as a wedge, and that recheck reason names which
@@ -76,12 +76,12 @@
 #                          agent, for human inspection only - never an automatic
 #                          interrupt, signal, or restart of the worker or its
 #                          tool process.
-#   stale: <window> (unread firstmate instruction: ...)
+#   stale: <window> (unread nexus instruction: ...)
 #                          the steering-inbox ladder spent its delivery-attempt
 #                          budget on an idle pane without an acknowledgement
 #   stale: <window> (steering-inbox ladder bookkeeping unwritable: ...)
 #                          an unhandled record's ladder cannot advance; quiet
-#                          successful attempts never wake firstmate
+#                          successful attempts never wake nexus
 #                          (bin/fm-task-inbox-lib.sh owns the ladder policy)
 #   check: <script>: <out> authenticated check output, always actionable
 #   check: process-event result captured: <keys>
@@ -310,7 +310,7 @@ TURNEND_CHURN_ABSORB_SECS=${FM_TURNEND_CHURN_ABSORB_SECS:-900}  # longest a task
 # remaining rendered-text fallback (Grok only).
 # Always-on wake triage: most wakes during a long crew validation are benign (a
 # working: note or turn-end while a pipeline runs, a no-change heartbeat). Rather
-# than wake firstmate's LLM for each, this watcher classifies every wake in bash
+# than wake nexus's LLM for each, this watcher classifies every wake in bash
 # and ABSORBS the benign majority - it advances the suppression marker, logs to a
 # debug log, and keeps blocking WITHOUT enqueuing or exiting. The no-verb signal
 # / stale path is absorb-only-on-positive-evidence. The shared proof is an actively
@@ -503,7 +503,7 @@ window_key() {  # <window>
 
 inbox_steer_escalate_unavailable() {  # <window> <task> <record>
   local w=$1 task=$2 rec=$3 reason
-  reason="stale: $w (unread firstmate instruction: $rec is unhandled and the worker's agent has exited or its endpoint is missing, so the doorbell was not typed; recover the worker)"
+  reason="stale: $w (unread nexus instruction: $rec is unhandled and the worker's agent has exited or its endpoint is missing, so the doorbell was not typed; recover the worker)"
   if [ ! -d "${rec%/*}" ] || [ ! -f "$rec" ]; then
     fm_task_inbox_due_action "$STATE" "$task" >/dev/null || true
     return 0
@@ -599,7 +599,7 @@ inbox_steer_check() {  # <window> <task>
       triage_log "steer-inbox retry ring: $task ${rec##*/} result=$ring_rc"
       ;;
     escalate)
-      reason="stale: $w (unread firstmate instruction: $rec still unhandled after $count doorbell delivery attempts with an idle pane; inspect the worker)"
+      reason="stale: $w (unread nexus instruction: $rec still unhandled after $count doorbell delivery attempts with an idle pane; inspect the worker)"
       if [ ! -d "${rec%/*}" ] || [ ! -f "$rec" ]; then
         fm_task_inbox_due_action "$STATE" "$task" >/dev/null || true
         return 0
@@ -911,7 +911,7 @@ secondmate_idle_ring_safe() {  # <window>
 }
 
 # Write one fire-and-forget drain steer and ring the child's doorbell. The
-# steer carries the same from-firstmate fire-and-forget carrier fm-send uses
+# steer carries the same from-nexus fire-and-forget carrier fm-send uses
 # for a secondmate (marker, then delivery=<16-hex-id>, then the text), so the
 # mate reads it as a parent request that expects no reply, never as captain
 # intervention. The worker's ordinary wake-handling turn drains its own home's
@@ -1206,7 +1206,7 @@ wedge_defer_writing() {  # <window> <since-file> <triage-label> <idle-age>
 #   <kind>       what the evidence IS, as the recheck names it.
 #   <subject>    WHO the wait is on, in the recheck's own words.
 #   <whom>       `captain` when that subject is the captain, `supervisor` when
-#                it is firstmate itself, `external` otherwise; this is what
+#                it is nexus itself, `external` otherwise; this is what
 #                applies the away-posture rule below, which only `captain` takes.
 #   <action>     the one thing that clears the lane.
 #   <age-record> the file whose mtime is when this wait started, or EMPTY when
@@ -1265,11 +1265,11 @@ wait_record() {  # <kind> <subject> <whom> <action> <age-record>
 # must still hold an open `needs-decision` record whose key is `nm-<run>-<step>`
 # for the run that verdict reports. The gate's table alone says only that the
 # answer is owed by a human; the open decision bound to that run is the positive
-# evidence that firstmate was actually told about THIS gate and has not answered
+# evidence that nexus was actually told about THIS gate and has not answered
 # yet, which is what makes the lane's quiet a wait rather than a suspected wedge.
 # An open decision under any other key - an unrelated question never closed - is
 # not that evidence, and neither is a verdict that names no run. The wait is owed
-# by firstmate, not the captain: ask-user findings are routed to firstmate, which
+# by nexus, not the captain: ask-user findings are routed to nexus, which
 # decides most of them itself, and one it escalates becomes a captain-held
 # transfer that the first record above already catches. So the away-posture
 # silence does not apply to it: under away posture the supervision branch is the
@@ -1318,7 +1318,7 @@ wedge_wait_evidence() {  # <task> -> one wait_record on stdout
   if status_has_open_needs_decision "$statusf" \
     && run=$(crew_gate_awaits_human_decision "$task") \
     && status_has_open_needs_decision "$statusf" "$run"; then
-    wait_record 'verified wait at a parked gate' "awaiting firstmate's ask-user decision" \
+    wait_record 'verified wait at a parked gate' "awaiting nexus's ask-user decision" \
       supervisor "decide the gate's ask-user finding and relay the decision to the crewmate" ''
     return 0
   fi
@@ -1788,7 +1788,7 @@ pause_state_class() {  # <window> <task>
 #
 # status_is_paused_or_captain_held reads the status LINE a worker wrote, which is
 # the only record when the worker itself is waiting. It is not the only record
-# there is: once firstmate hands work to the captain, the wait is written into the
+# there is: once nexus hands work to the captain, the wait is written into the
 # BACKLOG by bin/fm-captain-hold.sh, and the worker's last line stays whatever it
 # was - routinely `done` after a PR delivery, which no line predicate can
 # read as a wait. An alarm bounded only by the line therefore re-fires for the
@@ -1881,7 +1881,7 @@ captain_call_stale_bound() {  # <window-key> <task>
   stale_wait_throttled "$key" "$STALE_WAIT_DECLARATION"
 }
 
-# Surface a stale pane no classifier could resolve, so firstmate inspects it: it
+# Surface a stale pane no classifier could resolve, so nexus inspects it: it
 # may have finished through an interactive menu that wrote no status, be waiting on
 # a decision, or be wedged. pause_state_class deliberately answers `none` for a
 # still-LIVE agent even under a declared wait, so a worker genuinely waiting on a
@@ -1892,13 +1892,13 @@ captain_call_stale_bound() {  # <window-key> <task>
 # cadence resurface_absorbed owns for the absorbed paths, throttled by this
 # window's own .paused-resurfaced-<key> marker: an idle parked pane still churns
 # its hash (a clock, a token counter), and each new hash re-enters this path, so
-# without that bound one wait re-alarms firstmate for its whole duration.
+# without that bound one wait re-alarms nexus for its whole duration.
 # The FIRST sight still wakes, keeping the inspect-an-inconclusive-state intent,
 # and the throttle is read BEFORE anything is queued and advanced only by a wake
 # that really fires - a throttle written by the wake it should have prevented, or
 # read after that wake was already appended, bounds nothing.
 # Both records of an ordinary crew wait bound it (see task_captain_call_open
-# above): the status line the worker declared, and the backlog hold firstmate
+# above): the status line the worker declared, and the backlog hold nexus
 # recorded once the captain took the work in hand.
 surface_nonterminal_stale() {  # <window> <hash>
   local win=$1 h=$2 key task last declared=1 bounded=1 throttled=1 until now
@@ -2012,12 +2012,12 @@ scan_signals() {
   return 0
 }
 
-# Deliver a durably queued process-event result to firstmate. Publication is
+# Deliver a durably queued process-event result to nexus. Publication is
 # owned by bin/fm-procevent.sh - by the runner at capture time and by reconcile's
 # re-announcement - so this decides only whether a queued check record has been
 # surfaced yet, then reports it through the same actionable exit every other wake
 # uses. Without it a captured result sits on the queue until something else
-# happens to wake firstmate, which is exactly the missed delivery this repairs.
+# happens to wake nexus, which is exactly the missed delivery this repairs.
 # Dedup uses the same .seen-* discipline as scan_signals: the durable record is
 # always written before its marker, so nothing is suppressed before it is queued,
 # and re-announcement, drain-time deduplication, and the handled acknowledgement
@@ -2251,12 +2251,12 @@ EOF
 
 # Cheap heartbeat fleet-scan (the always-on twin of the daemon's catch-all). 0 if
 # any status log carries a captain-relevant event past the position already
-# surfaced to firstmate (.hb-surfaced-<task>). It walks every log rather than only
+# surfaced to nexus (.hb-surfaced-<task>). It walks every log rather than only
 # those whose LAST line looks captain-relevant, because the event this backstop
 # most needs to catch is precisely one a later routine append has already moved
 # past. Pure detect, no side effects: the caller enqueues first, then marks
 # surfaced. Because every captain-relevant signal/stale already marks itself
-# surfaced when it wakes firstmate, this normally finds nothing and the heartbeat
+# surfaced when it wakes nexus, this normally finds nothing and the heartbeat
 # is absorbed; it surfaces only an event the per-wake path absorbed by mistake -
 # the fail-safe backstop.
 heartbeat_scan_finds_actionable() {
@@ -2380,7 +2380,7 @@ fi
 # is invisible - every cycle would exit early, no source would ever start, and
 # the whole home would sit disarmed while presenting as supervised. A watcher
 # that refuses to arm is loud through an existing, independent, proven path:
-# the liveness guard's WATCHER DOWN banner in firstmate's own session. The
+# the liveness guard's WATCHER DOWN banner in nexus's own session. The
 # message shape is reconcile's own, so the operator reads one refusal in both
 # places. The refusal goes to stdout because bin/fm-watch-arm.sh relays the
 # child's stdout and recognises `watcher: FAILED` as the typed failure line.
@@ -2721,7 +2721,7 @@ while :; do
 
   # The existing poll loop also owns the bounded inactive-outcome cadence.
   # This is mechanical and silent unless a durable terminal-outcome obligation
-  # was created, so quiet cycles never wake firstmate or consume model tokens.
+  # was created, so quiet cycles never wake nexus or consume model tokens.
   inactive_out=
   if inactive_out=$(FM_HOME="$FM_HOME" FM_STATE_OVERRIDE="$STATE" \
     "$SCRIPT_DIR/fm-inactive-reconcile.sh" scan 2>/dev/null); then
@@ -2732,7 +2732,7 @@ while :; do
     triage_log "inactive-outcome reconciliation unavailable"
   fi
 
-  # Slow per-task checks (firstmate writes these, e.g. a merged-PR poll).
+  # Slow per-task checks (nexus writes these, e.g. a merged-PR poll).
   # Time-based via .last-check mtime so the cadence survives watcher restarts.
   # Evaluated BEFORE the signal scan: wake() exits the cycle, so a check placed
   # after the signal scan would be starved whenever a chatty sibling crewmate
@@ -2870,7 +2870,7 @@ EOF
   # On the first changed signal, linger one grace period and re-scan before
   # classifying: a crewmate's final status write and the same turn's turn-end
   # hook land seconds apart, and reporting them as separate actionable wakes
-  # costs a full firstmate turn each. The re-scan also picks up a newer
+  # costs a full nexus turn each. The re-scan also picks up a newer
   # signature for an already-pending file (last write wins below).
   pending=$(scan_signals)
   if [ -n "$pending" ]; then
@@ -3038,7 +3038,7 @@ EOF
       echo "$n" > "$cf"
       if [ "$n" -ge 2 ] && [ "$busy_now" -ne 0 ]; then
         # The pane is idle/stale at hash $h. Triage decides whether this wakes
-        # firstmate. Detection itself is unchanged from above.
+        # nexus. Detection itself is unchanged from above.
         if [ "$kind" = secondmate ]; then
           case "$(pause_state_class "$w" "$task")" in
             paused) handle_paused_stale "$w" "$task" "$h" ;;
@@ -3059,7 +3059,7 @@ EOF
         elif stale_is_terminal "$w" "$STATE"; then
           # The log's latest status event is captain-relevant - but that alone is not
           # proof the crew is actually done: a crew's own status log gets no
-          # new entry once firstmate hands it to a no-mistakes validation
+          # new entry once nexus hands it to a no-mistakes validation
           # (AGENTS.md's sparse status-reporting contract), so the log can
           # keep showing a "done:"/needs-decision/blocked leftover from
           # BEFORE that validation started for the run's entire (possibly
@@ -3125,7 +3125,7 @@ EOF
           #     liveness evidence each kind of crew must supply), so absorb on the long
           #     PAUSE_RESURFACE_SECS cadence instead of wedge-escalating;
           #   - none: no running pipeline, no exact busy verdict, no admitted declared wait.
-          #     Surface immediately so firstmate inspects the inconclusive state
+          #     Surface immediately so nexus inspects the inconclusive state
           #     (it may be done via an interactive menu that wrote no done: status,
           #     waiting on a decision, or wedged) instead of leaving the finish to
           #     wait out the timer.
@@ -3236,7 +3236,7 @@ EOF
       # Backstop: a captain-relevant event the per-wake path absorbed by mistake.
       # Enqueue first, then record every status log surfaced through its end so the
       # next heartbeat does not re-fire it (enqueue-before-suppress preserved);
-      # this wake sends firstmate to the whole fleet, so every log is read.
+      # this wake sends nexus to the whole fleet, so every log is read.
       fm_wake_append heartbeat heartbeat heartbeat || exit 1
       touch "$STATE/.last-heartbeat"
       mark_all_captain_relevant_surfaced || true

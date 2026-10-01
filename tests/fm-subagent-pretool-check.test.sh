@@ -179,7 +179,7 @@ test_escape_hatch_allows_deliberate_use() {
   pass "the single documented escape hatch releases the guard only on the exact opt-in value"
 }
 
-test_task_worktree_and_non_firstmate_repo_are_inert() {
+test_task_worktree_and_non_nexus_repo_are_inert() {
   local child="$TMP_ROOT/child" plain="$TMP_ROOT/plain" rc=0
   git -C "$PRIMARY" config user.name fixture
   git -C "$PRIMARY" config user.email fixture@example.test
@@ -201,8 +201,8 @@ test_task_worktree_and_non_firstmate_repo_are_inert() {
   rc=0
   FM_ROOT_OVERRIDE="$plain" FM_HOME="$plain" FM_STATE_OVERRIDE="$plain/state" \
     "$CHECK" --claude --tool Agent > "$OUT" 2> "$ERR" || rc=$?
-  [ "$rc" -eq 0 ] || fail "a non-firstmate repo must be out of scope, got exit $rc"
-  pass "the guard is inert in a crewmate task worktree and in a non-firstmate repo"
+  [ "$rc" -eq 0 ] || fail "a non-nexus repo must be out of scope, got exit $rc"
+  pass "the guard is inert in a crewmate task worktree and in a non-nexus repo"
 }
 
 test_secondmate_home_is_in_scope() {
@@ -284,7 +284,7 @@ test_plan_only_exclusion_is_exact_name
 test_guard_never_classifies_mcp_tools
 test_deny_message_defers_to_intake_classification
 test_escape_hatch_allows_deliberate_use
-test_task_worktree_and_non_firstmate_repo_are_inert
+test_task_worktree_and_non_nexus_repo_are_inert
 test_secondmate_home_is_in_scope
 test_stdin_transports_and_output_shapes
 test_malformed_transport_fails_open

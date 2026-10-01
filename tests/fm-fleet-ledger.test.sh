@@ -20,7 +20,7 @@ case "$*" in
   *"#{pane_current_path}"*) printf '%s\n' "${FM_FAKE_PANE_PATH:-}"; exit 0 ;;
 esac
 case "${1:-}" in
-  display-message) printf 'firstmate\n' ;;
+  display-message) printf 'nexus\n' ;;
 esac
 exit 0
 SH
@@ -47,7 +47,7 @@ make_case() {  # <name> <on|off>
 ## Captain's intent
 Exercise the fleet ledger for $TASK.
 
-## Firstmate spec
+## Nexus spec
 Nothing to build.
 EOF
   FAKEBIN=$(make_fakebin "$dir")
@@ -80,7 +80,7 @@ run_lifecycle() {
   printf ' finished\ndone: ready in branch\n' >> "$HOME_DIR/state/$TASK.status"
   printf 'landed\n' > "$WT_DIR/landed.txt"
   git -C "$WT_DIR" add landed.txt
-  git -C "$WT_DIR" -c user.name='Firstmate Tests' -c user.email='tests@example.invalid' \
+  git -C "$WT_DIR" -c user.name='Nexus Tests' -c user.email='tests@example.invalid' \
     commit -qm 'landed'
   out=$(in_home "$ROOT/bin/fm-merge-local.sh" "$TASK" 2>&1) || fail "local merge failed: $out"
   out=$(in_home "$ROOT/bin/fm-teardown.sh" "$TASK" 2>&1) || fail "teardown failed: $out"
@@ -180,7 +180,7 @@ worker_status_command() {  # <state> <note> [<state-dir> [<config-dir>]]
 }
 
 # Run a filled status command as a worker would: a plain shell with no
-# firstmate environment.
+# nexus environment.
 run_worker_command() {  # <command>
   env -i PATH="$PATH" HOME="$HOME_DIR/user-home" bash -c "$1"
 }

@@ -69,9 +69,9 @@ await handlers.get("before_agent_start")({}, ctx);
 await handlers.get("tool_call")({ type: "tool_call", toolName: "bash", input: { command: "printf test" } });
 await handlers.get("agent_settled")({}, ctx);
 const operational = await import(`${new URL("./lib/fm-operational-input.ts", pathToFileURL(process.env.EXT)).href}?windows=${Date.now()}`);
-operational.classifyFirstmateOperationalText("probe");
+operational.classifyNexusOperationalText("probe");
 let asyncInvocation;
-const encoded = await operational.encodeFirstmateOperationalInputWith(
+const encoded = await operational.encodeNexusOperationalInputWith(
   (command, args, { input }) => {
     asyncInvocation = { command, args: [...args], input };
     return new Promise((resolve, reject) => {

@@ -34,7 +34,7 @@
 # runner: every byte autohandle applies lands in the parent's state/<id>.status
 # stream, whose ordinary signal-scan announcement is durable, so a fully
 # autohandled capture needs - and gets - no `check` wake of its own. One remote
-# note therefore produces exactly one firstmate wake, through the same signal
+# note therefore produces exactly one nexus wake, through the same signal
 # classification a local secondmate's own status append gets, and a replayed
 # capture whose source lines are already recorded adds no bytes and stays
 # completely quiet. Only a capture autohandle could NOT

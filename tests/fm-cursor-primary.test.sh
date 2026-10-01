@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Behavior tests for Cursor Agent CLI as a firstmate PRIMARY
+# Behavior tests for Cursor Agent CLI as a nexus PRIMARY
 # (docs/turnend-guard.md, docs/sessionstart-nudge.md,
 # docs/supervision-protocols/cursor.md).
 #
@@ -728,7 +728,7 @@ install_digest_fixture() {  # <dir>
   cat > "$1/bin/fm-session-start.sh" <<'SH'
 #!/usr/bin/env bash
 printf '%s\n' "$*" >> "$FM_HOME/state/digest-args"
-printf 'FIRSTMATE DIGEST "quoted" line\nsecond line\n'
+printf 'NEXUS DIGEST "quoted" line\nsecond line\n'
 SH
   chmod +x "$1/bin/fm-session-start.sh"
 }
@@ -739,7 +739,7 @@ test_sessionstart_emits_additional_context() {
   install_digest_fixture "$dir"
   out=$(run_session "$dir" sessionStart startup)
   ctx=$(printf '%s' "$out" | jq -r '.additional_context // empty' 2>/dev/null)
-  case "$ctx" in *'FIRSTMATE DIGEST "quoted" line'*) ;; *) fail "the digest must reach model context verbatim, got: $out" ;; esac
+  case "$ctx" in *'NEXUS DIGEST "quoted" line'*) ;; *) fail "the digest must reach model context verbatim, got: $out" ;; esac
   case "$ctx" in *'second line'*) ;; *) fail "the digest was truncated at the first line: $ctx" ;; esac
   grep -q -- '--source startup' "$dir/state/digest-args" \
     || fail "the adapter must supply --source itself; Cursor's payload has no source field"
@@ -766,7 +766,7 @@ test_sessionstart_silent_in_child_worktree() {
 test_tracked_registration_covers_the_primary_events() {
   local reg
   reg="$ROOT/.cursor/hooks.json"
-  [ -f "$reg" ] || fail "firstmate must ship a tracked project-scope .cursor/hooks.json"
+  [ -f "$reg" ] || fail "nexus must ship a tracked project-scope .cursor/hooks.json"
   jq -e '.hooks.stop and .hooks.sessionStart and .hooks.preToolUse' "$reg" >/dev/null 2>&1 \
     || fail "the registration must cover stop, sessionStart, and preToolUse"
   jq -e '.hooks | has("preCompact") | not' "$reg" >/dev/null 2>&1 \
@@ -779,7 +779,7 @@ test_tracked_registration_covers_the_primary_events() {
 }
 
 # The two bounds must nest, and the only honest way to prove it is to run the
-# adapter at Cursor's own registered limit with its DEFAULT ceiling: firstmate's
+# adapter at Cursor's own registered limit with its DEFAULT ceiling: nexus's
 # bound must already have stopped the loop by then, so Cursor's hard ceiling is
 # never what silently ends supervision.
 test_default_ceiling_bites_before_the_registered_loop_limit() {
@@ -792,7 +792,7 @@ test_default_ceiling_bites_before_the_registered_loop_limit() {
   out=$(run_park "$dir" "$((limit - 1))")
   [ -z "$out" ] || fail "at Cursor's own limit the adapter must already be quiet from its own bound, got: $out"
   [ ! -e "$dir/state/arm-ran" ] || fail "the adapter armed past its own default ceiling"
-  pass "cursor bounds nest: firstmate's default ceiling stops the loop before Cursor's loop_limit does"
+  pass "cursor bounds nest: nexus's default ceiling stops the loop before Cursor's loop_limit does"
 }
 
 test_turnend_guard_stands_down_on_cursor_payload

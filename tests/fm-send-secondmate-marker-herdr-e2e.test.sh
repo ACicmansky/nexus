@@ -163,7 +163,7 @@ GOT=$(jq -r --arg needle "$REQUEST" 'select(.prompt | contains($needle)) | .prom
 [ "$GOT" = "${FM_FROMFIRST_MARK}${REQUEST}" ] \
   || fail "real Pi exact-id prompt did not contain exactly one terminal-safe marker"$'\n'"--- bytes ---"$'\n'"$(printf '%s' "$GOT" | od -An -tx1)"
 printf 'evidence: exact-id received-hex=%s\n' "$(printf '%s' "$GOT" | od -An -tx1 | tr -d ' \n')"
-pass "real Pi/Herdr: exact-id FM_HOME send delivers exactly one from-firstmate marker"
+pass "real Pi/Herdr: exact-id FM_HOME send delivers exactly one from-nexus marker"
 wait_for_idle || fail "real Pi did not become idle after the exact-id capture"
 
 # Direct terminal input bypasses fm-send's metadata-routed transformation and
@@ -173,8 +173,8 @@ wait_for_idle || fail "real Pi did not become idle after the exact-id capture"
 wait_for_prompt "$DIRECT" || fail "real Pi did not receive direct terminal input"
 GOT=$(jq -r --arg needle "$DIRECT" 'select(.prompt | contains($needle)) | .prompt' "$CAPTURE" | tail -1)
 [ "$GOT" = "$DIRECT" ] || fail "direct captain input was changed or marked"$'\n'"--- bytes ---"$'\n'"$(printf '%s' "$GOT" | od -An -tx1)"
-if fm_message_from_firstmate "$GOT"; then
-  fail "direct captain input was classified as from-firstmate"
+if fm_message_from_nexus "$GOT"; then
+  fail "direct captain input was classified as from-nexus"
 fi
 printf 'evidence: direct-input received-hex=%s\n' "$(printf '%s' "$GOT" | od -An -tx1 | tr -d ' \n')"
 pass "real Pi/Herdr: direct captain terminal input stays unmarked"

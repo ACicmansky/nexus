@@ -32,7 +32,7 @@ FM_TEST_CLEANUP_DIRS+=("$TMP_ROOT")
 trap fm_test_cleanup EXIT
 
 # new_world <name>: an FM_HOME plus a fake code root whose bin/ is a real
-# firstmate bin/ except for fm-bootstrap.sh, which is replaced by a scriptable
+# nexus bin/ except for fm-bootstrap.sh, which is replaced by a scriptable
 # stand-in. The stage's contract is about WHEN and WHETHER the network half runs
 # and how its result is published; bin/fm-bootstrap.sh's own behavior is owned by
 # tests/fm-bootstrap.test.sh, so pinning it here would duplicate that owner and

@@ -377,9 +377,9 @@ test_home_seed_does_not_return_unsafe_acquired_home() {
 
   if PATH="$fakebin:$PATH" FM_HOME="$home" FM_FAKE_TREEHOUSE_HOME="$home" FM_FAKE_TMUX_LOG="$log" \
     "$ROOT/bin/fm-home-seed.sh" dash - alpha >/dev/null 2>"$err"; then
-    fail "seed accepted an acquired home matching the active firstmate home"
+    fail "seed accepted an acquired home matching the active nexus home"
   fi
-  grep -F 'secondmate home cannot be the active firstmate home' "$err" >/dev/null \
+  grep -F 'secondmate home cannot be the active nexus home' "$err" >/dev/null \
     || fail "seed did not explain active acquired-home rejection"
   grep -F "treehouse return --force" "$log" >/dev/null \
     && fail "seed returned an unsafe acquired active home through treehouse"
@@ -388,9 +388,9 @@ test_home_seed_does_not_return_unsafe_acquired_home() {
   : > "$log"
   if PATH="$fakebin:$PATH" FM_HOME="$home" FM_FAKE_TREEHOUSE_HOME="$descendant" FM_FAKE_TMUX_LOG="$log" \
     "$ROOT/bin/fm-home-seed.sh" dash - alpha >/dev/null 2>"$err"; then
-    fail "seed accepted an acquired home inside the active firstmate home"
+    fail "seed accepted an acquired home inside the active nexus home"
   fi
-  grep -F 'secondmate home cannot be inside the active firstmate home' "$err" >/dev/null \
+  grep -F 'secondmate home cannot be inside the active nexus home' "$err" >/dev/null \
     || fail "seed did not explain active descendant acquired-home rejection"
   grep -F "treehouse return --force" "$log" >/dev/null \
     && fail "seed returned an unsafe acquired active descendant through treehouse"
@@ -503,7 +503,7 @@ test_home_seed_refuses_empty_charter_fields() {
 }
 
 test_home_seed_no_projects_end_to_end() {
-  # A domain whose subject is the firstmate repo itself needs no project clones:
+  # A domain whose subject is the nexus repo itself needs no project clones:
   # the deliberate --no-projects signal scaffolds, seeds, registers, and spawns a
   # project-less home end to end with no placeholder clone.
   local home sub sub_abs fakebin log meta proj_val out
@@ -513,16 +513,16 @@ test_home_seed_no_projects_end_to_end() {
   fakebin=$(make_fake_tmux "$TMP_ROOT/no-projects-fake")
   log="$TMP_ROOT/no-projects-fake/tmux.log"
 
-  out=$(FM_HOME="$home" FM_SECONDMATE_CHARTER='firstmate self-development' \
-    FM_SECONDMATE_SCOPE='firstmate repo work' \
+  out=$(FM_HOME="$home" FM_SECONDMATE_CHARTER='nexus self-development' \
+    FM_SECONDMATE_SCOPE='nexus repo work' \
     "$ROOT/bin/fm-home-seed.sh" fdev "$sub" --no-projects) \
     || fail "project-less seed failed"
   sub_abs=$(cd "$sub" && pwd -P)
   printf '%s\n' "$out" | grep -F "home=$sub_abs" >/dev/null || fail "seed did not report the project-less subhome"
 
   # Registered with an empty projects field, marked, charter copied, no clones.
-  assert_grep '- fdev - firstmate self-development' "$home/data/secondmates.md" "project-less registry line missing"
-  assert_grep 'scope: firstmate repo work' "$home/data/secondmates.md" "project-less registry scope missing"
+  assert_grep '- fdev - nexus self-development' "$home/data/secondmates.md" "project-less registry line missing"
+  assert_grep 'scope: nexus repo work' "$home/data/secondmates.md" "project-less registry scope missing"
   assert_grep 'projects: ;' "$home/data/secondmates.md" "project-less registry did not render an empty projects field"
   [ "$(cat "$sub/.fm-secondmate-home")" = fdev ] || fail "project-less seed did not mark the subhome"
   assert_present "$sub/data/charter.md" "project-less seed did not copy the charter"
@@ -552,7 +552,7 @@ test_secondmate_spawn_resolves_punctuated_registry_projects() {
   mkdir -p "$sub/data" "$sub/state" "$sub/config" "$sub/projects"
   printf '%s\n' 'projects/' 'state/' 'data/' 'config/' '.no-mistakes/' > "$sub/.gitignore"
   git -C "$sub" init -q -b main
-  mark_firstmate_home "$sub"
+  mark_nexus_home "$sub"
   printf 'punctuated\n' > "$sub/.fm-secondmate-home"
   printf '# Charter\n\nHandled work.\n' > "$sub/data/charter.md"
   sub_abs=$(cd "$sub" && pwd -P)
@@ -581,8 +581,8 @@ test_secondmate_spawn_refuses_ambiguous_and_mismatched_registry_bindings() {
     sub="$TMP_ROOT/spawn-binding-$case_name-sub"
     other="$TMP_ROOT/spawn-binding-$case_name-other"
     mkdir -p "$home/data" "$home/state" "$home/config" "$home/projects"
-    mark_firstmate_home "$sub"
-    mark_firstmate_home "$other"
+    mark_nexus_home "$sub"
+    mark_nexus_home "$other"
     printf 'domain\n' > "$sub/.fm-secondmate-home"
     printf 'domain\n' > "$other/.fm-secondmate-home"
     case "$case_name" in
@@ -643,10 +643,10 @@ test_home_seed_refuses_projectful_reused_charter_for_projectless_home() {
   stale_brief_before="$TMP_ROOT/no-projects-reused-charter.before"
   err="$TMP_ROOT/no-projects-reused-charter.err"
   mkdir -p "$home/data" "$home/state" "$reusable_sub/data" "$stale_sub/data"
-  mark_firstmate_home "$reusable_sub"
-  mark_firstmate_home "$stale_sub"
+  mark_nexus_home "$reusable_sub"
+  mark_nexus_home "$stale_sub"
 
-  scaffold_secondmate_charter "$home" reusable 'firstmate self-development' --no-projects \
+  scaffold_secondmate_charter "$home" reusable 'nexus self-development' --no-projects \
     || fail "project-less charter scaffold failed"
   printf '\n# Custom note\nThe projects above are local clones for work you supervise.\n' >> "$home/data/reusable/brief.md"
   FM_HOME="$home" "$ROOT/bin/fm-home-seed.sh" reusable "$reusable_sub" --no-projects >/dev/null \
@@ -654,7 +654,7 @@ test_home_seed_refuses_projectful_reused_charter_for_projectless_home() {
   assert_grep 'None. This is a project-less domain' "$reusable_sub/data/charter.md" \
     "reused project-less charter was not copied"
 
-  scaffold_secondmate_charter "$home" stale 'firstmate self-development. None. This is a project-less domain.' alpha \
+  scaffold_secondmate_charter "$home" stale 'nexus self-development. None. This is a project-less domain.' alpha \
     || fail "projectful charter scaffold failed"
   sed 's/The projects above are local clones for work you supervise; they are not an exclusive ownership claim./Project clone details are customized for this domain./' \
     "$stale_brief" > "$stale_brief_before"
@@ -684,15 +684,15 @@ test_home_seed_refuses_projectless_conversion_of_populated_home() {
   sub="$TMP_ROOT/no-projects-conversion-subhome"
   err="$TMP_ROOT/no-projects-conversion.err"
   mkdir -p "$home/data" "$home/state" "$sub/data" "$sub/projects/existing-clone"
-  mark_firstmate_home "$sub"
+  mark_nexus_home "$sub"
   fm_git_init_commit "$sub/projects/existing-clone"
   cat > "$sub/data/projects.md" <<EOF
 - registry-only [direct-PR] - retained project entry (added 2026-06-22)
 EOF
   registry_before=$(cat "$sub/data/projects.md")
 
-  if FM_HOME="$home" FM_SECONDMATE_CHARTER='firstmate self-development' \
-    FM_SECONDMATE_SCOPE='firstmate repo work' \
+  if FM_HOME="$home" FM_SECONDMATE_CHARTER='nexus self-development' \
+    FM_SECONDMATE_SCOPE='nexus repo work' \
     "$ROOT/bin/fm-home-seed.sh" fdev "$sub" --no-projects >/dev/null 2>"$err"; then
     fail "project-less seed converted a populated secondmate home"
   fi
@@ -720,12 +720,12 @@ test_home_seed_refuses_projectless_home_with_uninspectable_projects() {
   sub="$TMP_ROOT/no-projects-uninspectable-subhome"
   err="$TMP_ROOT/no-projects-uninspectable.err"
   mkdir -p "$home/data" "$home/state" "$sub/data" "$sub/projects/hidden-clone"
-  mark_firstmate_home "$sub"
+  mark_nexus_home "$sub"
   fm_git_init_commit "$sub/projects/hidden-clone"
   chmod 311 "$sub/projects"
 
-  if FM_HOME="$home" FM_SECONDMATE_CHARTER='firstmate self-development' \
-    FM_SECONDMATE_SCOPE='firstmate repo work' \
+  if FM_HOME="$home" FM_SECONDMATE_CHARTER='nexus self-development' \
+    FM_SECONDMATE_SCOPE='nexus repo work' \
     "$ROOT/bin/fm-home-seed.sh" fdev "$sub" --no-projects >/dev/null 2>"$err"; then
     chmod 700 "$sub/projects"
     fail "project-less seed accepted a home whose projects directory could not be inspected"
@@ -752,13 +752,13 @@ test_home_seed_refuses_projectless_home_with_symlinked_projects() {
   target="$sub/retained-projects"
   err="$TMP_ROOT/no-projects-symlinked-projects.err"
   mkdir -p "$home/data" "$home/state" "$sub/data" "$target/hidden-clone"
-  mark_firstmate_home "$sub"
+  mark_nexus_home "$sub"
   fm_git_init_commit "$target/hidden-clone"
   ln -s "$target" "$sub/projects"
   chmod 311 "$target"
 
-  if FM_HOME="$home" FM_SECONDMATE_CHARTER='firstmate self-development' \
-    FM_SECONDMATE_SCOPE='firstmate repo work' \
+  if FM_HOME="$home" FM_SECONDMATE_CHARTER='nexus self-development' \
+    FM_SECONDMATE_SCOPE='nexus repo work' \
     "$ROOT/bin/fm-home-seed.sh" fdev "$sub" --no-projects >/dev/null 2>"$err"; then
     chmod 700 "$target"
     fail "project-less seed accepted a home whose projects directory is a symlink"
@@ -787,12 +787,12 @@ test_home_seed_refuses_projectless_home_with_non_directory_projects() {
   sub="$TMP_ROOT/no-projects-nondirectory-projects-subhome"
   err="$TMP_ROOT/no-projects-nondirectory-projects.err"
   mkdir -p "$home/data" "$home/state" "$sub/data"
-  mark_firstmate_home "$sub"
+  mark_nexus_home "$sub"
   printf '%s\n' 'retained project path' > "$sub/projects"
   projects_before=$(cat "$sub/projects")
 
-  if FM_HOME="$home" FM_SECONDMATE_CHARTER='firstmate self-development' \
-    FM_SECONDMATE_SCOPE='firstmate repo work' \
+  if FM_HOME="$home" FM_SECONDMATE_CHARTER='nexus self-development' \
+    FM_SECONDMATE_SCOPE='nexus repo work' \
     "$ROOT/bin/fm-home-seed.sh" fdev "$sub" --no-projects >/dev/null 2>"$err"; then
     fail "project-less seed accepted a home whose projects path is not a directory"
   fi
@@ -817,13 +817,13 @@ test_home_seed_refuses_projectless_home_with_uninspectable_registry() {
   sub="$TMP_ROOT/no-projects-uninspectable-registry-subhome"
   err="$TMP_ROOT/no-projects-uninspectable-registry.err"
   mkdir -p "$home/data" "$home/state" "$sub/data"
-  mark_firstmate_home "$sub"
+  mark_nexus_home "$sub"
   printf '%s\n' '- hidden-registry [direct-PR] - retained project entry (added 2026-06-22)' > "$sub/data/projects.md"
   registry_before=$(cat "$sub/data/projects.md")
   chmod 000 "$sub/data/projects.md"
 
-  if FM_HOME="$home" FM_SECONDMATE_CHARTER='firstmate self-development' \
-    FM_SECONDMATE_SCOPE='firstmate repo work' \
+  if FM_HOME="$home" FM_SECONDMATE_CHARTER='nexus self-development' \
+    FM_SECONDMATE_SCOPE='nexus repo work' \
     "$ROOT/bin/fm-home-seed.sh" fdev "$sub" --no-projects >/dev/null 2>"$err"; then
     chmod 600 "$sub/data/projects.md"
     fail "project-less seed accepted a home whose project registry could not be inspected"
@@ -960,34 +960,34 @@ test_home_seed_refuses_active_home_and_root() {
   if FM_HOME="$home" "$ROOT/bin/fm-home-seed.sh" design "$home" alpha >/dev/null 2>"$err"; then
     fail "seed allowed secondmate home to reuse active FM_HOME"
   fi
-  grep -F 'secondmate home cannot be the active firstmate home' "$err" >/dev/null \
+  grep -F 'secondmate home cannot be the active nexus home' "$err" >/dev/null \
     || fail "seed did not explain active FM_HOME rejection"
 
   if FM_HOME="$home" "$ROOT/bin/fm-home-seed.sh" design "$active_descendant" alpha >/dev/null 2>"$err"; then
     fail "seed allowed secondmate home inside active FM_HOME"
   fi
-  grep -F 'secondmate home cannot be inside the active firstmate home' "$err" >/dev/null \
+  grep -F 'secondmate home cannot be inside the active nexus home' "$err" >/dev/null \
     || fail "seed did not explain active FM_HOME descendant rejection"
   [ ! -e "$home/nested" ] || fail "seed created a directory inside active FM_HOME before descendant rejection"
 
   if FM_HOME="$home" "$ROOT/bin/fm-home-seed.sh" design "$active_ancestor" alpha >/dev/null 2>"$err"; then
     fail "seed allowed secondmate home to contain active FM_HOME"
   fi
-  grep -F 'secondmate home cannot be an ancestor of the active firstmate home' "$err" >/dev/null \
+  grep -F 'secondmate home cannot be an ancestor of the active nexus home' "$err" >/dev/null \
     || fail "seed did not explain active FM_HOME ancestor rejection"
   [ ! -f "$active_ancestor/.fm-secondmate-home" ] || fail "seed marked an ancestor of active FM_HOME"
 
   if FM_HOME="$home" "$ROOT/bin/fm-home-seed.sh" design "$ROOT" alpha >/dev/null 2>"$err"; then
     fail "seed allowed secondmate home to reuse FM_ROOT"
   fi
-  grep -F 'secondmate home cannot be the firstmate repo' "$err" >/dev/null \
+  grep -F 'secondmate home cannot be the nexus repo' "$err" >/dev/null \
     || fail "seed did not explain FM_ROOT rejection"
 
   git clone --quiet "$ROOT" "$root_clone"
   if FM_HOME="$home" FM_ROOT_OVERRIDE="$root_clone" "$ROOT/bin/fm-home-seed.sh" design "$root_descendant" alpha >/dev/null 2>"$err"; then
     fail "seed allowed secondmate home inside FM_ROOT"
   fi
-  grep -F 'secondmate home cannot be inside the firstmate repo' "$err" >/dev/null \
+  grep -F 'secondmate home cannot be inside the nexus repo' "$err" >/dev/null \
     || fail "seed did not explain FM_ROOT descendant rejection"
   [ ! -e "$root_clone/tmp" ] || fail "seed created a directory inside FM_ROOT before descendant rejection"
 
@@ -996,7 +996,7 @@ test_home_seed_refuses_active_home_and_root() {
   if FM_HOME="$home" FM_ROOT_OVERRIDE="$root_inside" "$ROOT/bin/fm-home-seed.sh" design "$root_ancestor" alpha >/dev/null 2>"$err"; then
     fail "seed allowed secondmate home to contain FM_ROOT"
   fi
-  grep -F 'secondmate home cannot be an ancestor of the firstmate repo' "$err" >/dev/null \
+  grep -F 'secondmate home cannot be an ancestor of the nexus repo' "$err" >/dev/null \
     || fail "seed did not explain FM_ROOT ancestor rejection"
   [ ! -f "$root_ancestor/.fm-secondmate-home" ] || fail "seed marked an ancestor of FM_ROOT"
   pass "home seeding refuses active home and repo root"
@@ -1442,59 +1442,59 @@ SH
     "$ROOT/bin/fm-spawn.sh" domain "$marker_only" codex --secondmate >/dev/null 2>"$err"; then
     fail "secondmate spawn accepted a marked home missing AGENTS.md"
   fi
-  grep -F 'not a firstmate home (missing AGENTS.md)' "$err" >/dev/null || fail "spawn did not explain missing AGENTS.md"
+  grep -F 'not a nexus home (missing AGENTS.md)' "$err" >/dev/null || fail "spawn did not explain missing AGENTS.md"
 
-  printf '# Firstmate\n' > "$marker_only/AGENTS.md"
+  printf '# Nexus\n' > "$marker_only/AGENTS.md"
   if PATH="$fakebin:$PATH" FM_HOME="$home" FM_FAKE_TMUX_LOG="$log" FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/spawn-validate-fake/pane.txt" \
     "$ROOT/bin/fm-spawn.sh" domain "$marker_only" codex --secondmate >/dev/null 2>"$err"; then
     fail "secondmate spawn accepted a marked home missing bin"
   fi
-  grep -F 'not a firstmate home (missing bin/)' "$err" >/dev/null || fail "spawn did not explain missing bin"
+  grep -F 'not a nexus home (missing bin/)' "$err" >/dev/null || fail "spawn did not explain missing bin"
 
   printf 'domain\n' > "$home/.fm-secondmate-home"
   if PATH="$fakebin:$PATH" FM_HOME="$home" FM_FAKE_TMUX_LOG="$log" FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/spawn-validate-fake/pane.txt" \
     "$ROOT/bin/fm-spawn.sh" domain "$home" codex --secondmate >/dev/null 2>"$err"; then
     fail "secondmate spawn accepted the active home"
   fi
-  grep -F 'secondmate home cannot be the active firstmate home' "$err" >/dev/null || fail "spawn did not reject active home"
+  grep -F 'secondmate home cannot be the active nexus home' "$err" >/dev/null || fail "spawn did not reject active home"
 
   if PATH="$fakebin:$PATH" FM_HOME="$home" FM_FAKE_TMUX_LOG="$log" FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/spawn-validate-fake/pane.txt" \
     "$ROOT/bin/fm-spawn.sh" domain "$ROOT" codex --secondmate >/dev/null 2>"$err"; then
-    fail "secondmate spawn accepted the firstmate repo root"
+    fail "secondmate spawn accepted the nexus repo root"
   fi
-  grep -F 'secondmate home cannot be the firstmate repo' "$err" >/dev/null || fail "spawn did not reject firstmate repo root"
+  grep -F 'secondmate home cannot be the nexus repo' "$err" >/dev/null || fail "spawn did not reject nexus repo root"
 
   printf 'domain\n' > "$active_descendant/.fm-secondmate-home"
   printf 'charter\n' > "$active_descendant/data/charter.md"
   if PATH="$fakebin:$PATH" FM_HOME="$home" FM_FAKE_TMUX_LOG="$log" FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/spawn-validate-fake/pane.txt" \
     "$ROOT/bin/fm-spawn.sh" domain "$active_descendant" codex --secondmate >/dev/null 2>"$err"; then
-    fail "secondmate spawn accepted a home inside the active firstmate home"
+    fail "secondmate spawn accepted a home inside the active nexus home"
   fi
-  grep -F 'secondmate home cannot be inside the active firstmate home' "$err" >/dev/null || fail "spawn did not reject active home descendant"
+  grep -F 'secondmate home cannot be inside the active nexus home' "$err" >/dev/null || fail "spawn did not reject active home descendant"
 
   printf 'domain\n' > "$active_ancestor/.fm-secondmate-home"
   printf 'charter\n' > "$active_ancestor/data/charter.md"
   if PATH="$fakebin:$PATH" FM_HOME="$ancestor_active_home" FM_FAKE_TMUX_LOG="$log" FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/spawn-validate-fake/pane.txt" \
     "$ROOT/bin/fm-spawn.sh" domain "$active_ancestor" codex --secondmate >/dev/null 2>"$err"; then
-    fail "secondmate spawn accepted a home containing the active firstmate home"
+    fail "secondmate spawn accepted a home containing the active nexus home"
   fi
-  grep -F 'secondmate home cannot be an ancestor of the active firstmate home' "$err" >/dev/null || fail "spawn did not reject active home ancestor"
+  grep -F 'secondmate home cannot be an ancestor of the active nexus home' "$err" >/dev/null || fail "spawn did not reject active home ancestor"
 
   printf 'domain\n' > "$root_descendant/.fm-secondmate-home"
   printf 'charter\n' > "$root_descendant/data/charter.md"
   if PATH="$fakebin:$PATH" FM_ROOT_OVERRIDE="$fakeroot" FM_HOME="$home" FM_FAKE_TMUX_LOG="$log" FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/spawn-validate-fake/pane.txt" \
     "$ROOT/bin/fm-spawn.sh" domain "$root_descendant" codex --secondmate >/dev/null 2>"$err"; then
-    fail "secondmate spawn accepted a home inside the firstmate repo"
+    fail "secondmate spawn accepted a home inside the nexus repo"
   fi
-  grep -F 'secondmate home cannot be inside the firstmate repo' "$err" >/dev/null || fail "spawn did not reject repo root descendant"
+  grep -F 'secondmate home cannot be inside the nexus repo' "$err" >/dev/null || fail "spawn did not reject repo root descendant"
 
   printf 'domain\n' > "$root_ancestor/.fm-secondmate-home"
   printf 'charter\n' > "$root_ancestor/data/charter.md"
   if PATH="$fakebin:$PATH" FM_ROOT_OVERRIDE="$root_inside" FM_HOME="$home" FM_FAKE_TMUX_LOG="$log" FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/spawn-validate-fake/pane.txt" \
     "$ROOT/bin/fm-spawn.sh" domain "$root_ancestor" codex --secondmate >/dev/null 2>"$err"; then
-    fail "secondmate spawn accepted a home containing the firstmate repo"
+    fail "secondmate spawn accepted a home containing the nexus repo"
   fi
-  grep -F 'secondmate home cannot be an ancestor of the firstmate repo' "$err" >/dev/null || fail "spawn did not reject repo ancestor"
+  grep -F 'secondmate home cannot be an ancestor of the nexus repo' "$err" >/dev/null || fail "spawn did not reject repo ancestor"
 
   pass "secondmate spawn validates homes before launch"
 }
@@ -1546,13 +1546,13 @@ test_fm_send_refuses_bare_window_without_home_meta() {
 
   if PATH="$fakebin:$PATH" FM_HOME="$home" FM_FAKE_TMUX_WINDOW="other-session:fm-missing" FM_FAKE_TMUX_LOG="$log" FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/send-fake/pane.txt" \
     "$ROOT/bin/fm-send.sh" fm-missing 'wrong home' >/dev/null 2>"$err"; then
-    fail "fm-send sent to a bare firstmate window without home metadata"
+    fail "fm-send sent to a bare nexus window without home metadata"
   fi
   grep -F "no metadata for fm-missing in $home/state" "$err" >/dev/null \
     || fail "fm-send did not explain missing home metadata"
   grep -F 'send-keys -t other-session:fm-missing' "$log" >/dev/null \
     && fail "fm-send fell back to a foreign same-name window"
-  pass "fm-send refuses a bare firstmate window with no metadata in this home"
+  pass "fm-send refuses a bare nexus window with no metadata in this home"
 }
 
 test_secondmate_teardown_retires_empty_home() {
@@ -1560,13 +1560,13 @@ test_secondmate_teardown_retires_empty_home() {
   home="$TMP_ROOT/teardown-home"
   subhome="$TMP_ROOT/teardown-subhome"
   fmroot="$TMP_ROOT/teardown-fmroot"
-  make_firstmate_git_root "$fmroot"
+  make_nexus_git_root "$fmroot"
   git -C "$fmroot" worktree add --quiet --detach "$subhome" HEAD
   mkdir -p "$home/state" "$home/data" "$subhome/state"
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   subhome_abs=$(cd "$subhome" && pwd -P)
   cat > "$home/state/domain.meta" <<EOF
-window=firstmate:fm-domain
+window=nexus:fm-domain
 worktree=$subhome
 project=$subhome
 harness=echo
@@ -1600,7 +1600,7 @@ test_branch_actor_cannot_retire_secondmate() {
   home="$TMP_ROOT/branch-retire-home"
   subhome="$TMP_ROOT/branch-retire-subhome"
   fmroot="$TMP_ROOT/branch-retire-fmroot"
-  make_firstmate_git_root "$fmroot"
+  make_nexus_git_root "$fmroot"
   git -C "$fmroot" worktree add --quiet --detach "$subhome" HEAD
   mkdir -p "$home/state" "$home/data" "$subhome/state"
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
@@ -1675,7 +1675,7 @@ test_secondmate_teardown_sweeps_process_events_before_removal() {
   subhome="$TMP_ROOT/procevent-teardown-subhome"
   sweep_log="$TMP_ROOT/procevent-teardown-sweep.log"
   mkdir -p "$home/state" "$home/data" "$subhome/state/procevent"
-  mark_firstmate_home "$subhome"
+  mark_nexus_home "$subhome"
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   printf 'adapter=lavish\n' > "$subhome/state/procevent/source.source"
   printf 'runner\n' > "$subhome/state/procevent/source.runner"
@@ -1704,7 +1704,7 @@ test_secondmate_teardown_refuses_process_events_without_sweep_script() {
   err="$TMP_ROOT/procevent-refusal.err"
   claim_root="$TMP_ROOT/procevent-refusal-claims"
   mkdir -p "$home/state" "$home/data" "$subhome/state/procevent" "$claim_root"
-  mark_firstmate_home "$subhome"
+  mark_nexus_home "$subhome"
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   printf 'adapter=lavish\n' > "$subhome/state/procevent/source.source"
   printf '%s\n999999\ntoken\nidentity\n' "$subhome" > "$claim_root/source.claim"
@@ -1735,7 +1735,7 @@ test_secondmate_teardown_preserves_process_events_on_later_refusal() {
   sweep_log="$TMP_ROOT/procevent-later-refusal-sweep.log"
   err="$TMP_ROOT/procevent-later-refusal.err"
   mkdir -p "$home/state/public-followup/registry" "$home/data" "$subhome/state/procevent"
-  mark_firstmate_home "$subhome"
+  mark_nexus_home "$subhome"
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   printf 'adapter=lavish\n' > "$subhome/state/procevent/source.source"
   install_fake_process_event_sweep "$subhome" "$sweep_log"
@@ -1772,8 +1772,8 @@ test_secondmate_force_teardown_sweeps_nested_homes() {
   childhome="$TMP_ROOT/procevent-force-childhome"
   sweep_log="$TMP_ROOT/procevent-force-sweep.log"
   mkdir -p "$home/state" "$home/data" "$subhome/state/procevent" "$childhome/state/procevent"
-  mark_firstmate_home "$subhome"
-  mark_firstmate_home "$childhome"
+  mark_nexus_home "$subhome"
+  mark_nexus_home "$childhome"
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   printf 'nested\n' > "$childhome/.fm-secondmate-home"
   printf 'adapter=lavish\n' > "$subhome/state/procevent/parent-source.source"
@@ -1813,11 +1813,11 @@ test_secondmate_force_teardown_preserves_nested_restore_status() {
   sweep_log="$TMP_ROOT/procevent-nested-fail-sweep.log"
   rearm_log="$TMP_ROOT/procevent-nested-fail-rearm.log"
   err="$TMP_ROOT/procevent-nested-fail.err"
-  make_firstmate_git_root "$fmroot"
+  make_nexus_git_root "$fmroot"
   git -C "$fmroot" worktree add --quiet --detach "$grandchildhome" HEAD
   mkdir -p "$home/state" "$home/data" "$subhome/state" "$childhome/state" "$grandchildhome/state/procevent"
-  mark_firstmate_home "$subhome"
-  mark_firstmate_home "$childhome"
+  mark_nexus_home "$subhome"
+  mark_nexus_home "$childhome"
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   printf 'nested\n' > "$childhome/.fm-secondmate-home"
   printf 'leaf\n' > "$grandchildhome/.fm-secondmate-home"
@@ -1863,7 +1863,7 @@ test_secondmate_teardown_refuses_failed_leased_home_return() {
   err="$TMP_ROOT/teardown-return-fail.err"
   sweep_log="$TMP_ROOT/teardown-return-fail-sweep.log"
   rearm_log="$TMP_ROOT/teardown-return-fail-rearm.log"
-  make_firstmate_git_root "$fmroot"
+  make_nexus_git_root "$fmroot"
   git -C "$fmroot" worktree add --quiet --detach "$subhome" HEAD
   mkdir -p "$home/state" "$home/data" "$subhome/state/procevent"
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
@@ -1872,7 +1872,7 @@ test_secondmate_teardown_refuses_failed_leased_home_return() {
   : > "$rearm_log"
   subhome_abs=$(cd "$subhome" && pwd -P)
   cat > "$home/state/domain.meta" <<EOF
-window=firstmate:fm-domain
+window=nexus:fm-domain
 worktree=$subhome
 project=$subhome
 harness=echo
@@ -1924,11 +1924,11 @@ test_secondmate_teardown_removes_plain_clone_home_without_treehouse_return() {
   home="$TMP_ROOT/plain-clone-teardown-home"
   subhome="$TMP_ROOT/plain-clone-teardown-subhome"
   mkdir -p "$home/state" "$home/data" "$subhome/state"
-  mark_firstmate_home "$subhome"
+  mark_nexus_home "$subhome"
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   subhome_abs=$(cd "$subhome" && pwd -P)
   cat > "$home/state/domain.meta" <<EOF
-window=firstmate:fm-domain
+window=nexus:fm-domain
 worktree=$subhome
 project=$subhome
 harness=echo
@@ -1966,7 +1966,7 @@ test_secondmate_force_teardown_discards_child_work() {
   fm_git_worktree "$childproj" "$childwt" force-child
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   cat > "$home/state/domain.meta" <<EOF
-window=firstmate:fm-domain
+window=nexus:fm-domain
 worktree=$subhome
 project=$subhome
 harness=echo
@@ -1978,7 +1978,7 @@ projects=alpha
 EOF
   printf '%s\n' '- domain - design domain (home: '"$subhome"'; scope: design domain; projects: alpha; added 2026-06-22)' > "$home/data/secondmates.md"
   cat > "$subhome/state/child.meta" <<EOF
-window=firstmate:fm-child
+window=nexus:fm-child
 worktree=$childwt
 project=$childproj
 harness=echo
@@ -1999,8 +1999,8 @@ EOF
   [ ! -d "$childwt" ] || fail "force teardown did not remove child worktree"
   [ ! -e "$home/state/domain.meta" ] || fail "teardown did not clear parent meta"
   grep -F -- '- domain ' "$home/data/secondmates.md" >/dev/null && fail "force teardown did not remove secondmate registry route"
-  grep -F 'kill-window -t =firstmate:=fm-child' "$log" >/dev/null || fail "force teardown did not kill child window"
-  grep -F 'kill-window -t =firstmate:=fm-domain' "$log" >/dev/null || fail "force teardown did not kill parent window"
+  grep -F 'kill-window -t =nexus:=fm-child' "$log" >/dev/null || fail "force teardown did not kill child window"
+  grep -F 'kill-window -t =nexus:=fm-domain' "$log" >/dev/null || fail "force teardown did not kill parent window"
   pass "secondmate force teardown discards child work"
 }
 
@@ -2017,7 +2017,7 @@ test_secondmate_force_teardown_refuses_duplicated_child_slot() {
     > "$TMP_ROOT/force-duplicate-slot-pool/treehouse-state.json"
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   cat > "$home/state/domain.meta" <<EOF
-window=firstmate:fm-domain
+window=nexus:fm-domain
 worktree=$subhome
 project=$subhome
 harness=echo
@@ -2030,7 +2030,7 @@ EOF
   printf '%s\n' '- domain - design domain (home: '"$subhome"'; scope: design domain; projects: alpha; added 2026-06-22)' > "$home/data/secondmates.md"
   for child in stale-child live-child; do
     cat > "$subhome/state/$child.meta" <<EOF
-window=firstmate:fm-$child
+window=nexus:fm-$child
 worktree=$childwt
 project=$childproj
 harness=echo
@@ -2071,7 +2071,7 @@ test_secondmate_force_teardown_preserves_child_on_unproven_lock() {
     > "$TMP_ROOT/force-lock-child-pool/treehouse-state.json"
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   cat > "$home/state/domain.meta" <<EOF
-window=firstmate:fm-domain
+window=nexus:fm-domain
 worktree=$subhome
 project=$subhome
 harness=echo
@@ -2083,7 +2083,7 @@ projects=alpha
 EOF
   printf '%s\n' '- domain - design domain (home: '"$subhome"'; scope: design domain; projects: alpha; added 2026-06-22)' > "$home/data/secondmates.md"
   cat > "$subhome/state/child.meta" <<EOF
-window=firstmate:fm-child
+window=nexus:fm-child
 worktree=$childwt
 project=$childproj
 harness=echo
@@ -2157,7 +2157,7 @@ test_secondmate_force_teardown_allows_non_state_operational_dir_symlinks_inside_
     printf 'domain\n' > "$subhome/.fm-secondmate-home"
     ln -s "$target" "$subhome/$opdir"
     cat > "$home/state/domain.meta" <<EOF
-window=firstmate:fm-domain
+window=nexus:fm-domain
 worktree=$subhome
 project=$subhome
 harness=echo
@@ -2175,7 +2175,7 @@ EOF
       || fail "force teardown refused $opdir symlinked inside the secondmate home"
     [ ! -e "$subhome" ] || fail "force teardown did not remove subhome with inside $opdir symlink"
     [ ! -e "$home/state/domain.meta" ] || fail "force teardown did not clear parent meta for inside $opdir symlink"
-    grep -F 'kill-window -t =firstmate:=fm-domain' "$log" >/dev/null || fail "force teardown did not kill parent window for inside $opdir symlink"
+    grep -F 'kill-window -t =nexus:=fm-domain' "$log" >/dev/null || fail "force teardown did not kill parent window for inside $opdir symlink"
   done
   pass "force teardown allows non-state operational directory symlinks inside the subhome"
 }
@@ -2190,7 +2190,7 @@ test_secondmate_force_teardown_refuses_operational_dir_symlink_outside_home() {
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   ln -s "$external_state" "$subhome/state"
   cat > "$home/state/domain.meta" <<EOF
-window=firstmate:fm-domain
+window=nexus:fm-domain
 worktree=$subhome
 project=$subhome
 harness=echo
@@ -2218,13 +2218,13 @@ EOF
 test_secondmate_teardown_path_boundary_matrix() {
   # The teardown path-boundary matrix: a secondmate home is refused (and left
   # fully intact, with no window killed before validation) when it is unmarked,
-  # an ancestor of the active firstmate home, inside the active firstmate home,
-  # or inside the firstmate repo. One row per hazard, one shared assertion block.
+  # an ancestor of the active nexus home, inside the active nexus home,
+  # or inside the nexus repo. One row per hazard, one shared assertion block.
   local row base home subhome fmroot fakebin log err expect tid
   while IFS='|' read -r row expect; do
     [ -n "$row" ] || continue
     base="$TMP_ROOT/td-pb-$row"
-    fmroot="$ROOT"   # real firstmate repo unless a row overrides it
+    fmroot="$ROOT"   # real nexus repo unless a row overrides it
     tid=domain
     case "$row" in
       unmarked)
@@ -2233,7 +2233,7 @@ test_secondmate_teardown_path_boundary_matrix() {
         # No .fm-secondmate-home marker on purpose.
         ;;
       ancestor)
-        # The home being torn down is an ANCESTOR of the active firstmate home.
+        # The home being torn down is an ANCESTOR of the active nexus home.
         subhome="$base/anc"; home="$subhome/main-home"
         mkdir -p "$home/state" "$home/data" "$subhome/state"
         printf 'domain\n' > "$subhome/.fm-secondmate-home"
@@ -2272,9 +2272,9 @@ SH
     grep -F 'kill-window' "$log" >/dev/null && fail "teardown ($row) killed a window before validation"
   done <<'ROWS'
 unmarked|not a seeded secondmate home
-ancestor|ancestor of the active firstmate home
-active-descendant|inside the active firstmate home
-repo-descendant|inside the firstmate repo
+ancestor|ancestor of the active nexus home
+active-descendant|inside the active nexus home
+repo-descendant|inside the nexus repo
 ROWS
   pass "secondmate teardown path-boundary matrix refuses unmarked/ancestor/active-descendant/repo-descendant homes"
 }
@@ -2289,7 +2289,7 @@ test_secondmate_teardown_refuses_registered_nested_home() {
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   printf 'nested\n' > "$nested/.fm-secondmate-home"
   cat > "$home/state/domain.meta" <<EOF
-window=firstmate:fm-domain
+window=nexus:fm-domain
 worktree=$subhome
 project=$subhome
 harness=echo
@@ -2300,7 +2300,7 @@ home=$subhome
 projects=alpha
 EOF
   cat > "$home/state/nested.meta" <<EOF
-window=firstmate:fm-nested
+window=nexus:fm-nested
 worktree=$nested
 project=$nested
 harness=echo
@@ -2339,7 +2339,7 @@ test_secondmate_teardown_refuses_child_registry_nested_home() {
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   printf 'nested\n' > "$nested/.fm-secondmate-home"
   cat > "$home/state/domain.meta" <<EOF
-window=firstmate:fm-domain
+window=nexus:fm-domain
 worktree=$subhome
 project=$subhome
 harness=echo
@@ -2374,7 +2374,7 @@ test_secondmate_force_teardown_prevalidates_before_child_cleanup() {
   err="$TMP_ROOT/prevalidate-teardown.err"
   mkdir -p "$home/state" "$home/data" "$subhome/state" "$childproj" "$childwt"
   cat > "$home/state/domain.meta" <<EOF
-window=firstmate:fm-domain
+window=nexus:fm-domain
 worktree=$subhome
 project=$subhome
 harness=echo
@@ -2386,7 +2386,7 @@ projects=alpha
 EOF
   printf '%s\n' '- domain - design domain (home: '"$subhome"'; scope: design domain; projects: alpha; added 2026-06-22)' > "$home/data/secondmates.md"
   cat > "$subhome/state/child.meta" <<EOF
-window=firstmate:fm-child
+window=nexus:fm-child
 worktree=$childwt
 project=$childproj
 harness=echo
@@ -2429,7 +2429,7 @@ seed_task_set_lock_home() {  # <tag> -> echoes "<home>|<subhome>"
   fm_git_worktree "$childproj" "$childwt" "child-$tag"
   printf '%s\n' domain > "$subhome/.fm-secondmate-home"
   cat > "$home/state/domain.meta" <<EOF
-window=firstmate:fm-domain
+window=nexus:fm-domain
 worktree=$subhome
 project=$subhome
 harness=echo
@@ -2441,7 +2441,7 @@ projects=alpha
 EOF
   printf '%s\n' '- domain - design domain (home: '"$subhome"'; scope: design domain; projects: alpha; added 2026-06-22)' > "$home/data/secondmates.md"
   cat > "$subhome/state/child.meta" <<EOF
-window=firstmate:fm-child
+window=nexus:fm-child
 worktree=$childwt
 project=$childproj
 harness=echo
@@ -2496,7 +2496,7 @@ seed_empty_task_set_home() {  # <tag> -> echoes "<home>|<subhome>"
   mkdir -p "$home/state" "$home/data" "$subhome/data"
   printf '%s\n' domain > "$subhome/.fm-secondmate-home"
   cat > "$home/state/domain.meta" <<EOF
-window=firstmate:fm-domain
+window=nexus:fm-domain
 worktree=$subhome
 project=$subhome
 harness=echo
@@ -2566,7 +2566,7 @@ test_force_teardown_locks_descendant_with_absent_state() {
   IFS='|' read -r home subhome <<EOF
 $rec
 EOF
-  claim_root="$TMP_ROOT/taskset-state-absent-xdg/firstmate/procevent-claims"
+  claim_root="$TMP_ROOT/taskset-state-absent-xdg/nexus/procevent-claims"
   ready="$TMP_ROOT/taskset-state-absent.ready"
   release="$TMP_ROOT/taskset-state-absent.release"
   mkdir -p "$claim_root" "$subhome/bin"
@@ -2715,7 +2715,7 @@ test_secondmate_force_teardown_refuses_child_active_home_descendant() {
   mkdir -p "$home/state" "$home/data" "$subhome/state" "$childproj"
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   cat > "$home/state/domain.meta" <<EOF
-window=firstmate:fm-domain
+window=nexus:fm-domain
 worktree=$subhome
 project=$subhome
 harness=echo
@@ -2727,7 +2727,7 @@ projects=alpha
 EOF
   printf '%s\n' '- domain - design domain (home: '"$subhome"'; scope: design domain; projects: alpha; added 2026-06-22)' > "$home/data/secondmates.md"
   cat > "$subhome/state/child.meta" <<EOF
-window=firstmate:fm-child
+window=nexus:fm-child
 worktree=$childwt
 project=$childproj
 harness=echo
@@ -2746,7 +2746,7 @@ EOF
   [ -e "$home/state/domain.meta" ] || fail "force teardown cleared parent meta after child validation refusal"
   [ -e "$subhome/state/child.meta" ] || fail "force teardown cleared child meta after child validation refusal"
   grep -F 'kill-window' "$log" >/dev/null && fail "force teardown killed windows before child validation refusal"
-  grep -F 'inside the active firstmate home' "$err" >/dev/null || fail "force teardown did not explain active home descendant rejection"
+  grep -F 'inside the active nexus home' "$err" >/dev/null || fail "force teardown did not explain active home descendant rejection"
   pass "force teardown refuses child worktrees inside the active home"
 }
 
@@ -2766,7 +2766,7 @@ SH
   chmod +x "$fakeroot/bin/fm-guard.sh"
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   cat > "$home/state/domain.meta" <<EOF
-window=firstmate:fm-domain
+window=nexus:fm-domain
 worktree=$subhome
 project=$subhome
 harness=echo
@@ -2778,7 +2778,7 @@ projects=alpha
 EOF
   printf '%s\n' '- domain - design domain (home: '"$subhome"'; scope: design domain; projects: alpha; added 2026-06-22)' > "$home/data/secondmates.md"
   cat > "$subhome/state/child.meta" <<EOF
-window=firstmate:fm-child
+window=nexus:fm-child
 worktree=$childwt
 project=$childproj
 harness=echo
@@ -2797,8 +2797,8 @@ EOF
   [ -e "$home/state/domain.meta" ] || fail "force teardown cleared parent meta after repo child validation refusal"
   [ -e "$subhome/state/child.meta" ] || fail "force teardown cleared child meta after repo child validation refusal"
   grep -F 'kill-window' "$log" >/dev/null && fail "force teardown killed windows before repo child validation refusal"
-  grep -F 'inside the firstmate repo' "$err" >/dev/null || fail "force teardown did not explain repo descendant rejection"
-  pass "force teardown refuses child worktrees inside the firstmate repo"
+  grep -F 'inside the nexus repo' "$err" >/dev/null || fail "force teardown did not explain repo descendant rejection"
+  pass "force teardown refuses child worktrees inside the nexus repo"
 }
 
 test_secondmate_force_teardown_refuses_unregistered_child_worktree() {
@@ -2811,7 +2811,7 @@ test_secondmate_force_teardown_refuses_unregistered_child_worktree() {
   mkdir -p "$home/state" "$home/data" "$subhome/state" "$childproj" "$childwt"
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   cat > "$home/state/domain.meta" <<EOF
-window=firstmate:fm-domain
+window=nexus:fm-domain
 worktree=$subhome
 project=$subhome
 harness=echo
@@ -2823,7 +2823,7 @@ projects=alpha
 EOF
   printf '%s\n' '- domain - design domain (home: '"$subhome"'; scope: design domain; projects: alpha; added 2026-06-22)' > "$home/data/secondmates.md"
   cat > "$subhome/state/child.meta" <<EOF
-window=firstmate:fm-child
+window=nexus:fm-child
 worktree=$childwt
 project=$childproj
 harness=echo
@@ -2850,7 +2850,7 @@ test_secondmate_idle_pane_is_not_stale() {
   local home fakebin out pid window
   home="$TMP_ROOT/watch-home"
   mkdir -p "$home/state"
-  window="firstmate:fm-domain"
+  window="nexus:fm-domain"
   cat > "$home/state/domain.meta" <<EOF
 window=$window
 worktree=$TMP_ROOT/watch-subhome
@@ -2885,14 +2885,14 @@ test_secondmate_charter_brief_is_idle_by_default() {
   brief="$home/data/idle-sm/brief.md"
   [ -f "$brief" ] || fail "secondmate charter brief was not scaffolded"
   # Idle contract: waits for routed work, never self-initiates.
-  grep -F 'go idle and wait silently for the main firstmate' "$brief" >/dev/null \
+  grep -F 'go idle and wait silently for the main nexus' "$brief" >/dev/null \
     || fail "charter brief does not tell the secondmate to go idle and wait for routed work"
-  grep -F 'Act only on tasks the main firstmate routes to you' "$brief" >/dev/null \
+  grep -F 'Act only on tasks the main nexus routes to you' "$brief" >/dev/null \
     || fail "charter brief does not restrict work to routed tasks"
   grep -F 'never spawn a survey, audit, or any self-directed' "$brief" >/dev/null \
     || fail "charter brief does not forbid self-initiated survey/audit work"
   # Reconcile-on-startup must remain: bootstrap and recovery still run, scoped to own work.
-  grep -F 'run normal firstmate bootstrap and recovery' "$brief" >/dev/null \
+  grep -F 'run normal nexus bootstrap and recovery' "$brief" >/dev/null \
     || fail "charter brief dropped the bootstrap/recovery reconciliation step"
   grep -F 'only to RECONCILE work that is already yours' "$brief" >/dev/null \
     || fail "charter brief does not scope startup work to reconciling existing work"

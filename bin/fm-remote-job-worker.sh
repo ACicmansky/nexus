@@ -1,7 +1,7 @@
 #!/bin/bash
 # Long-lived per-account worker for remote fm-on jobs.
 #
-# This process is launched by the Firstmate-owned dev.firstmate.remote-job
+# This process is launched by the Nexus-owned dev.nexus.remote-job
 # LaunchAgent on macOS and by a detached restart supervisor on Linux. It claims
 # only complete 0700 records staged by fm-remote-job-lib.sh under the fixed
 # account queue, refuses symlinks and malformed records, and executes only a
@@ -35,7 +35,7 @@
 # than the shortest record reap age.
 #
 # The worker is abandoned when its configured FM_ROOT stops being a genuine
-# Firstmate checkout - the state a pruned no-mistakes gate worktree, a returned
+# Nexus checkout - the state a pruned no-mistakes gate worktree, a returned
 # pooled worktree, or a removed test fixture root leaves behind. It can never
 # validate or execute another job from a root that is gone, so both the serving
 # loop and the Linux restart supervisor stop instead of polling forever
@@ -1137,7 +1137,7 @@ main() {
   local account_home lock_status next_heartbeat=-1 next_sweep=0 sweep_interval
   account_home=$(worker_account_home) || { worker_error "cannot resolve account home"; exit 1; }
   FM_ROOT=$(fm_remote_job_canonical_existing_dir "$FM_ROOT") || { worker_error "configured FM_ROOT is unsafe"; exit 1; }
-  [ -f "$FM_ROOT/AGENTS.md" ] && [ ! -L "$FM_ROOT/AGENTS.md" ] || { worker_error "FM_ROOT is not a Firstmate checkout"; exit 1; }
+  [ -f "$FM_ROOT/AGENTS.md" ] && [ ! -L "$FM_ROOT/AGENTS.md" ] || { worker_error "FM_ROOT is not a Nexus checkout"; exit 1; }
   fm_remote_job_prepare_state "$account_home" || { worker_error "$FM_REMOTE_JOB_ERROR"; exit 1; }
   WORKER_LOCK=$(fm_remote_job_worker_lock_path)
   trap worker_exit_cleanup EXIT
@@ -1212,7 +1212,7 @@ worker_supervise_linux() {
   local account_home child_status started failures=0 restarts=0 backoff
   account_home=$(worker_account_home) || { worker_error "cannot resolve account home"; return 1; }
   FM_ROOT=$(fm_remote_job_canonical_existing_dir "$FM_ROOT") || { worker_error "configured FM_ROOT is unsafe"; return 1; }
-  [ -f "$FM_ROOT/AGENTS.md" ] && [ ! -L "$FM_ROOT/AGENTS.md" ] || { worker_error "FM_ROOT is not a Firstmate checkout"; return 1; }
+  [ -f "$FM_ROOT/AGENTS.md" ] && [ ! -L "$FM_ROOT/AGENTS.md" ] || { worker_error "FM_ROOT is not a Nexus checkout"; return 1; }
   fm_remote_job_prepare_state "$account_home" || { worker_error "$FM_REMOTE_JOB_ERROR"; return 1; }
   trap worker_supervisor_shutdown HUP INT TERM
   while :; do

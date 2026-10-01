@@ -71,7 +71,7 @@ case "\${1:-}" in
   list-windows)
     [ -f "\$state" ] || exit 0
     name=\$(cut -d'|' -f1 "\$state")
-    case "\$*" in *'#{session_name}:#{window_name}'*) printf 'firstmate:%s\n' "\$name" ;; *) printf '%s\n' "\$name" ;; esac
+    case "\$*" in *'#{session_name}:#{window_name}'*) printf 'nexus:%s\n' "\$name" ;; *) printf '%s\n' "\$name" ;; esac
     exit 0
     ;;
   new-window)
@@ -89,7 +89,7 @@ case "\${1:-}" in
       *'#{pane_current_path}'*) cut -d'|' -f2- "\$state" ;;
       *'#{pane_current_command}'*) printf 'codex\n' ;;
       *'#{cursor_y}'*) printf '0\n' ;;
-      *'#S'*) printf 'firstmate\n' ;;
+      *'#S'*) printf 'nexus\n' ;;
       *) printf '%%1\n' ;;
     esac
     exit 0
@@ -109,7 +109,7 @@ git -C "$REMOTE_ROOT" config user.email test@example.com
 git -C "$REMOTE_ROOT" config user.name Test
 git -C "$REMOTE_ROOT" add .
 git -C "$REMOTE_ROOT" commit -qm 'remote fixture root'
-REMOTE_ORIGIN="$TMP_ROOT/firstmate-origin.git"
+REMOTE_ORIGIN="$TMP_ROOT/nexus-origin.git"
 git init -q --bare "$REMOTE_ORIGIN"
 git -C "$REMOTE_ROOT" remote add origin "file://$REMOTE_ORIGIN"
 git -C "$REMOTE_ROOT" push -q -u origin main
@@ -178,7 +178,7 @@ if [ "$command_name" = fm-remote-doctor.sh ]; then
         printf 'fix launchagent=applied: wrote the Aqua-scoped launch agent\n'
         exit 255
       fi
-      printf 'check launchagent=fixable: no Firstmate herdr launch agent\n'
+      printf 'check launchagent=fixable: no Nexus herdr launch agent\n'
       printf 'error: this host is not ready for a remote second mate; unresolved: launchagent\n' >&2
       exit 1
       ;;
@@ -197,7 +197,7 @@ if [ "$command_name" = fm-remote-doctor.sh ]; then
         exit 0
       fi
       [ -f "$FM_FAKE_DOCTOR_REPAIRED" ] || {
-        printf 'check launchagent=fixable: no Firstmate herdr launch agent\n'
+        printf 'check launchagent=fixable: no Nexus herdr launch agent\n'
         printf 'error: this host is not ready for a remote second mate; unresolved: launchagent\n' >&2
         exit 1
       }
@@ -219,7 +219,7 @@ case "${FM_FAKE_SSH_MODE:-normal}:$command_name:$command_rel" in
     [ "$_command_action" = launch ] || exit 93
     printf 'schema=fm-remote-secondmate-control.v1\n'
     printf 'backend=tmux\n'
-    printf 'target=firstmate:fm-ios\n'
+    printf 'target=nexus:fm-ios\n'
     printf 'harness=codex\n'
     exit 0
     ;;
@@ -570,7 +570,7 @@ doctor-fixable --fix
 doctor-fixable -' ] || fail "the repaired seed did not re-check after its repair"$'\n'"$(cat "$DOCTOR_LOG")"
 pass "remote seeding proceeds once the repair closes every gap"
 
-# Seeding must not need a copy of the project in this home: firstmate names the
+# Seeding must not need a copy of the project in this home: nexus names the
 # origin it already resolved, the seed validates and transports it, and the
 # primary project tree is left exactly as it was found.
 projects_snapshot() { # <dir>
@@ -681,7 +681,7 @@ assert_grep 'not an accepted clone URL' "$TMP_ROOT/unsafe-origin.out" \
 assert_absent "$TMP_ROOT/unsafe-origin-home" "the rejected manifest left a remote home behind"
 pass "remote provisioning re-validates a supplied origin at the receiving host"
 
-# Firstmate is a shared template, so seeding must carry a project origin from any
+# Nexus is a shared template, so seeding must carry a project origin from any
 # forge or host, not a privileged one. These four URL shapes have to survive the
 # parent's validation, the manifest, the transport, and the receiving host's own
 # validation, and arrive at git unchanged. A fixture resolver records the exact
@@ -698,7 +698,7 @@ forge_project() { # <project> <origin-url>
   printf 'served from %s\n' "$origin" > "$TMP_ROOT/forge-src-$project/ORIGIN.txt"
   git -C "$TMP_ROOT/forge-src-$project" add ORIGIN.txt
   git -C "$TMP_ROOT/forge-src-$project" \
-    -c user.name='Firstmate Tests' -c user.email='tests@example.invalid' commit -qm origin
+    -c user.name='Nexus Tests' -c user.email='tests@example.invalid' commit -qm origin
   git clone --quiet --bare "$TMP_ROOT/forge-src-$project" "$TMP_ROOT/forge-$project.git"
   rm -rf "$TMP_ROOT/forge-src-$project"
   printf '%s%s%s\n' "$origin" "$tab" "$TMP_ROOT/forge-$project.git" >> "$FORGE_ORIGIN_MAP"
@@ -928,7 +928,7 @@ cmp -s "$TMP_ROOT/parent-ios-before-nonherdr.meta" "$PARENT/state/ios.meta" \
 remote_route_meta="$REMOTE_HOME/state/parent-route/ios.meta"
 cp "$remote_route_meta" "$TMP_ROOT/remote-ios-before-legacy.meta"
 cat > "$remote_route_meta" <<EOF
-window=firstmate:fm-ios
+window=nexus:fm-ios
 worktree=$REMOTE_HOME
 project=$REMOTE_ROOT
 harness=codex
@@ -957,7 +957,7 @@ pass "non-herdr remote endpoints are refused without changing either route"
 rm -f "$TMP_ROOT/inherit.entered" "$TMP_ROOT/inherit.release" "$TMP_ROOT/inherit.payload"
 cat > "$PARENT/data/captain-shared.md" <<'EOF'
 # Shared captain preferences
-This file is main-authoritative and maintained by the main firstmate.
+This file is main-authoritative and maintained by the main nexus.
 It is read-only in secondmate homes and must not be edited there.
 Changes return through a marked status document pointer.
 stale spawn preference
@@ -976,7 +976,7 @@ while [ ! -f "$TMP_ROOT/inherit.entered" ]; do
 done
 cat > "$PARENT/data/captain-shared.md" <<'EOF'
 # Shared captain preferences
-This file is main-authoritative and maintained by the main firstmate.
+This file is main-authoritative and maintained by the main nexus.
 It is read-only in secondmate homes and must not be edited there.
 Changes return through a marked status document pointer.
 current post-spawn preference
@@ -1017,7 +1017,7 @@ records_after_send=$(find "$PARENT_ROUTE_INBOX" -maxdepth 1 -name '*.msg' | wc -
 [ "$records_after_send" -eq $((records_before_send + 1)) ] \
   || fail "the retried remote steer did not dedup onto one new record, went $records_before_send -> $records_after_send"
 assert_no_grep 'report the build result' "$HERDR_LOG" "the steer payload was typed into the remote pane"
-assert_grep 'Firstmate instruction waiting' "$HERDR_LOG" "the remote doorbell never rang"
+assert_grep 'Nexus instruction waiting' "$HERDR_LOG" "the remote doorbell never rang"
 CORR=$(newest_remote_inbox_corr)
 [ -n "$CORR" ] || fail "remote send did not carry a correlation token"
 assert_grep "FM_PENDING_REPLY_EXISTING_CORR=$CORR" "$TMP_ROOT/send.err" "ambiguous remote send did not print its correlation-reusing command"
@@ -1068,7 +1068,7 @@ pass "partial remote inheritance retains reread intent through bootstrap converg
 rm -f "$TMP_ROOT/inherit.entered" "$TMP_ROOT/inherit.release" "$TMP_ROOT/inherit.payload"
 cat > "$PARENT/data/captain-shared.md" <<'EOF'
 # Shared captain preferences
-This file is main-authoritative and maintained by the main firstmate.
+This file is main-authoritative and maintained by the main nexus.
 It is read-only in secondmate homes and must not be edited there.
 Changes return through a marked status document pointer.
 stale concurrent preference
@@ -1087,7 +1087,7 @@ while [ ! -f "$TMP_ROOT/inherit.entered" ]; do
 done
 cat > "$PARENT/data/captain-shared.md" <<'EOF'
 # Shared captain preferences
-This file is main-authoritative and maintained by the main firstmate.
+This file is main-authoritative and maintained by the main nexus.
 It is read-only in secondmate homes and must not be edited there.
 Changes return through a marked status document pointer.
 current concurrent preference
@@ -1190,7 +1190,7 @@ rm -f "$PARENT/state/.wake-queue"
 
 # The remote code root updates independently, then the persistent home imports
 # and fast-forwards to that host-local commit without touching project clones.
-REMOTE_SEED="$TMP_ROOT/firstmate-seed"
+REMOTE_SEED="$TMP_ROOT/nexus-seed"
 git clone -q "file://$REMOTE_ORIGIN" "$REMOTE_SEED"
 git -C "$REMOTE_SEED" config user.email test@example.com
 git -C "$REMOTE_SEED" config user.name Test
@@ -1384,7 +1384,7 @@ cp "$remote_route_meta" "$TMP_ROOT/remote-ios-before-liveness-legacy.meta"
 cp "$PARENT/state/ios.meta" "$TMP_ROOT/parent-ios-before-liveness-legacy.meta"
 cp "$PARENT/data/secondmates.md" "$TMP_ROOT/registry-before-liveness-legacy.md"
 cat > "$remote_route_meta" <<EOF
-window=firstmate:fm-ios
+window=nexus:fm-ios
 worktree=$REMOTE_HOME
 project=$REMOTE_ROOT
 harness=codex

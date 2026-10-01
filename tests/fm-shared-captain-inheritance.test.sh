@@ -28,9 +28,9 @@ shared_header() {
   cat <<'EOF'
 # Shared captain preferences
 
-This file is main-authoritative in the main firstmate home.
+This file is main-authoritative in the main nexus home.
 In secondmate homes it is read-only in secondmate homes and must not be edited there.
-Route new captain-preference discoveries to the main firstmate through marked status or a document pointer.
+Route new captain-preference discoveries to the main nexus through marked status or a document pointer.
 EOF
 }
 
@@ -360,9 +360,9 @@ test_header_check_names_the_missing_phrase() {
   cat > "$missing_path" <<'EOF'
 # Shared captain preferences
 
-This file is main-authoritative in the main firstmate home.
+This file is main-authoritative in the main nexus home.
 In secondmate homes it is read-only in secondmate homes.
-Route new captain-preference discoveries to the main firstmate through marked status or a document pointer.
+Route new captain-preference discoveries to the main nexus through marked status or a document pointer.
 EOF
   out=$(shared_captain_header_valid "$missing_path"); rc=$?
   [ "$rc" -ne 0 ] || fail "a header missing a required phrase should still fail"
@@ -489,7 +489,7 @@ EOF
   mkdir -p "$data_override"
   write_shared "$data_override/captain-shared.md" "shared from bootstrap override"
   {
-    printf 'window=firstmate:fm-sm\n'
+    printf 'window=nexus:fm-sm\n'
     printf 'kind=secondmate\n'
   } > "$home/state/sm.meta"
   printf -- '- sm - fixture secondmate (home: %s; scope: fixture; projects: sample; added 2026-07-16)\n' "$sm" \
@@ -518,7 +518,7 @@ EOF
   data_override="$w/primary-data-override"
   mkdir -p "$data_override"
   {
-    printf 'window=firstmate:fm-sm\n'
+    printf 'window=nexus:fm-sm\n'
     printf 'kind=secondmate\n'
     printf 'home=%s\n' "$sm"
   } > "$home/state/sm.meta"
@@ -547,7 +547,7 @@ EOF
   data_override="$w/primary-data-override"
   mkdir -p "$data_override"
   {
-    printf 'window=firstmate:fm-sm\n'
+    printf 'window=nexus:fm-sm\n'
     printf 'kind=secondmate\n'
     printf 'home=%s\n' "$sm"
   } > "$home/state/sm.meta"

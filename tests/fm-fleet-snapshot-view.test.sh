@@ -75,7 +75,7 @@ write_fixture() {  # <home>
   cat > "$home/data/backlog.md" <<EOF
 ## In flight
 - [ ] scout-task - Scout Task data/scout-task/report.md (repo: alpha) (kind: scout) (since 2026-07-07)
-- [ ] ship-task - Ship Task https://github.com/kunchenguid/firstmate/pull/9 (repo: alpha) (kind: ship) (priority: 2) (since 2026-07-07)
+- [ ] ship-task - Ship Task https://github.com/ACicmansky/nexus/pull/9 (repo: alpha) (kind: ship) (priority: 2) (since 2026-07-07)
   Preserve this detail for bearings.
 
 ## Queued
@@ -83,19 +83,19 @@ write_fixture() {  # <home>
 handoff note without canonical syntax
 
 ## Done
-- [x] done-task - Done Task https://github.com/kunchenguid/firstmate/pull/7 (repo: alpha) (kind: ship) (merged 2026-07-06)
+- [x] done-task - Done Task https://github.com/ACicmansky/nexus/pull/7 (repo: alpha) (kind: ship) (merged 2026-07-06)
 EOF
   mkdir -p "$home/data/scout-task"
   printf '# Scout\n' > "$home/data/scout-task/report.md"
   fm_write_meta "$home/state/ship-task.meta" \
-    "window=firstmate:fm-ship-task" \
+    "window=nexus:fm-ship-task" \
     "worktree=$home/projects/alpha-worktree" \
     "project=alpha" \
     "harness=claude" \
     "kind=ship" \
     "mode=ship" \
     "yolo=off" \
-    "pr=https://github.com/kunchenguid/firstmate/pull/9"
+    "pr=https://github.com/ACicmansky/nexus/pull/9"
   printf 'needs-decision: choose an API shape\n' > "$home/state/ship-task.status"
   # A working ship task proves it through its own semantic busy-state record
   # (bin/fm-busy-lib.sh), which is what the snapshot's current-state read
@@ -104,7 +104,7 @@ EOF
   "$ROOT/bin/fm-busy-event.sh" apply "$home/state" ship-task busy --gen "$fixture_gen" \
     --source claude-hook --event user-prompt-submit
   fm_write_meta "$home/state/scout-task.meta" \
-    "window=firstmate:fm-scout-task" \
+    "window=nexus:fm-scout-task" \
     "worktree=$home/projects/scout-worktree" \
     "project=alpha" \
     "harness=codex" \
@@ -113,7 +113,7 @@ EOF
     "yolo=off"
   printf 'done: report ready\n' > "$home/state/scout-task.status"
   fm_write_meta "$home/state/secondmate-task.meta" \
-    "window=firstmate:fm-secondmate-task" \
+    "window=nexus:fm-secondmate-task" \
     "worktree=$home/secondmate-home" \
     "project=$home/secondmate-home" \
     "harness=codex" \
@@ -165,7 +165,7 @@ test_fixture_snapshot_json() {
     .tasks[] | select(.id == "ship-task")
     | .current_state.state == "working"
       and .current_state.source == "pane"
-      and .pr.url == "https://github.com/kunchenguid/firstmate/pull/9"
+      and .pr.url == "https://github.com/ACicmansky/nexus/pull/9"
       and .backlog.body_excerpt == "Preserve this detail for bearings."
       and .hints.pending_decision == false
       and .paths.status_log.kind == "event_history"
@@ -197,7 +197,7 @@ test_fixture_snapshot_json() {
   ' >/dev/null || fail "queued canonical and unstructured backlog records missing"
   printf '%s' "$out" | jq -e '
     .backlog.records[] | select(.id == "done-task")
-    | .state == "done" and .pr_url == "https://github.com/kunchenguid/firstmate/pull/7"
+    | .state == "done" and .pr_url == "https://github.com/ACicmansky/nexus/pull/7"
   ' >/dev/null || fail "done backlog PR row missing"
 
   local line expected_age before after emitted epoch observed
@@ -331,7 +331,7 @@ another free-form queued note
 ## Done
 EOF
   fm_write_meta "$home/state/visible-ship.meta" \
-    "window=firstmate:fm-visible-ship" \
+    "window=nexus:fm-visible-ship" \
     "worktree=$home/projects/visible" \
     "project=alpha" \
     "harness=codex" \
@@ -359,7 +359,7 @@ EOF
 ## Done
 EOF
   fm_write_meta "$home/state/orphan-ship.meta" \
-    "window=firstmate:fm-orphan-ship" \
+    "window=nexus:fm-orphan-ship" \
     "worktree=$home/projects/visible" \
     "project=alpha" \
     "harness=codex" \
@@ -395,7 +395,7 @@ test_normalized_roles_and_plural_blocker_readiness() {
 ## Done
 EOF
   fm_write_meta "$home/state/worker.meta" \
-    "window=firstmate:fm-worker" "worktree=$home/projects/worker" "project=alpha" \
+    "window=nexus:fm-worker" "worktree=$home/projects/worker" "project=alpha" \
     "harness=codex" "kind=ship" "mode=ship"
   printf 'working: preparing canary\n' > "$home/state/worker.status"
   fakebin=$(make_fakebin "$home")
@@ -479,7 +479,7 @@ test_event_hints_follow_reconciled_current_state() {
     "$home/projects/stale-decision" \
     "$home/projects/stale-blocked"
   fm_write_meta "$home/state/active-decision.meta" \
-    "window=firstmate:fm-active-decision" \
+    "window=nexus:fm-active-decision" \
     "worktree=$home/projects/active-decision" \
     "project=alpha" \
     "harness=claude" \
@@ -488,7 +488,7 @@ test_event_hints_follow_reconciled_current_state() {
   record_claude_idle "$home/state" active-decision
   printf 'needs-decision: choose an API shape\n' > "$home/state/active-decision.status"
   fm_write_meta "$home/state/active-blocked.meta" \
-    "window=firstmate:fm-active-blocked" \
+    "window=nexus:fm-active-blocked" \
     "worktree=$home/projects/active-blocked" \
     "project=alpha" \
     "harness=claude" \
@@ -497,7 +497,7 @@ test_event_hints_follow_reconciled_current_state() {
   record_claude_idle "$home/state" active-blocked
   printf 'blocked: waiting on access\n' > "$home/state/active-blocked.status"
   fm_write_meta "$home/state/stale-decision.meta" \
-    "window=firstmate:fm-stale-decision-ship-task" \
+    "window=nexus:fm-stale-decision-ship-task" \
     "worktree=$home/projects/stale-decision" \
     "project=alpha" \
     "harness=claude" \
@@ -508,7 +508,7 @@ test_event_hints_follow_reconciled_current_state() {
     --source claude-hook --event user-prompt-submit
   printf 'needs-decision: already answered\n' > "$home/state/stale-decision.status"
   fm_write_meta "$home/state/stale-blocked.meta" \
-    "window=firstmate:fm-stale-blocked-ship-task" \
+    "window=nexus:fm-stale-blocked-ship-task" \
     "worktree=$home/projects/stale-blocked" \
     "project=alpha" \
     "harness=claude" \
@@ -576,14 +576,14 @@ test_backlog_tasks_axi_forms_and_overrides() {
 - [ ] parked-prose - Parked captain call (repo: sample) (kind: ship) (hold: DEFERRED by captain) (hold-kind: captain)
 
 ## Done
-- [x] done-comma - Done Comma Task https://github.com/kunchenguid/firstmate/pull/42 (repo: gamma, merged 2026-07-09) (kind: ship)
-- [x] done-bracket-pr - Done Bracket PR - <https://github.com/kunchenguid/firstmate/pull/43> (repo: gamma, merged 2026-07-12) (kind: ship)
+- [x] done-comma - Done Comma Task https://github.com/ACicmansky/nexus/pull/42 (repo: gamma, merged 2026-07-09) (kind: ship)
+- [x] done-bracket-pr - Done Bracket PR - <https://github.com/ACicmansky/nexus/pull/43> (repo: gamma, merged 2026-07-12) (kind: ship)
 - [x] reported-comma - Reported Scout data/reported-comma/report.md (repo: gamma, reported 2026-07-10) (kind: scout)
 - [x] done-note - Done Note local main (repo: delta, done 2026-07-11) (kind: ship)
 EOF
   printf '# Bold Scout\n' > "$data/bold-task/report.md"
   fm_write_meta "$home/state/bold-task.meta" \
-    "window=firstmate:fm-bold-task" \
+    "window=nexus:fm-bold-task" \
     "worktree=$projects/bold-worktree" \
     "project=alpha" \
     "harness=claude" \
@@ -660,8 +660,8 @@ EOF
     .backlog.records[] | select(.id == "done-bracket-pr")
     | .repo == "gamma"
       and .title == "Done Bracket PR"
-      and .pr_url == "https://github.com/kunchenguid/firstmate/pull/43"
-      and .links == ["https://github.com/kunchenguid/firstmate/pull/43"]
+      and .pr_url == "https://github.com/ACicmansky/nexus/pull/43"
+      and .links == ["https://github.com/ACicmansky/nexus/pull/43"]
       and .completion == {verb:"merged",date:"2026-07-12"}
   ' >/dev/null || fail "bracketed PR artifact did not parse"
   printf '%s' "$out" | jq -e '
@@ -690,7 +690,7 @@ EOF
     "view should render bold in-flight row from snapshot"
   assert_contains "$view" "| blocked-reason | Blocked Reason | beta | ship | queued-comma - waits on queued-comma | - |" \
     "view should render blocked reason without title metadata"
-  assert_contains "$view" "| done-bracket-pr | Done Bracket PR | gamma | ship | - | https://github.com/kunchenguid/firstmate/pull/43 |" \
+  assert_contains "$view" "| done-bracket-pr | Done Bracket PR | gamma | ship | - | https://github.com/ACicmansky/nexus/pull/43 |" \
     "view should render bracketed PR artifact outside the title"
   assert_contains "$view" "| done-note | Done Note | delta | ship | - | local main |" \
     "view should render local-only done artifact outside the title"
@@ -795,18 +795,18 @@ test_view_renders_snapshot() {
   write_fixture "$home"
   fakebin=$(make_fakebin "$home")
   view=$(PATH="$fakebin:$PATH" FM_HOME="$home" "$VIEW")
-  assert_contains "$view" "| ship-task | working / pane | ship | alpha | tmux | present | https://github.com/kunchenguid/firstmate/pull/9" \
+  assert_contains "$view" "| ship-task | working / pane | ship | alpha | tmux | present | https://github.com/ACicmansky/nexus/pull/9" \
     "view should render ship row from snapshot"
   assert_contains "$view" "| queued-task | Queued Task | alpha | ship | ship-task | -" \
     "view should render queued backlog row"
-  assert_contains "$view" "| done-task | Done Task | alpha | ship | - | https://github.com/kunchenguid/firstmate/pull/7 |" \
+  assert_contains "$view" "| done-task | Done Task | alpha | ship | - | https://github.com/ACicmansky/nexus/pull/7 |" \
     "view should render done backlog row"
   assert_contains "$view" "bin/fm-send.sh fm-secondmate-task" \
     "view should show secondmate send guidance"
   assert_contains "$view" "| secondmate-task | working / status-log | secondmate | $home/secondmate-home | tmux | present / alive |" \
     "view should show secondmate endpoint agent liveness"
   assert_not_contains "$view" "fm-peek.sh fm-secondmate-task" \
-    "view must not tell firstmate to routinely peek secondmates"
+    "view must not tell nexus to routinely peek secondmates"
   pass "fleet view renders the snapshot without secondmate peek guidance"
 }
 
@@ -814,7 +814,7 @@ test_view_renders_dead_secondmate_agent_status() {
   local home fakebin view
   home=$(make_home dead-secondmate)
   fm_write_meta "$home/state/dead-secondmate.meta" \
-    "window=firstmate:fm-dead-secondmate" \
+    "window=nexus:fm-dead-secondmate" \
     "project=$home/secondmate-home" \
     "harness=codex" \
     "kind=secondmate" \
@@ -840,7 +840,7 @@ test_open_decision_survives_later_unrelated_event() {
   home=$(make_home masking)
   mkdir -p "$home/secondmate-home"
   fm_write_meta "$home/state/masked-decision.meta" \
-    "window=firstmate:fm-masked-decision" \
+    "window=nexus:fm-masked-decision" \
     "worktree=$home/secondmate-home" \
     "project=$home/secondmate-home" \
     "harness=codex" \
@@ -869,7 +869,7 @@ test_secondmate_open_decision_survives_live_endpoint() {
   home=$(make_home active-secondmate)
   mkdir -p "$home/secondmate-home"
   fm_write_meta "$home/state/active-secondmate.meta" \
-    "window=firstmate:fm-active-secondmate" \
+    "window=nexus:fm-active-secondmate" \
     "worktree=$home/secondmate-home" \
     "project=$home/secondmate-home" \
     "harness=codex" \
@@ -896,7 +896,7 @@ test_open_decision_transfers_to_captain_hold() {
   home=$(make_home captain-held-transfer)
   mkdir -p "$home/secondmate-home"
   fm_write_meta "$home/state/transferred-decision.meta" \
-    "window=firstmate:fm-transferred-decision" \
+    "window=nexus:fm-transferred-decision" \
     "worktree=$home/secondmate-home" \
     "project=$home/secondmate-home" \
     "harness=codex" \
@@ -921,7 +921,7 @@ test_open_decision_clears_on_keyed_resolution() {
   home=$(make_home resolution)
   mkdir -p "$home/secondmate-home"
   fm_write_meta "$home/state/resolved-decision.meta" \
-    "window=firstmate:fm-resolved-decision" \
+    "window=nexus:fm-resolved-decision" \
     "worktree=$home/secondmate-home" \
     "project=$home/secondmate-home" \
     "harness=codex" \
@@ -955,9 +955,9 @@ test_completed_scout_report_is_pointer_not_pending() {
   home=$(make_home completed-scout)
   mkdir -p "$home/projects/scout-wt" "$home/data/lavish-103"
   fm_write_meta "$home/state/lavish-103.meta" \
-    "window=firstmate:fm-lavish-103" \
+    "window=nexus:fm-lavish-103" \
     "worktree=$home/projects/scout-wt" \
-    "project=firstmate" \
+    "project=nexus" \
     "harness=claude" \
     "kind=scout" \
     "mode=scout"
@@ -986,7 +986,7 @@ test_completed_scout_report_is_pointer_not_pending() {
     for terminal in 'done' failed; do
       id="$kind-$terminal"
       fm_write_meta "$home/state/$id.meta" \
-        "window=firstmate:fm-$id" "worktree=$home/projects/task" \
+        "window=nexus:fm-$id" "worktree=$home/projects/task" \
         "kind=$kind" "harness=claude"
       record_claude_idle "$home/state" "$id"
       printf 'blocked [key=access]: waiting\nneeds-decision [key=choice]: choose a route\n%s: final outcome\nnote: cleanup complete\n' \
@@ -1036,9 +1036,9 @@ test_parked_scout_decision_stays_pending() {
   home=$(make_home parked-scout)
   mkdir -p "$home/projects/scout-wt2"
   fm_write_meta "$home/state/parked-scout.meta" \
-    "window=firstmate:fm-parked-scout" \
+    "window=nexus:fm-parked-scout" \
     "worktree=$home/projects/scout-wt2" \
-    "project=firstmate" \
+    "project=nexus" \
     "harness=claude" \
     "kind=scout" \
     "mode=scout"
@@ -1070,7 +1070,7 @@ test_home_summary_excludes_secondmate_from_child_inventory() {
 ## Done
 EOF
   fm_write_meta "$home/state/mate.meta" \
-    "window=firstmate:fm-mate" \
+    "window=nexus:fm-mate" \
     "worktree=$home/secondmate-home" \
     "project=$home/secondmate-home" \
     "harness=codex" \
@@ -1108,7 +1108,7 @@ EOF
   ' >/dev/null || fail "terminal secondmate with a matching in-flight row must not produce terminal_in_flight: $out"
 
   fm_write_meta "$home/state/unowned-ship.meta" \
-    "window=firstmate:fm-unowned-ship" \
+    "window=nexus:fm-unowned-ship" \
     "worktree=$home/projects/unowned" \
     "project=alpha" \
     "harness=claude" \
@@ -1134,7 +1134,7 @@ EOF
 ## Done
 EOF
   fm_write_meta "$home/state/terminal-ship.meta" \
-    "window=firstmate:fm-terminal-ship" \
+    "window=nexus:fm-terminal-ship" \
     "worktree=$home/projects/terminal" \
     "project=alpha" \
     "harness=claude" \

@@ -8,7 +8,7 @@
 . "$(dirname "${BASH_SOURCE[0]}")/lib.sh"
 
 # fm-wake-drain.sh now calls fm-guard.sh to assert watcher liveness on every
-# drain. fm-guard.sh's first check warns when the firstmate PRIMARY checkout
+# drain. fm-guard.sh's first check warns when the nexus PRIMARY checkout
 # (FM_ROOT) sits on a feature branch; with no override FM_ROOT resolves to the
 # test runner's own checkout, which during validation is on a feature branch, so
 # each drain would emit a spurious worktree-tangle banner. Point the tangle check

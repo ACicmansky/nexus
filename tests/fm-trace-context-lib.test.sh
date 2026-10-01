@@ -71,8 +71,8 @@ fm_trace_context_valid "$SECOND_TP" || fail "second mint must be a valid tracepa
 pass "every mint is an unrelated fresh root - one trace per task, no parent adoption"
 
 # --- minted-root shape --------------------------------------------------------
-# A firstmate-MINTED root is exactly the fixed 55-char W3C form with random ids
-# and no free-form field where firstmate could originate a prompt, path, or
+# A nexus-MINTED root is exactly the fixed 55-char W3C form with random ids
+# and no free-form field where nexus could originate a prompt, path, or
 # secret (that the lib reads no task prose is asserted separately below). With
 # no inherited-context path, every carrier the lib yields is either such a mint
 # or the same task's previously recorded carrier reused verbatim.
@@ -80,7 +80,7 @@ case "$ROOT_TP" in
   *[!0-9a-f-]*) fail "a minted traceparent must contain only hex and hyphens: $ROOT_TP" ;;
 esac
 [ "${#ROOT_TP}" -eq 55 ] || fail "a minted traceparent is exactly 55 chars, got ${#ROOT_TP}"
-pass "a minted root is the fixed 55-char W3C form (hex and hyphens only), so firstmate originates no free-form content in the carrier"
+pass "a minted root is the fixed 55-char W3C form (hex and hyphens only), so nexus originates no free-form content in the carrier"
 
 # --- enablement precedence ---------------------------------------------------
 

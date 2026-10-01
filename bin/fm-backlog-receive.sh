@@ -100,7 +100,7 @@ case "/$REL/" in */../*|*/./*) die "delivered outbox path contains traversal" ;;
 case "$REL" in *'//'*) die "delivered outbox path is malformed" ;; esac
 [ -f "$FM_HOME/.fm-secondmate-home" ] && [ ! -L "$FM_HOME/.fm-secondmate-home" ] \
   || die "FM_HOME is not a seeded secondmate home"
-[ -f "$FM_HOME/AGENTS.md" ] && [ -d "$FM_HOME/bin" ] || die "FM_HOME is not a Firstmate home"
+[ -f "$FM_HOME/AGENTS.md" ] && [ -d "$FM_HOME/bin" ] || die "FM_HOME is not a Nexus home"
 HOME_REAL=$(CDPATH='' cd -- "$FM_HOME" 2>/dev/null && pwd -P) || die "FM_HOME cannot be resolved"
 PARENT=$(dirname "$FM_HOME/$REL")
 PARENT_REAL=$(CDPATH='' cd -- "$PARENT" 2>/dev/null && pwd -P) || die "delivered outbox parent is unavailable"

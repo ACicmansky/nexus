@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # PreToolUse guard against primary-session delegation outside the fleet.
 #
-# A firstmate primary that delegates through a harness's own delegation,
+# A nexus primary that delegates through a harness's own delegation,
 # scheduling, or background-work tool creates work with no `state/<id>.meta` and
 # no `data/<id>/brief.md`. Only `bin/fm-spawn.sh` writes that metadata, and
 # untracked project work contributes nothing to the in-flight branch of
@@ -42,7 +42,7 @@
 #   DENY - exit 2, a Claude-shaped deny object on stderr, and a Grok-shaped
 #          deny object on stdout unless --claude was supplied.
 #   INERT - not a genuine primary home (a crewmate/scout task worktree or a
-#           non-firstmate repo): exit 0 with no output, exactly like ALLOW.
+#           non-nexus repo): exit 0 with no output, exactly like ALLOW.
 #   ESCAPE - FM_ALLOW_SUBAGENT=1 in the environment allows deliberately.
 #   FAIL OPEN - malformed or empty stdin, or missing jq for stdin transport.
 #
@@ -53,7 +53,7 @@
 set -u
 
 # Lowercase substrings that mark a tool name as delegation-shaped: it creates
-# work, an agent, a schedule, or an isolated workspace that firstmate would not
+# work, an agent, a schedule, or an isolated workspace that nexus would not
 # know about. This list is the single owner of the shipped classification.
 DELEGATION_STEMS='agent subagent task workflow cron schedul worktree delegate spawn dispatch handoff remote sendmessage monitor'
 
@@ -68,7 +68,7 @@ OBSERVE_ONLY_TOOLS='taskoutput taskstop taskget tasklist cronlist bashoutput kil
 # Exact lowercase tool names that match a stem above but create no RUNNABLE
 # work. These write only the harness's session-local todo list, which has no
 # executor: it spawns no agent, allocates no worktree, registers no schedule,
-# and starts nothing that could outlive the session or escape a firstmate
+# and starts nothing that could outlive the session or escape a nexus
 # guard. Denying them stops the primary tracking its own plan while granting no
 # delegation power, and the deny text would tell it to run bin/fm-brief.sh for a
 # todo entry, so the stem match here is a false positive rather than a policy.
@@ -95,8 +95,8 @@ Do not ship that Claude-only list in tracked project settings, because linked
 worktrees inherit it and legitimate crewmates would lose their delegation tools.
 This hook remains as the shipped guard for future delegation-shaped names
 outside any local fixed list.
-Fires only in a genuine firstmate primary home; it is a silent no-op in a
-crewmate/scout task worktree or any non-firstmate repo, where a worker using
+Fires only in a genuine nexus primary home; it is a silent no-op in a
+crewmate/scout task worktree or any non-nexus repo, where a worker using
 delegation tools is legitimate.
 Exits 0 to allow and 2 to deny, naming the real crewmate dispatch path instead.
 Set FM_ALLOW_SUBAGENT=1 in the session environment to allow deliberately.
@@ -195,7 +195,7 @@ else
   ROUTE='first classify the work under the AGENTS.md intake contract, then use bin/fm-brief.sh followed by bin/fm-spawn.sh for dispatched work'
 fi
 
-REASON="[subagent-dispatch] the firstmate primary dispatches through the fleet, not the harness's own delegation tools: work started that way has no durable fleet record, leaves every firstmate guard inert, and dies with this session. Instead, $ROUTE (blocked tool: $TOOL, delegation-shaped on \"$MATCHED\"). Launch the session with FM_ALLOW_SUBAGENT=1 for a deliberate exception."
+REASON="[subagent-dispatch] the nexus primary dispatches through the fleet, not the harness's own delegation tools: work started that way has no durable fleet record, leaves every nexus guard inert, and dies with this session. Instead, $ROUTE (blocked tool: $TOOL, delegation-shaped on \"$MATCHED\"). Launch the session with FM_ALLOW_SUBAGENT=1 for a deliberate exception."
 
 json_escape() {
   printf '%s' "$1" | sed -e 's/\\/\\\\/g' -e 's/"/\\"/g' | tr '\n' ' '

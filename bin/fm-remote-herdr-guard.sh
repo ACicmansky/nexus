@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# launchd exec target for the Firstmate-owned dev.firstmate.herdr.fm-remote
+# launchd exec target for the Nexus-owned dev.nexus.herdr.fm-remote
 # launch agent: make the Aqua login session own the fm-remote Herdr server.
 #
 # Usage:
@@ -30,7 +30,7 @@
 #                                          reconnecting SSH attach can start
 #                                          another foreign server
 #   the foreign server does not release the socket in time -> exit 1
-# A takeover closes every pane in that session; the parent firstmate's
+# A takeover closes every pane in that session; the parent nexus's
 # secondmate liveness sweep relaunches its mates into the Aqua-born server.
 # bin/fm-remote-herdr-owner-lib.sh owns the owner discovery and the birth
 # markers; FM_REMOTE_HERDR_GUARD_STOP_WAIT_TENTHS (default 50) bounds the

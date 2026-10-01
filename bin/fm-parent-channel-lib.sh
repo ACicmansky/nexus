@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # fm-parent-channel-lib.sh - the one owner of a secondmate home's parent channel.
 #
-# WHY THIS EXISTS. A secondmate is a firstmate in its own home, and nobody reads
-# its chat: the captain and the main firstmate see only what is appended to the
+# WHY THIS EXISTS. A secondmate is a nexus in its own home, and nobody reads
+# its chat: the captain and the main nexus see only what is appended to the
 # parent channel. A mate can satisfy AGENTS.md's address rule in local chat
 # while skipping the charter's return-channel instruction, so a PR-ready result,
 # finding, decision, blocker, or failure never reaches the parent.

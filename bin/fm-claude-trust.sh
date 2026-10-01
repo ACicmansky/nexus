@@ -25,18 +25,18 @@
 # non-interactive mode (-p, or a non-TTY stdout), and a spawned pane is
 # interactive. Every fresh task worktree therefore hits it, and so does every
 # secondmate home the operator has not opened by hand. The dialog renders
-# with the cursor on "No, exit" and firstmate's steering plane carries only
-# Enter, Escape and C-c with no arrow navigation, so firstmate cannot answer it
+# with the cursor on "No, exit" and nexus's steering plane carries only
+# Enter, Escape and C-c with no arrow navigation, so nexus cannot answer it
 # and must not try - pressing Enter would select exit. The agent wedges before
 # it ever reads the brief. Registering the trust before launch is the only
 # control that reaches an interactive pane. The same reasoning covers Claude
 # Code's separate "Allow external CLAUDE.md file imports?" dialog, which
-# `--setting-sources project,local` (firstmate PR 10's minimal worker tool
+# `--setting-sources project,local` (nexus PR 10's minimal worker tool
 # surface) stopped suppressing: it renders whenever a loaded CLAUDE.md chain
 # reaches outside the project tree - which every crewmate's does, through the
 # captain's own `~/.claude/CLAUDE.md` importing `~/.claude/RTK.md` - and it is
 # gated the same fail-closed way as trust: cursor on "No, disable", no arrow
-# navigation from firstmate's steering plane. Only worktree mode reaches this
+# navigation from nexus's steering plane. Only worktree mode reaches this
 # second dialog's flags: a secondmate home has no separate "project" entry to
 # carry consent forward from, so its registration stays trust-only.
 #
@@ -120,21 +120,21 @@
 # opt-in guard family (FM_*_LIVE_E2E=1) and record the result in
 # docs/verification/runtime-backends.md, rather than assuming the shape here.
 #
-# SECONDMATE-HOME MODE. A secondmate home is a whole firstmate instance rather
+# SECONDMATE-HOME MODE. A secondmate home is a whole nexus instance rather
 # than a task worktree, and bin/fm-home-seed.sh produces it in two shapes: a
-# leased treehouse worktree (linked) and a standalone clone of the firstmate
+# leased treehouse worktree (linked) and a standalone clone of the nexus
 # repo (a primary checkout). The worktree test above therefore cannot decide
 # this case at all - it refuses the standalone clone as a primary checkout,
 # which is why a claude secondmate in an explicit ~/fm-homes/<id> home met the
 # dialog with nothing registered. Git shape is not the evidence here; THE SEED
 # IS. The home must carry a .fm-secondmate-home marker that is a regular file
 # this user owns, never a symlink, naming exactly the <id> passed; it must hold
-# the firstmate instance files AGENTS.md and bin/; and each of its data, state,
+# the nexus instance files AGENTS.md and bin/; and each of its data, state,
 # config and projects paths must resolve inside the home. That is the set
-# bin/fm-home-seed.sh writes and bin/fm-spawn.sh's validate_firstmate_home_for_spawn
+# bin/fm-home-seed.sh writes and bin/fm-spawn.sh's validate_nexus_home_for_spawn
 # re-checks before launch, so this accepts exactly the homes a secondmate spawn
 # will launch into and nothing wider: a plain directory, a project checkout, an
-# ordinary firstmate checkout, a home marked for a different secondmate, and a
+# ordinary nexus checkout, a home marked for a different secondmate, and a
 # home whose operational directory escapes it are each refused. An ABSENT
 # operational directory is accepted for the same reason the spawn accepts one -
 # a test stricter than the spawn's own would move the wedge from the dialog to
@@ -334,8 +334,8 @@ elif [ "$MODE" = lab-home ]; then
   if ! { [ -f "$LAB_MARKER" ] && [ -O "$LAB_MARKER" ] && fm_gate_lab_home "$TARGET_REAL"; }; then
     refuse "'$TARGET_REAL' carries no lab-home marker owned by this user, so it is not a disposable lab home"
   fi
-  [ -f "$TARGET_REAL/AGENTS.md" ] || refuse "'$TARGET_REAL' has no AGENTS.md, so it is not a firstmate home"
-  [ -d "$TARGET_REAL/bin" ] || refuse "'$TARGET_REAL' has no bin/, so it is not a firstmate home"
+  [ -f "$TARGET_REAL/AGENTS.md" ] || refuse "'$TARGET_REAL' has no AGENTS.md, so it is not a nexus home"
+  [ -d "$TARGET_REAL/bin" ] || refuse "'$TARGET_REAL' has no bin/, so it is not a nexus home"
   LAB_TOP=$(git -C "$TARGET_REAL" rev-parse --show-toplevel 2>/dev/null) || true
   [ -n "$LAB_TOP" ] && [ "$(real_dir "$LAB_TOP")" = "$TARGET_REAL" ] \
     || refuse "'$TARGET_REAL' is not the top level of a git checkout"
@@ -360,8 +360,8 @@ else
   [ -O "$SUB_MARKER" ] || refuse "'$SUB_MARKER' is not owned by this user"
   SUB_MARKER_ID=$(cat "$SUB_MARKER" 2>/dev/null) || true
   [ "$SUB_MARKER_ID" = "$SUB_ID" ] || refuse "'$TARGET_REAL' is marked for secondmate '${SUB_MARKER_ID:-unknown}', not '$SUB_ID'"
-  [ -f "$TARGET_REAL/AGENTS.md" ] || refuse "'$TARGET_REAL' has no AGENTS.md, so it is not a firstmate home"
-  [ -d "$TARGET_REAL/bin" ] || refuse "'$TARGET_REAL' has no bin/, so it is not a firstmate home"
+  [ -f "$TARGET_REAL/AGENTS.md" ] || refuse "'$TARGET_REAL' has no AGENTS.md, so it is not a nexus home"
+  [ -d "$TARGET_REAL/bin" ] || refuse "'$TARGET_REAL' has no bin/, so it is not a nexus home"
   for sub_dir_name in data state config projects; do
     sub_dir="$TARGET_REAL/$sub_dir_name"
     if [ -L "$sub_dir" ] && [ ! -e "$sub_dir" ]; then
@@ -406,7 +406,7 @@ if [ -e "$STORE" ]; then
 fi
 
 # Read-modify-write, then read back and confirm. fm-spawn runs from a live
-# firstmate Claude Code session that writes this same file, so the store can move
+# nexus Claude Code session that writes this same file, so the store can move
 # under us in both directions and each needs its own answer.
 #
 # Losing the VENDOR's write is the serious one: this renames a whole
@@ -422,7 +422,7 @@ fi
 # lost, and this claims no more than that.
 #
 # Losing OUR entry is the mild one: a vendor rewrite that drops it only resurrects
-# the dialog this registration removes, which reaches firstmate as an ordinary
+# the dialog this registration removes, which reaches nexus as an ordinary
 # stale wake and a relaunch registers again. The readback catches it within these
 # attempts, and it must fail loudly rather than report a trust it did not leave.
 # ponytail: fingerprint-and-refuse, not a lock; flock is absent on macOS and

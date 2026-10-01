@@ -93,7 +93,7 @@ fm_test_fake_gh_axi() {
 
 # fm_test_fake_tmux_spawn <fakebin>
 # Spawn-world tmux: pane_current_path from FM_FAKE_PANE_PATH, session named
-# firstmate, window ops succeed, send-keys succeed. When FM_FAKE_LAUNCH_LOG is
+# nexus, window ops succeed, send-keys succeed. When FM_FAKE_LAUNCH_LOG is
 # set, each send-keys -l payload is appended one per line. When FM_FAKE_PANE_LOG
 # is set, each send-keys TEXT-LINE payload (the pre-launch pane exports, which
 # carry no -l) is appended there instead, one per line in send order. Optional
@@ -111,7 +111,7 @@ case "$*" in
   *"#{pane_current_path}"*) printf '%s\n' "${FM_FAKE_PANE_PATH:-}"; exit 0 ;;
 esac
 case "${1:-}" in
-  display-message) printf 'firstmate\n'; exit 0 ;;
+  display-message) printf 'nexus\n'; exit 0 ;;
   list-windows)
     if [ -n "${FM_FAKE_DUPLICATE_WINDOW:-}" ]; then
       printf '%s\n' "$FM_FAKE_DUPLICATE_WINDOW"
@@ -266,7 +266,7 @@ SH
 # --- spawn-world ------------------------------------------------------------
 
 # fm_test_spawn_home <home> [harness]
-# Minimal firstmate home layout plus watcher-liveness beat. Optional harness
+# Minimal nexus home layout plus watcher-liveness beat. Optional harness
 # pin is written to config/crew-harness.
 fm_test_spawn_home() {
   local home=$1 harness=${2-}
@@ -286,7 +286,7 @@ fm_test_spawn_brief() {
 ## Captain's intent
 $intent
 
-## Firstmate spec
+## Nexus spec
 Exercise the spawn behavior under test.
 EOF
 }

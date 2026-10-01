@@ -77,8 +77,8 @@ case "${1:-}" in
           fi
           printf 'zsh' > "$D/command.$target"
           ;;
-        *'encode launch-brief'* | *'Firstmate operational input waiting: read'*) cat "$D/becomes" > "$D/command.$target" ;;
-        ': Firstmate instruction waiting: list '*)
+        *'encode launch-brief'* | *'Nexus operational input waiting: read'*) cat "$D/becomes" > "$D/command.$target" ;;
+        ': Nexus instruction waiting: list '*)
           printf 'doorbell\n' >> "$D/rings"
           if [ -x "$D/on-doorbell" ]; then
             "$D/on-doorbell" "$payload"
@@ -177,8 +177,8 @@ add_local_mate() {
 }
 
 # add_repo_backed_mate <case-dir> <id> [harness] [backend-line]
-# Like add_local_mate, but the world is the one /updatefirstmate actually runs
-# against: a bare origin, a firstmate repo clone on its default branch, and the
+# Like add_local_mate, but the world is the one /updatenexus actually runs
+# against: a bare origin, a nexus repo clone on its default branch, and the
 # mate's home as a DETACHED worktree of that repo already sitting on origin's tip.
 # That "already current" home is the shape the old classifier skipped entirely.
 add_repo_backed_mate() {  # <case-dir> <id> [harness] [backend]
@@ -192,12 +192,12 @@ add_repo_backed_mate() {  # <case-dir> <id> [harness] [backend]
     printf '# agents\n' > "$dir/seed/AGENTS.md"
     printf 'echo a\n' > "$dir/seed/bin/tool.sh"
     printf 's1\n' > "$dir/seed/.agents/skills/note.md"
-    # The operational dirs a live home carries are gitignored in a real firstmate
+    # The operational dirs a live home carries are gitignored in a real nexus
     # checkout; without that the home would read as dirty and be skipped.
     printf '/data/\n/state/\n/config/\n/projects/\n/.no-mistakes/\n.fm-secondmate-home\n' \
       > "$dir/seed/.gitignore"
     git -C "$dir/seed" add -A
-    git -C "$dir/seed" -c user.name='Firstmate Tests' -c user.email='tests@example.invalid' commit -qm c1
+    git -C "$dir/seed" -c user.name='Nexus Tests' -c user.email='tests@example.invalid' commit -qm c1
     git -C "$dir/seed" push -q origin main
     git clone -q "$dir/origin.git" "$repo"
     git -C "$repo" remote set-head origin main >/dev/null 2>&1 || true
@@ -225,7 +225,7 @@ add_repo_backed_mate() {  # <case-dir> <id> [harness] [backend]
   printf '%s' "$smhome" > "$dir/fake/cwd"
 }
 
-# run_update_in_case <case-dir>: the real /updatefirstmate mechanics over that world.
+# run_update_in_case <case-dir>: the real /updatenexus mechanics over that world.
 run_update_in_case() {
   local dir=$1
   env PATH="$dir/fakebin:$PATH" FM_FAKE_DIR="$dir/fake" \
@@ -297,7 +297,7 @@ test_persist_precedes_restart() {
   assert_contains "$out" "summary: 1 of 1 restarted, 0 nudged, 0 unreached" "the summary should report the reload"
   # The pane transcript orders the two phases: the instruction doorbell first,
   # the harness exit command only after it.
-  doorbell_line=$(grep -n '^: Firstmate instruction waiting: ' "$dir/fake/literal" | head -1 | cut -d: -f1)
+  doorbell_line=$(grep -n '^: Nexus instruction waiting: ' "$dir/fake/literal" | head -1 | cut -d: -f1)
   exit_line=$(grep -n '^/exit$' "$dir/fake/literal" | head -1 | cut -d: -f1)
   [ -n "$doorbell_line" ] || fail "the persist request never reached the mate"
   [ -n "$exit_line" ] || fail "the mate was never stopped, so it was not restarted"
@@ -639,7 +639,7 @@ test_persist_waits_are_polled_together() {
 
   expect_code 3 "$rc" "the unanswered mate should fall back after the confirmed mate restarts"$'\n'"$out"
   exit_line=$(grep -n '^/exit$' "$dir/fake/literal" | head -1 | cut -d: -f1)
-  nudge_line=$(grep -n '^: Firstmate instruction waiting: ' "$dir/fake/literal" | tail -1 | cut -d: -f1)
+  nudge_line=$(grep -n '^: Nexus instruction waiting: ' "$dir/fake/literal" | tail -1 | cut -d: -f1)
   [ -n "$exit_line" ] && [ -n "$nudge_line" ] && [ "$exit_line" -lt "$nudge_line" ] \
     || fail "Nexus's timeout held the confirmed second mate behind it: $out"
   pass "T10 pending persist answers are polled as one fleet"
@@ -798,7 +798,7 @@ test_already_current_mate_restarts_end_to_end() {
   assert_contains "$out" "summary: 1 of 1 restarted, 0 nudged, 0 unreached" \
     "the pass must report the reload it performed"
   # Persist strictly before replace, read off the pane transcript.
-  doorbell_line=$(grep -n '^: Firstmate instruction waiting: ' "$dir/fake/literal" | head -1 | cut -d: -f1)
+  doorbell_line=$(grep -n '^: Nexus instruction waiting: ' "$dir/fake/literal" | head -1 | cut -d: -f1)
   exit_line=$(grep -n '^/exit$' "$dir/fake/literal" | head -1 | cut -d: -f1)
   [ -n "$doorbell_line" ] || fail "the persist request never reached the already-current mate"
   [ -n "$exit_line" ] || fail "the already-current mate was never stopped, so it was not restarted"

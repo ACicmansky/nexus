@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Post firstmate's composed answer back to the relay for a pending X-mode mention.
+# Post nexus's composed answer back to the relay for a pending X-mode mention.
 #
 # Usage: fm-x-reply.sh <request_id> [--image <path>] <text>
 #        fm-x-reply.sh <request_id> [--image <path>] --text-file <path>
@@ -62,7 +62,7 @@
 # the ORIGINAL platform's budget even after the inbox is drained and with no task
 # link surviving. FAIL-SAFE: if a --followup reply's platform/budget cannot be
 # authoritatively resolved, this REFUSES with exit 8 (distinct from the 409 exit
-# 9) rather than posting with a locally defaulted budget - firstmate holds and
+# 9) rather than posting with a locally defaulted budget - nexus holds and
 # retries it.
 #
 # Long replies auto-split into a numbered thread. X stays within
@@ -76,7 +76,7 @@
 # FMX_X_THREAD_MAX messages (default 25) are produced.
 #
 # Live post config (home .env, FMX_ENV_FILE, or env): FMX_PAIRING_TOKEN
-# (required), FMX_RELAY_URL (default https://myfirstmate.io). Auth:
+# (required), FMX_RELAY_URL (default https://mynexus.io). Auth:
 # Authorization: Bearer <token>.
 #
 # Preview / dry-run: with FMX_DRY_RUN set (truthy), the reply is NOT posted.

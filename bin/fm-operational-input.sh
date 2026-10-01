@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
-# fm-operational-input.sh - canonical Firstmate operational-input protocol.
+# fm-operational-input.sh - canonical Nexus operational-input protocol.
 #
 # This file is both a source-safe shell library and the cross-language CLI used
 # by JavaScript and TypeScript integrations. It is the single owner of current
 # construction, current parsing, and narrow pre-protocol transcript parsing.
 #
 # Current generic wire form:
-#   U+2063 FIRSTMATE_OP: v1 <kind>: <body>
+#   U+2063 NEXUS_OP: v1 <kind>: <body>
 #
-# The landed U+2063 + "FIRSTMATE_OP: " prefix is permanent compatibility.
+# The landed U+2063 + "NEXUS_OP: " prefix is permanent compatibility.
 # The version and kind header make current inputs structurally typed without
-# deriving provenance from body prose. The established from-firstmate routing
+# deriving provenance from body prose. The established from-nexus routing
 # marker remains a current compatibility carrier because already-running
 # secondmates have its leading label in their charter context.
 #
@@ -20,10 +20,10 @@
 # ASCII that no consumer can tell apart from human text. For a harness named in
 # FM_OPERATIONAL_RECORD_HARNESSES a producer instead writes the complete current
 # envelope to a durable record and types only a constant ASCII doorbell naming
-# it. The doorbell text alone proves nothing: it counts as Firstmate input only
+# it. The doorbell text alone proves nothing: it counts as Nexus input only
 # when the record it names exists and holds a current generic envelope. Records
 # are not consumed on delivery, so a verbatim copy of a live doorbell line,
-# pasted back by anyone while its record exists, is treated as Firstmate's.
+# pasted back by anyone while its record exists, is treated as Nexus's.
 #   Record:   <state>/operational-inbox/<name>.msg, <name> matching [0-9a-z-]+,
 #             exactly the encoded envelope bytes, published by atomic rename.
 #             Records are never re-rung or acknowledged; every write prunes
@@ -53,7 +53,7 @@
 # A non-match exits 1 silently. Invalid use exits 2. Bash 3.2 compatible.
 
 FM_OPERATIONAL_MARK=$'\xE2\x81\xA3'
-FM_OPERATIONAL_PREFIX="${FM_OPERATIONAL_MARK}FIRSTMATE_OP: "
+FM_OPERATIONAL_PREFIX="${FM_OPERATIONAL_MARK}NEXUS_OP: "
 FM_OPERATIONAL_VERSION=v1
 FM_OPERATIONAL_HEADER_PREFIX="${FM_OPERATIONAL_PREFIX}${FM_OPERATIONAL_VERSION} "
 FM_OPERATIONAL_KINDS='session-start watcher turn-end-guard away-supervisor launch-brief branch-outcome'
@@ -62,9 +62,9 @@ FM_OPERATIONAL_KINDS='session-start watcher turn-end-guard away-supervisor launc
 # shellcheck disable=SC2034 # Public source-library variable used by callers.
 FM_INJECT_MARK=$FM_OPERATIONAL_MARK
 
-# The from-firstmate carrier stays byte-compatible with live secondmate charter
+# The from-nexus carrier stays byte-compatible with live secondmate charter
 # context while this owner supplies its construction and structural kind.
-FM_FROMFIRST_LABEL='[fm-from-firstmate]'
+FM_FROMFIRST_LABEL='[fm-from-nexus]'
 FM_FROMFIRST_SEPARATOR=$FM_OPERATIONAL_MARK
 FM_FROMFIRST_MARK="${FM_FROMFIRST_LABEL}${FM_FROMFIRST_SEPARATOR}"
 
@@ -86,8 +86,8 @@ fm_operational_input_encode() {  # <generic-kind> <body> <result-var>
 fm_operational_input_construct() {  # <kind> <body> <result-var>
   local kind=${1-} body=${2-} result_var=${3-}
   [ -n "$result_var" ] && [ -n "$body" ] || return 2
-  if [ "$kind" = from-firstmate ]; then
-    fm_message_mark_from_firstmate "$body" "$result_var"
+  if [ "$kind" = from-nexus ]; then
+    fm_message_mark_from_nexus "$body" "$result_var"
     return
   fi
   fm_operational_input_encode "$kind" "$body" "$result_var"
@@ -117,7 +117,7 @@ fm_operational_input_kind() {  # <message> <result-var>
   fi
   case "$message" in
     "$FM_FROMFIRST_MARK"?*)
-      printf -v "$result_var" '%s' from-firstmate
+      printf -v "$result_var" '%s' from-nexus
       return 0
       ;;
   esac
@@ -147,7 +147,7 @@ fm_operational_input_body() {  # <current-message> <result-var>
 # by current producers or current-path tests.
 # shellcheck disable=SC2016 # Backticks are literal historical prompt markup.
 FM_LEGACY_SESSIONSTART='Run `bin/fm-session-start.sh` now, exactly once, before executing any other instructions.'
-FM_LEGACY_WATCHER_PREFIX='FIRSTMATE WATCHER WAKE: '
+FM_LEGACY_WATCHER_PREFIX='NEXUS WATCHER WAKE: '
 FM_LEGACY_WATCHER_SUFFIX=$'\n\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.'
 FM_LEGACY_TURNEND_PREFIX=$'TURN WOULD END BLIND - supervision is off. The watcher cycle is missing, failed, or unhealthy. Follow the harness recovery instruction below before ending the turn.\n\n'
 FM_LEGACY_AWAY_PREFIX="${FM_OPERATIONAL_MARK}Supervisor escalate ("
@@ -156,7 +156,7 @@ fm_legacy_operational_input_kind() {  # <message> <result-var>
   local message=${1-} result_var=${2-}
   [ -n "$result_var" ] || return 2
 
-  # PR 899 landed an untyped FIRSTMATE_OP prefix. Its subtype cannot be
+  # PR 899 landed an untyped NEXUS_OP prefix. Its subtype cannot be
   # recovered without body prose, so it is explicitly generic.
   case "$message" in
     "$FM_OPERATIONAL_PREFIX"?*)
@@ -198,15 +198,15 @@ fm_operational_input_classify() {  # <message> <result-var>
   return 1
 }
 
-fm_message_from_firstmate() {  # <message>
+fm_message_from_nexus() {  # <message>
   local kind
-  fm_operational_input_kind "${1-}" kind && [ "$kind" = from-firstmate ]
+  fm_operational_input_kind "${1-}" kind && [ "$kind" = from-nexus ]
 }
 
-fm_message_mark_from_firstmate() {  # <message> <result-var>
+fm_message_mark_from_nexus() {  # <message> <result-var>
   local message=${1-} result_var=${2-} transformed
   [ -n "$result_var" ] || return 2
-  if fm_message_from_firstmate "$message"; then
+  if fm_message_from_nexus "$message"; then
     transformed=$message
   else
     transformed="${FM_FROMFIRST_MARK}${message}"
@@ -217,8 +217,8 @@ fm_message_mark_from_firstmate() {  # <message> <result-var>
 # --- record-backed carrier (see header) ---------------------------------------
 FM_OPERATIONAL_RECORD_HARNESSES='claude'
 FM_OPERATIONAL_RECORD_DIRNAME='operational-inbox'
-FM_OPERATIONAL_DOORBELL_PREFIX=": Firstmate operational input waiting: read '"
-FM_OPERATIONAL_DOORBELL_SUFFIX="' and handle its contents as Firstmate operational input."
+FM_OPERATIONAL_DOORBELL_PREFIX=": Nexus operational input waiting: read '"
+FM_OPERATIONAL_DOORBELL_SUFFIX="' and handle its contents as Nexus operational input."
 FM_OPERATIONAL_RECORD_RETENTION_DAYS=7
 
 # Whether operational input to <harness> must travel as a record plus doorbell.
@@ -360,10 +360,10 @@ Usage:
   bin/fm-operational-input.sh open <path>    # this home's record; prints its body
 
 Current construction kinds:
-  session-start watcher turn-end-guard away-supervisor from-firstmate launch-brief
+  session-start watcher turn-end-guard away-supervisor from-nexus launch-brief
   branch-outcome
 
-The from-firstmate kind uses its established live-charter-compatible carrier.
+The from-nexus kind uses its established live-charter-compatible carrier.
 A record-backed doorbell counts as operational input only when the record it
 names holds a current generic envelope; `open` also requires that record to be
 in this home's own state/operational-inbox.

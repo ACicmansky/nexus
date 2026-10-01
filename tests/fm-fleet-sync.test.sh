@@ -14,7 +14,7 @@
 #
 # It also pins the clone-root guard: a plain directory under projects/ resolves,
 # through git's upward repository discovery, to the ENCLOSING repository - in a
-# firstmate home, the firstmate checkout itself - so it must be skipped by name
+# nexus home, the nexus checkout itself - so it must be skipped by name
 # with the enclosing repo left untouched, in both the whole-fleet and
 # single-project forms, while a symlinked clone dir still syncs.
 #
@@ -97,7 +97,7 @@ run_sync() {
 }
 
 # build_enclosing_home <name>: an FM_HOME that is itself nested inside another git
-# repository - firstmate's own layout, where projects/ sits inside the firstmate
+# repository - nexus's own layout, where projects/ sits inside the nexus
 # checkout. The enclosing repo is a clean clone of a bare origin that is one commit
 # ahead, so a sync that walked git discovery UP out of projects/<dir> would find a
 # fast-forward available and visibly take it. Echoes the enclosing repo, which is

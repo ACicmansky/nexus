@@ -2,10 +2,10 @@
 # fm-public-followup-lib.sh - shared gating and private-transport helpers for the
 # deterministic public-followup consumer.
 #
-# Firstmate promises a public final reply when a myfirstmate relay mention (X or
+# Nexus promises a public final reply when a mynexus relay mention (X or
 # Discord) asks for work. `tasks-axi public-followup` is the sole owner of that
 # typed obligation and its state machine; state/x-context/ is the sole owner of
-# the private full request context. This library owns Firstmate's activation
+# the private full request context. This library owns Nexus's activation
 # gate, private per-home transport paths, retained-loop state and locking
 # helpers, follow-up window classification, and deterministic terminal-event
 # identity.
@@ -15,7 +15,7 @@
 # set -u / set -e safe.
 #
 # GATE ORDER - the acceptance criterion for relay-disabled homes:
-#   1. fm_pf_relay_active <home>     the authoritative myfirstmate activation
+#   1. fm_pf_relay_active <home>     the authoritative mynexus activation
 #                                    contract, a non-empty FMX_PAIRING_TOKEN in
 #                                    <home>/.env. There is no second flag. When
 #                                    <home>/.env is absent this is a single
@@ -98,7 +98,7 @@ FM_PF_EVENT_BYTES_MAX=${FM_PF_EVENT_BYTES_MAX:-8192}
 
 # --- gate 1: the authoritative relay activation contract --------------------
 
-# fm_pf_relay_active <home>: 0 when this home has opted into the myfirstmate
+# fm_pf_relay_active <home>: 0 when this home has opted into the mynexus
 # relay, 1 otherwise. Identical contract to bootstrap's X-mode activation - a
 # non-empty FMX_PAIRING_TOKEN in <home>/.env - so no second activation flag
 # exists to drift. FMX_PAIRING_TOKEN in the environment wins, matching
@@ -584,7 +584,7 @@ FM_PF_SURFACED_BASENAME=surfaced
 
 # fm_pf_events_signature <state>: a stable digest of the pending event id set.
 # The relay poll compares it against the surfaced record so an unconsumed event
-# wakes firstmate once per new event, not once per poll cycle.
+# wakes nexus once per new event, not once per poll cycle.
 fm_pf_events_signature() {
   local dir entry pending_names=
   dir=$(fm_pf_events_dir "$1")

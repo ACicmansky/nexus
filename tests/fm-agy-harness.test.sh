@@ -442,7 +442,7 @@ test_agy_trust_refuses_out_of_scope_paths() {
 # in the trustedWorkspaces array of the store the spawn just wrote.
 # FM_FAKE_AGY_IGNORE_TRUST=1 models a vendor that stopped honouring the store;
 # FM_FAKE_AGY_ASSUME_TRUSTED=1 models a pane that never shows the dialog even
-# though firstmate could not register the path (a busy verdict with no proof
+# though nexus could not register the path (a busy verdict with no proof
 # of where the turn runs);
 # FM_FAKE_AGY_RACE=1 models Herdr's native busy verdict rendering one capture
 # before the dialog paints; FM_FAKE_AGY_ANSWER=stuck models a dialog whose
@@ -483,7 +483,7 @@ case "$*" in
   *"#{cursor_y}"*) printf '1\n'; exit 0 ;;
 esac
 case "${1:-}" in
-  display-message) printf 'firstmate\n'; exit 0 ;;
+  display-message) printf 'nexus\n'; exit 0 ;;
   list-windows) exit 0 ;;
   has-session|new-session|new-window|kill-window) exit 0 ;;
   send-keys)
@@ -564,7 +564,7 @@ make_agy_spawn_case() {
 ## Captain's intent
 Exercise Antigravity dispatch.
 
-## Firstmate spec
+## Nexus spec
 Verify launch and delivery behavior.
 EOF
   printf 'agy\n' > "$home/config/crew-harness"

@@ -229,7 +229,7 @@ make_secondmate_dir() {
 }
 
 # A genuine linked `git worktree` of a base repo - the shape bin/fm-spawn.sh
-# always hands crewmate/scout tasks working on firstmate itself. git-dir and
+# always hands crewmate/scout tasks working on nexus itself. git-dir and
 # git-common-dir differ here, unlike a plain checkout.
 make_crewmate_worktree_dir() {
   local base=$1 dir=$2
@@ -525,7 +525,7 @@ test_hook_loop_guard_allows_retry() {
   pass "fm-turnend-guard: stop_hook_active=true always allows the stop (never blocks twice in one turn)"
 }
 
-# A secondmate's OWN home runs a primary firstmate session and must be guarded
+# A secondmate's OWN home runs a primary nexus session and must be guarded
 # exactly like the main primary. This was the guard's proven blind spot: the
 # .fm-secondmate-home marker used to early-exit here, so an overnight secondmate
 # could end a turn with an unsupervised child and sit blind. Removing that marker
@@ -754,7 +754,7 @@ EOF
   assert_contains "$(cat "$log")" '<session-test>' "grok adapter must pass the hook session id"
   assert_not_contains "$(cat "$log")" '<--permission-mode>' "grok adapter must not add a stronger permission mode"
   assert_not_contains "$(cat "$log")" '<bypassPermissions>' "grok adapter must not bypass permissions on forced resume"
-  assert_contains "$(cat "$log")" 'FIRSTMATE_OP: v1 turn-end-guard: TURN WOULD END BLIND' "grok adapter must retain the typed guard kind"
+  assert_contains "$(cat "$log")" 'NEXUS_OP: v1 turn-end-guard: TURN WOULD END BLIND' "grok adapter must retain the typed guard kind"
   pass "fm-turnend-guard-grok: forces one explicitly marked same-session resume when the shared predicate blocks"
 }
 
@@ -957,7 +957,7 @@ EOF
   chmod +x "$dir/bin/fm-turnend-guard.sh"
   payload=$(jq -cn --arg cwd "$outside" '{cwd:$cwd,stop_hook_active:false}')
   out=$(printf '%s' "$payload" | (cd "$dir" && bash -c "$command") 2>&1); status=$?
-  expect_code 0 "$status" "codex hook must execute successfully when payload cwd is outside the firstmate root"
+  expect_code 0 "$status" "codex hook must execute successfully when payload cwd is outside the nexus root"
   assert_contains "$out" "guard=$expected_root/bin/fm-turnend-guard.sh" "codex hook must use the hook process root"
   assert_contains "$out" "$payload" "codex hook must pass the original payload to the guard"
   pass ".codex/hooks.json: Stop hook uses hook process root when payload cwd is outside"
@@ -996,7 +996,7 @@ EOF
   payload=$(jq -cn --arg cwd "$subdir" '{cwd:$cwd,stop_hook_active:false}')
   out=$(printf '%s' "$payload" | (cd "$dir" && bash -c "$command") 2>&1); status=$?
   expect_code 0 "$status" "codex hook must not execute a nested project guard"
-  assert_contains "$out" "guard=$expected_root/bin/fm-turnend-guard.sh" "codex hook must keep using the outer firstmate guard"
+  assert_contains "$out" "guard=$expected_root/bin/fm-turnend-guard.sh" "codex hook must keep using the outer nexus guard"
   assert_not_contains "$out" "nested guard executed" "codex hook must not execute nested project code"
   pass ".codex/hooks.json: Stop hook ignores nested git root guard scripts"
 }
@@ -1036,7 +1036,7 @@ const hooks = await mod.FmPrimaryTurnendGuard({
   worktree: process.env.WORKTREE,
 });
 await hooks.event({ event: { type: "session.idle", properties: { sessionID: "session-test" } } });
-if (!promptBody.startsWith("\u2063FIRSTMATE_OP: v1 turn-end-guard: ")) {
+if (!promptBody.startsWith("\u2063NEXUS_OP: v1 turn-end-guard: ")) {
   console.error(`untyped operational prompt: ${promptBody}`);
   process.exit(1);
 }
@@ -1094,7 +1094,7 @@ const pi = {
   },
   async sendUserMessage(message, options) {
     prompts += 1;
-    if (!message.startsWith("\u2063FIRSTMATE_OP: v1 turn-end-guard: ")) throw new Error(`untyped operational prompt: ${message}`);
+    if (!message.startsWith("\u2063NEXUS_OP: v1 turn-end-guard: ")) throw new Error(`untyped operational prompt: ${message}`);
     if (!message.includes("TURN WOULD END BLIND")) throw new Error(`unexpected prompt: ${message}`);
     if (!message.includes("watcher cycle is missing, failed, or unhealthy")) throw new Error(`guard prompt omitted recovery-only state: ${message}`);
     if (message.includes("Resume supervision according to the session-start operating block")) throw new Error(`guard prompt used ordinary continuity: ${message}`);
@@ -1339,7 +1339,7 @@ test_hook_claude_mode_repeated_failed_to_arming_interleavings_reach_fail_open() 
 
   out=$(run_hook_claude "$dir" true); status=$?
   expect_code 0 "$status" "repeated failed-to-arming interleavings must reach terminal fail-open"
-  assert_contains "$out" 'FIRSTMATE SUPERVISION IS GENUINELY DOWN' "arming interleavings stalled before the bounded fail-open"
+  assert_contains "$out" 'NEXUS SUPERVISION IS GENUINELY DOWN' "arming interleavings stalled before the bounded fail-open"
   assert_present "$dir/state/.claude-autoarm-failure-alarmed" "arming interleavings did not consume the one-time alarm"
   pass "fm-turnend-guard --claude: repeated failed-to-arming races make bounded monotonic progress"
 }
@@ -1392,7 +1392,7 @@ SH
   [ -z "$auto_out" ] || fail "excluded terminal-window owner produced output: $auto_out"
   assert_absent "$dir/state/arm-ran" "excluded terminal-window owner started an arm cycle"
   expect_code 0 "$(cat "$guard_status")" "terminal boundary guard must complete without deadlock"
-  assert_contains "$(cat "$guard_out")" 'FIRSTMATE SUPERVISION IS GENUINELY DOWN' "terminal boundary did not produce the one-time alarm"
+  assert_contains "$(cat "$guard_out")" 'NEXUS SUPERVISION IS GENUINELY DOWN' "terminal boundary did not produce the one-time alarm"
   assert_absent "$dir/state/.claude-autoarm.lock" "terminal boundary left its owner lock behind"
   pass "fm-turnend-guard --claude: terminal owner boundary excludes a concurrent start without deadlock"
 }
@@ -1550,7 +1550,7 @@ test_hook_claude_mode_terminal_fail_open_clears_abandoned_claim() {
   kill "$pid" 2>/dev/null || true
   wait "$pid" 2>/dev/null || true
   expect_code 0 "$status" "the verified attended fail-open still ends the turn once it is spent"
-  assert_contains "$out" 'FIRSTMATE SUPERVISION IS GENUINELY DOWN' "an abandoned claim suppressed the episode's attended alarm"
+  assert_contains "$out" 'NEXUS SUPERVISION IS GENUINELY DOWN' "an abandoned claim suppressed the episode's attended alarm"
   assert_present "$dir/state/.claude-autoarm-failure-alarmed" "abandoned-claim terminal path did not consume the one-time alarm"
   assert_absent "$dir/state/.claude-autoarm.lock" "abandoned-claim terminal path left the stale claim in place"
   assert_absent "$dir/state/.claude-autoarm.lock.steal" "abandoned-claim reclaim left its serialization mutex behind"
@@ -1600,10 +1600,10 @@ test_hook_claude_mode_integrated_monotonic_fail_open() {
     guard_out=$(FM_CLAUDE_AUTOARM_SYNC_WAIT_MS=100 run_hook_claude "$dir" true); guard_status=$?
     if [ "$i" -lt 4 ]; then
       expect_code 2 "$guard_status" "failed epoch $i must consume a bounded blind-stop block"
-      assert_not_contains "$guard_out" 'FIRSTMATE SUPERVISION IS GENUINELY DOWN' "fail-open fired before the bounded progression ended"
+      assert_not_contains "$guard_out" 'NEXUS SUPERVISION IS GENUINELY DOWN' "fail-open fired before the bounded progression ended"
     else
       expect_code 0 "$guard_status" "the bounded failure progression must reach the attended fail-open"
-      assert_contains "$guard_out" 'FIRSTMATE SUPERVISION IS GENUINELY DOWN' "the integrated fail-open alarm is missing"
+      assert_contains "$guard_out" 'NEXUS SUPERVISION IS GENUINELY DOWN' "the integrated fail-open alarm is missing"
       assert_present "$dir/state/.claude-autoarm-failure-alarmed" "the integrated fail-open did not consume its episode alarm"
     fi
   done
@@ -1613,7 +1613,7 @@ test_hook_claude_mode_integrated_monotonic_fail_open() {
   [ -z "$out" ] || fail "post-fail-open auto-arm produced continuation output: $out"
   guard_out=$(FM_CLAUDE_AUTOARM_SYNC_WAIT_MS=100 run_hook_claude "$dir" true); guard_status=$?
   expect_code 2 "$guard_status" "a later unhealthy stop in the same episode must remain attended"
-  assert_not_contains "$guard_out" 'FIRSTMATE SUPERVISION IS GENUINELY DOWN' "the attended alarm repeated in the same episode"
+  assert_not_contains "$guard_out" 'NEXUS SUPERVISION IS GENUINELY DOWN' "the attended alarm repeated in the same episode"
 
   sleep 60 &
   pid=$!
@@ -1675,18 +1675,18 @@ test_hook_claude_mode_frozen_epoch_reaches_bounded_fail_open() {
     if [ "$i" -lt 4 ]; then
       expect_code 2 "$guard_status" "frozen-epoch stop $i must still re-block within the budget"
       assert_contains "$guard_out" "TURN WOULD END BLIND" "frozen-epoch re-block $i lost the blind-turn banner"
-      assert_not_contains "$guard_out" 'FIRSTMATE SUPERVISION IS GENUINELY DOWN' "fail-open fired before the frozen-epoch budget was spent"
+      assert_not_contains "$guard_out" 'NEXUS SUPERVISION IS GENUINELY DOWN' "fail-open fired before the frozen-epoch budget was spent"
       assert_absent "$dir/state/.claude-autoarm-failure-alarmed" "frozen-epoch re-block $i consumed the attended alarm early"
     else
       expect_code 0 "$guard_status" "the frozen-epoch progression must reach the attended fail-open"
-      assert_contains "$guard_out" 'FIRSTMATE SUPERVISION IS GENUINELY DOWN' "the frozen-epoch fail-open alarm is missing"
+      assert_contains "$guard_out" 'NEXUS SUPERVISION IS GENUINELY DOWN' "the frozen-epoch fail-open alarm is missing"
       assert_present "$dir/state/.claude-autoarm-failure-alarmed" "the frozen-epoch fail-open did not consume its episode alarm"
     fi
   done
 
   guard_out=$(FM_CLAUDE_AUTOARM_SYNC_WAIT_MS=100 run_hook_claude "$dir" true); guard_status=$?
   expect_code 2 "$guard_status" "a later unhealthy stop after the frozen-epoch alarm must remain attended"
-  assert_not_contains "$guard_out" 'FIRSTMATE SUPERVISION IS GENUINELY DOWN' "the attended alarm repeated against the frozen epoch"
+  assert_not_contains "$guard_out" 'NEXUS SUPERVISION IS GENUINELY DOWN' "the attended alarm repeated against the frozen epoch"
 
   # The other direction: the bound must not outlive the failure. A verified
   # healthy watcher still lets the stop through and clears the whole episode.
@@ -1841,14 +1841,14 @@ test_hook_claude_mode_verified_failure_alarm_is_loud_and_once() {
   seed_claude_budget "$dir" 3
   out=$(FM_CLAUDE_AUTOARM_SYNC_WAIT_MS=100 run_hook_claude "$dir" true); status=$?
   expect_code 0 "$status" "verified failure with exhausted budget must take the bounded attended fail-open"
-  assert_contains "$out" 'FIRSTMATE SUPERVISION IS GENUINELY DOWN' "bounded fail-open alarm was not unmistakable"
+  assert_contains "$out" 'NEXUS SUPERVISION IS GENUINELY DOWN' "bounded fail-open alarm was not unmistakable"
   assert_contains "$out" 'Keep this session attended' "bounded fail-open alarm omitted the attended-session action"
   assert_contains "$out" 'diagnose the automatic Stop-hook and watcher startup' "bounded fail-open alarm omitted automatic-mechanism diagnosis"
   assert_not_contains "$out" 'fm-watch-arm.sh' "bounded fail-open alarm assigned a manual watcher launch"
   assert_present "$dir/state/.claude-autoarm-failure-alarmed" "bounded fail-open did not consume the episode alarm"
   out2=$(FM_CLAUDE_AUTOARM_SYNC_WAIT_MS=100 run_hook_claude "$dir" true); status2=$?
   expect_code 2 "$status2" "a consumed attended alarm must make later unhealthy stops block again"
-  assert_not_contains "$out2" 'FIRSTMATE SUPERVISION IS GENUINELY DOWN' "attended failure alarm repeated in one episode"
+  assert_not_contains "$out2" 'NEXUS SUPERVISION IS GENUINELY DOWN' "attended failure alarm repeated in one episode"
   pass "fm-turnend-guard --claude: verified fail-open is loud, bounded, attended, and non-repeating"
 }
 

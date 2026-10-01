@@ -124,7 +124,7 @@ git -C "$REMOTE_ROOT" config user.email test@example.com
 git -C "$REMOTE_ROOT" config user.name Test
 git -C "$REMOTE_ROOT" add .
 git -C "$REMOTE_ROOT" commit -qm 'remote fixture root'
-REMOTE_ORIGIN="$TMP_ROOT/firstmate-origin.git"
+REMOTE_ORIGIN="$TMP_ROOT/nexus-origin.git"
 git init -q --bare "$REMOTE_ORIGIN"
 git -C "$REMOTE_ROOT" remote add origin "file://$REMOTE_ORIGIN"
 git -C "$REMOTE_ROOT" push -q -u origin main
@@ -240,7 +240,7 @@ mkdir -p "$REMOTE_HOME/state"
 printf '%s\n' manual > "$REMOTE_HOME/config/backlog-backend"
 write_child_meta() {
   fm_write_meta "$REMOTE_HOME/state/work-child.meta" \
-    "window=firstmate:fm-work-child" "endpoint_task_id=work-child" \
+    "window=nexus:fm-work-child" "endpoint_task_id=work-child" \
     "worktree=$CHILD_WT" "project=$CHILD_WT" "harness=codex" "kind=ship" \
     "mode=local-only" "yolo=off"
 }
@@ -263,7 +263,7 @@ run_child_teardown() { # <extra env assignments...>
 
 # Case B-equivalent: the delivered (wrong) binding points at the remote code
 # root, and that root itself carries an X-mode .env - a plausible real-world
-# state (a captain who also runs Firstmate directly on the build Mac). Before
+# state (a captain who also runs Nexus directly on the build Mac). Before
 # the fix this refused; the durable record now makes it out of scope.
 printf 'FMX_PAIRING_TOKEN=remote-host-token\n' > "$REMOTE_ROOT/.env"
 run_child_teardown FM_PUBLIC_FOLLOWUP_PRIMARY_HOME="$DELIVERED"

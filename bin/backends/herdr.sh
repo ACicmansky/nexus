@@ -14,7 +14,7 @@
 # Default container shape (D4, decided empirically - see
 # herdr-verification-p2.md "Task container shape", refined by
 # docs/herdr-backend.md "Default task container shape"): ONE herdr workspace PER
-# FIRSTMATE HOME (the primary, and each secondmate, gets its own), ONE herdr TAB
+# NEXUS HOME (the primary, and each secondmate, gets its own), ONE herdr TAB
 # per task inside its home's workspace. The default-on presentation projection
 # creates a disposable workspace for a clean fresh task instead unless the home
 # opts out. That
@@ -65,8 +65,8 @@
 # global before sourcing fm-backend.sh (which sources this file), so this
 # never overrides a real invocation. It exists only so this file's own unit
 # tests, which source it directly without that preamble, resolve to a sane
-# default (the firstmate repo root - never a secondmate home, so
-# fm_backend_herdr_workspace_label falls through to "firstmate" exactly like
+# default (the nexus repo root - never a secondmate home, so
+# fm_backend_herdr_workspace_label falls through to "nexus" exactly like
 # pre-P3 behavior when a test does not care about home-specific labeling).
 FM_BACKEND_HERDR_ROOT="$(d=${BASH_SOURCE[0]%/*}; [ "$d" != "${BASH_SOURCE[0]}" ] || d=.; cd "${d:-/}/../.." && pwd)"
 FM_ROOT="${FM_ROOT_OVERRIDE:-${FM_ROOT:-$FM_BACKEND_HERDR_ROOT}}"
@@ -137,7 +137,7 @@ FM_BACKEND_HERDR_PRESENTATION_FLOOR_MARKER_PREFIX=".herdr-presentation-floor-"
 FM_BACKEND_HERDR_ESCALATED_PREFIX=".herdr-escalated-"
 # .fm-secondmate-home is written by bin/fm-home-seed.sh (AGENTS.md section 6)
 # at a seeded secondmate home's root, containing exactly that secondmate's id.
-# The primary firstmate home never carries this marker.
+# The primary nexus home never carries this marker.
 FM_BACKEND_HERDR_SECONDMATE_MARKER=".fm-secondmate-home"
 # The presentation projection is intentionally separate from the authoritative
 # task endpoint record.
@@ -344,9 +344,9 @@ fm_backend_herdr_presentation_enabled() {  # <config-dir> [<state-dir>]
   fm_backend_herdr_presentation_default_supported "$state_dir"
 }
 
-# fm_backend_herdr_workspace_label: the per-firstmate-HOME herdr workspace
+# fm_backend_herdr_workspace_label: the per-nexus-HOME herdr workspace
 # label (docs/herdr-backend.md "Default task container shape"). The PRIMARY home (no
-# secondmate marker) resolves to the constant "firstmate", byte-identical to
+# secondmate marker) resolves to the constant "nexus", byte-identical to
 # every pre-existing task's recorded label - no forced migration. A SECONDMATE
 # home resolves to "2ndmate-<secondmate-id>", so its tasks land in their own
 # workspace, obviously distinguishable from the primary's (and from every
@@ -366,7 +366,7 @@ fm_backend_herdr_workspace_label() {
       return 0
     fi
   fi
-  printf 'firstmate'
+  printf 'nexus'
 }
 
 # fm_backend_herdr_cli: run `herdr <args...>` scoped to <session>, setting
@@ -423,7 +423,7 @@ fm_backend_herdr_cli() {  # <session> <herdr-subcommand-and-args...>
 # `herdr` on PATH, or the client already selected for that exact session. A
 # host can carry more than one herdr client (a self-updated copy in
 # ~/.local/bin next to a package-managed one), and the two PATH orders
-# Firstmate runs under (an interactive login shell, and the fixed remote-job
+# Nexus runs under (an interactive login shell, and the fixed remote-job
 # PATH that puts ~/.local/bin first - bin/fm-remote-job-lib.sh) can then resolve
 # DIFFERENT binaries. A client older than the running server is answered with
 # error code protocol_mismatch on operational commands (verified: herdr 0.8.2,
@@ -538,7 +538,7 @@ fm_backend_herdr_version_check() {
 
 # fm_backend_herdr_session: resolve which named herdr session this normal
 # spawn/op uses. HERDR_SESSION mirrors tmux's $TMUX ambient-selection for
-# adapter workspace/tab/pane operations: an operator (or firstmate's own
+# adapter workspace/tab/pane operations: an operator (or nexus's own
 # isolated test harness) sets it explicitly; absent means herdr's own
 # "default" session. Do not use HERDR_SESSION alone for destructive test
 # cleanup; tests/herdr-test-safety.sh documents and guards that path.
@@ -750,13 +750,13 @@ fm_backend_herdr_projection_journal_replace_endpoint() {  # <journal> <task-id> 
 
 # fm_backend_herdr_projection_concise_task_label: strip redundant owner
 # prefixes from a task id used only in the presentation workspace label.
-# Removes firstmate/, 2ndmate-<id>/, and a presentation-level fm- owner
+# Removes nexus/, 2ndmate-<id>/, and a presentation-level fm- owner
 # prefix when present. The ordinary task tab remains fm-<id> and is not
 # built by this helper.
 fm_backend_herdr_projection_concise_task_label() {  # <task-id>
   local task=$1
   case "$task" in
-    firstmate/*) task=${task#firstmate/} ;;
+    nexus/*) task=${task#nexus/} ;;
     2ndmate-*/*) task=${task#*/} ;;
   esac
   case "$task" in
@@ -774,13 +774,13 @@ fm_backend_herdr_projection_workspace_label() {  # <task-id> <projection-id>
 }
 
 # fm_backend_herdr_presentation_session_lock_path: one machine-private lock
-# path per live named Herdr session/socket, shared across every Firstmate home
+# path per live named Herdr session/socket, shared across every Nexus home
 # that uses that session.
 # The path is never under any one home's state/ and secondmates never write the
 # primary home. Returns non-zero when the named session's socket cannot be
 # resolved unambiguously.
 fm_backend_herdr_presentation_lock_namespace() {
-  printf '%s' '/tmp/firstmate-herdr-presentation'
+  printf '%s' '/tmp/nexus-herdr-presentation'
 }
 
 fm_backend_herdr_presentation_lock_namespace_mode() {
@@ -1124,7 +1124,7 @@ fm_backend_herdr_projection_close_pane_focus_preserving() {  # <session> <pane-i
 #   focused workspace's right neighbor otherwise (upstream issue #1621, fixed
 #   by PR #1912, commit a979916).
 # Both fixes first shipped in Herdr 0.8.0 (protocol 19), verified 2026-08-05.
-# Firstmate therefore removes a doomed non-focused workspace by ending its
+# Nexus therefore removes a doomed non-focused workspace by ending its
 # verified lone idle shell (the pane-death path), repositioning it behind the
 # focused workspace first when needed. Moving it to the end preserves every
 # other workspace's relative order, so no presentation ordering change
@@ -1457,7 +1457,7 @@ fm_backend_herdr_pane_idle_shell_sample() {  # <session> <pane-id>
 # returned by THIS projected create immediately after its owning parent's
 # contiguous child block and before the next parent.
 #
-# <parent-label> is the owning FM_HOME label (firstmate or 2ndmate-<id>).
+# <parent-label> is the owning FM_HOME label (nexus or 2ndmate-<id>).
 # Optional <parent-workspace-id> is that parent's EXACT id, which the caller
 # already resolved from the launching agent's own herdr identity. When given it
 # anchors the owning parent by id, so two workspaces sharing the home label no
@@ -1465,7 +1465,7 @@ fm_backend_herdr_pane_idle_shell_sample() {  # <session> <pane-id>
 # label exactly as before. With a unique label the two select the same
 # workspace, so ordering behavior is unchanged in the ordinary case.
 # New-format └ ... · p:<token> children and, for compatibility only, already
-# adjacent old-format firstmate/... or 2ndmate-<id>/... projections may extend
+# adjacent old-format nexus/... or 2ndmate-<id>/... projections may extend
 # the block read-only; they are never renamed or moved.
 #
 # This is presentation-only and always returns success.
@@ -1497,13 +1497,13 @@ fm_backend_herdr_projection_order_best_effort() {  # <session> <created-workspac
       end;
     def is_top_level_parent:
       (.label | type) == "string"
-      and ((.label == "firstmate") or (.label | test("^2ndmate-[^/]+$")));
+      and ((.label == "nexus") or (.label | test("^2ndmate-[^/]+$")));
     def is_new_child:
       (.label | type) == "string"
       and (.label | test("^└ .+ · p:[A-Za-z0-9_-]{22}$"));
     def is_legacy_child:
       (.label | type) == "string"
-      and (.label | test("^(firstmate|2ndmate-[^/]+)/.+ · p:[A-Za-z0-9_-]{22}$"));
+      and (.label | test("^(nexus|2ndmate-[^/]+)/.+ · p:[A-Za-z0-9_-]{22}$"));
     def is_legacy_child_for($owner):
       is_legacy_child and (.label | startswith($owner + "/"));
     def is_child_for($owner):
@@ -1691,7 +1691,7 @@ fm_backend_herdr_workspace_find_all() {  # <session>
   # NOTE: the jq variable is $want, NOT $label - `label` is a jq reserved
   # keyword (label/break), so declaring a jq variable named "label" is a
   # compile error that `2>/dev/null` would silently swallow, making this find
-  # ALWAYS return empty and every spawn mint a fresh "firstmate" workspace
+  # ALWAYS return empty and every spawn mint a fresh "nexus" workspace
   # (the workspace leak).
   printf '%s' "$list" | jq -r --arg want "$label" \
     '.result.workspaces[]? | select(.label == $want) | .workspace_id' 2>/dev/null
@@ -1713,11 +1713,11 @@ fm_backend_herdr_workspace_find() {  # <session>
 #
 # Herdr 0.7.5 injects HERDR_ENV=1, HERDR_PANE_ID, HERDR_SESSION,
 # HERDR_SOCKET_PATH, HERDR_TAB_ID, and HERDR_WORKSPACE_ID into every process it
-# manages a pane for (docs/verification/runtime-backends.md), and a firstmate
+# manages a pane for (docs/verification/runtime-backends.md), and a nexus
 # or secondmate agent's own tool calls inherit them. Older injection shapes are
 # unverified and cannot establish launcher ancestry without both pane and
 # socket identity. Workspace LABELS are mutable and herdr enforces no
-# uniqueness on them, so a label search cannot tell one `firstmate` workspace
+# uniqueness on them, so a label search cannot tell one `nexus` workspace
 # from another, and herdr's globally focused workspace is whatever the captain
 # happens to be looking at, not the launcher's.
 #
@@ -1848,8 +1848,8 @@ fm_backend_herdr_launcher_identity() {  # <session>
 # had just resolved. Herdr enforces no label uniqueness (docs/herdr-backend.md
 # "Label collisions") and derives an unlabeled workspace's DISPLAYED label from
 # its pane cwd's basename, so a captain launching herdr directly inside a
-# directory named "firstmate" produces a workspace that looks byte-identical,
-# by label alone, to firstmate's own auto-created container - one tab, label
+# directory named "nexus" produces a workspace that looks byte-identical,
+# by label alone, to nexus's own auto-created container - one tab, label
 # "1". workspace_find adopted that pre-existing (captain-owned, LIVE) workspace
 # by the label match, the heuristic matched too, and the very next spawn
 # closed the captain's own live pane 27ms after creating its task tab. The
@@ -1939,7 +1939,7 @@ fm_backend_herdr_workspace_prune_seeded_default_tab() {  # <session> <workspace_
 # depth and because it is a no-op in the already-safe case.
 #
 # <launcher-relationship> (3rd arg, default "launcher-home") says whether the
-# container being ensured belongs to the SAME firstmate home as the process
+# container being ensured belongs to the SAME nexus home as the process
 # calling this:
 #   launcher-home - a crewmate or scout for the caller's own home. When the
 #                   caller is itself running in a herdr pane, the worker MUST
@@ -1977,7 +1977,7 @@ fm_backend_herdr_workspace_ensure() {  # <session> <cwd> [<launcher-relationship
   matches=$(fm_backend_herdr_workspace_find_all "$session")
   count=$(printf '%s' "$matches" | grep -c '[^[:space:]]' || true)
   if [ "$count" -gt 1 ]; then
-    echo "error: ${count} herdr workspaces in session '$session' are labeled '$label' (${matches//$'\n'/ }) and this spawn has no herdr parent pane to identify which one is its own; rename or close the extras, or run firstmate inside the workspace its workers belong in" >&2
+    echo "error: ${count} herdr workspaces in session '$session' are labeled '$label' (${matches//$'\n'/ }) and this spawn has no herdr parent pane to identify which one is its own; rename or close the extras, or run nexus inside the workspace its workers belong in" >&2
     return 3
   fi
   wsid=${matches%%$'\n'*}
@@ -1990,7 +1990,7 @@ fm_backend_herdr_workspace_ensure() {  # <session> <cwd> [<launcher-relationship
   wsid=$(printf '%s' "$out" | jq -r '.result.workspace.workspace_id // empty' 2>/dev/null)
   [ -n "$wsid" ] || return 1
   FM_BACKEND_HERDR_WS_ID=$wsid
-  # Herdr seeds a new workspace with one auto-created default tab firstmate
+  # Herdr seeds a new workspace with one auto-created default tab nexus
   # never uses. It is NOT pruned here: at this instant it is the workspace's
   # ONLY tab, and closing a workspace's last tab deletes the workspace itself
   # (verified against the real herdr binary) - pruning here would destroy the
@@ -2460,7 +2460,7 @@ fm_backend_herdr_agent_alive() {  # <target>
 # once a future `resume_agents_on_restore = false` config ships) a plain
 # agent-less shell sitting in the saved cwd, never the crewmate that used to
 # be there. Before this fix, every fleet respawn after such a restart needed
-# the operator to manually close each husk pane first before firstmate could
+# the operator to manually close each husk pane first before nexus could
 # spawn into it again. fm_backend_herdr_tab_is_husk classifies the existing
 # tab's pane conservatively (dead or no-agent only; anything live or
 # ambiguous refuses exactly as before) and, when it is a confirmed husk,
@@ -2724,7 +2724,7 @@ fm_backend_herdr_projection_live_binding_matches() {  # <session> <token> <works
         and (.label | test("^└ .+ · p:[A-Za-z0-9_-]{22}$"));
       def is_legacy_child_for($owner):
         (.label | type) == "string"
-        and (.label | test("^(firstmate|2ndmate-[^/]+)/.+ · p:[A-Za-z0-9_-]{22}$"))
+        and (.label | test("^(nexus|2ndmate-[^/]+)/.+ · p:[A-Za-z0-9_-]{22}$"))
         and (.label | startswith($owner + "/"));
       (.result.workspaces // null) as $spaces
       | select(($spaces | type) == "array")
@@ -3082,7 +3082,7 @@ fm_backend_herdr_send_literal() {  # <target> <text>
   return "$rc"
 }
 
-# fm_backend_herdr_normalize_key: map firstmate's key vocabulary (Enter,
+# fm_backend_herdr_normalize_key: map nexus's key vocabulary (Enter,
 # Escape, C-c, as used by fm-send.sh --key and stuck-crewmate-recovery) onto
 # herdr's `pane send-keys` names. Verified empirically: enter, escape/esc, and
 # both ctrl+c/C-c all work (case-insensitive on herdr's side, but normalize
@@ -3379,7 +3379,7 @@ fm_backend_herdr_composer_content() {  # <target>
 # composer that was empty before the send, shows <text>.
 # Literal equality ignores whitespace, the same comparison zellij uses, so a
 # wrapped payload still matches. It also ignores U+2063, the invisible mark
-# that starts operational inputs and separates the from-firstmate label:
+# that starts operational inputs and separates the from-nexus label:
 # Claude's composer read-back on Herdr never shows it (verified live), and it
 # carries no instruction text of its own. A composer that holds only
 # `[Pasted text #N]` or `[Pasted text #N +M lines]` placeholders (the
@@ -3783,7 +3783,7 @@ EOF
 }
 
 # fm_backend_herdr_list_live: recovery/orphan discovery. Lists every tab whose
-# label looks like a firstmate task window (fm-<id>) in <session>'s, THIS
+# label looks like a nexus task window (fm-<id>) in <session>'s, THIS
 # HOME'S OWN workspace (fm_backend_herdr_workspace_label - never another
 # home's), by LABEL - never by trusting a stored pane id, since ids are not
 # guaranteed stable across every server lifecycle (see herdr-verification-p2.md

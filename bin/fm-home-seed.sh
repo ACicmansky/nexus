@@ -3,15 +3,15 @@
 #
 # Usage:
 #   fm-home-seed.sh <id> <home|-> {<project>...|--no-projects}
-#       Provision <home> as an isolated firstmate home. If <home> is "-", acquire
-#       a fresh firstmate worktree via "treehouse get --lease", which durably
+#       Provision <home> as an isolated nexus home. If <home> is "-", acquire
+#       a fresh nexus worktree via "treehouse get --lease", which durably
 #       leases the worktree under the secondmate <id> so the home survives with
 #       no live process and is never recycled until the lease is released with
 #       "treehouse return". Projects are cloned
 #       from the active home into the secondmate home's projects/ directory.
 #       That project list is non-exclusive provisioning data. Pass --no-projects
 #       instead of a project list to seed a project-less home for a domain whose
-#       subject is the firstmate repo itself; it is mutually exclusive with a
+#       subject is the nexus repo itself; it is mutually exclusive with a
 #       project list, and omitting both still fails loudly. A project-less seed
 #       refuses a home with project clones or project-registry entries, so it
 #       never converts populated homes in place. The charter brief
@@ -227,27 +227,27 @@ refuse_active_home_path() {
     return 1
   fi
   if [ "$abs_home" = "$abs_active_home" ]; then
-    echo "error: secondmate home cannot be the active firstmate home: $home" >&2
+    echo "error: secondmate home cannot be the active nexus home: $home" >&2
     return 1
   fi
   if [ "$abs_home" = "$abs_root" ]; then
-    echo "error: secondmate home cannot be the firstmate repo: $home" >&2
+    echo "error: secondmate home cannot be the nexus repo: $home" >&2
     return 1
   fi
   if path_is_ancestor_of "$abs_active_home" "$abs_home"; then
-    echo "error: secondmate home cannot be inside the active firstmate home: $home" >&2
+    echo "error: secondmate home cannot be inside the active nexus home: $home" >&2
     return 1
   fi
   if path_is_ancestor_of "$abs_root" "$abs_home"; then
-    echo "error: secondmate home cannot be inside the firstmate repo: $home" >&2
+    echo "error: secondmate home cannot be inside the nexus repo: $home" >&2
     return 1
   fi
   if path_is_ancestor_of "$abs_home" "$abs_active_home"; then
-    echo "error: secondmate home cannot be an ancestor of the active firstmate home: $home" >&2
+    echo "error: secondmate home cannot be an ancestor of the active nexus home: $home" >&2
     return 1
   fi
   if path_is_ancestor_of "$abs_home" "$abs_root"; then
-    echo "error: secondmate home cannot be an ancestor of the firstmate repo: $home" >&2
+    echo "error: secondmate home cannot be an ancestor of the nexus repo: $home" >&2
     return 1
   fi
 }
@@ -268,11 +268,11 @@ validate_operational_dir() {
     return 1
   fi
   if [ "$abs_dir" = "$abs_active_home" ] || path_is_ancestor_of "$abs_active_home" "$abs_dir"; then
-    echo "error: secondmate $name directory cannot be inside the active firstmate home: $dir" >&2
+    echo "error: secondmate $name directory cannot be inside the active nexus home: $dir" >&2
     return 1
   fi
   if [ "$abs_dir" = "$abs_root" ] || path_is_ancestor_of "$abs_root" "$abs_dir"; then
-    echo "error: secondmate $name directory cannot be inside the firstmate repo: $dir" >&2
+    echo "error: secondmate $name directory cannot be inside the nexus repo: $dir" >&2
     return 1
   fi
 }
@@ -342,11 +342,11 @@ validate_project_destination() {
     return 1
   fi
   if [ "$abs_dst" = "$abs_active_home" ] || path_is_ancestor_of "$abs_active_home" "$abs_dst"; then
-    echo "error: seeded project $project destination cannot be inside the active firstmate home: $dst" >&2
+    echo "error: seeded project $project destination cannot be inside the active nexus home: $dst" >&2
     return 1
   fi
   if [ "$abs_dst" = "$abs_root" ] || path_is_ancestor_of "$abs_root" "$abs_dst"; then
-    echo "error: seeded project $project destination cannot be inside the firstmate repo: $dst" >&2
+    echo "error: seeded project $project destination cannot be inside the nexus repo: $dst" >&2
     return 1
   fi
   printf '%s\n' "$abs_dst"
@@ -389,15 +389,15 @@ seeded_origin_url() {
 
 acquire_treehouse_home() {
   local id=$1 home
-  # Durably lease a firstmate worktree from the pool. The lease persists with no
+  # Durably lease a nexus worktree from the pool. The lease persists with no
   # live process and is skipped by later get/prune, so the home survives restarts
   # until teardown or rollback returns it. treehouse prints only the worktree path
   # to stdout (banners go to stderr), so command substitution captures the path.
   home=$(cd "$FM_ROOT" && treehouse get --lease --lease-holder "$id") || {
-    echo "error: treehouse get --lease failed to lease a firstmate home" >&2
+    echo "error: treehouse get --lease failed to lease a nexus home" >&2
     return 1
   }
-  [ -n "$home" ] || { echo "error: treehouse get --lease did not report a firstmate home" >&2; return 1; }
+  [ -n "$home" ] || { echo "error: treehouse get --lease did not report a nexus home" >&2; return 1; }
   printf '%s\n' "$home"
 }
 
@@ -405,7 +405,7 @@ ensure_home() {
   local id=$1 requested=$2 home
   if [ "$requested" = "-" ]; then
     home=$(acquire_treehouse_home "$id")
-    verify_firstmate_home "$home"
+    verify_nexus_home "$home"
     return
   fi
 
@@ -417,14 +417,14 @@ ensure_home() {
     mkdir -p "$(dirname "$home")"
     git clone --quiet "$FM_ROOT" "$home"
   fi
-  verify_firstmate_home "$home"
+  verify_nexus_home "$home"
 }
 
-verify_firstmate_home() {
+verify_nexus_home() {
   local home=$1
   refuse_active_home_path "$home" || return 1
-  [ -f "$home/AGENTS.md" ] || { echo "error: $home is not a firstmate home (missing AGENTS.md)" >&2; return 1; }
-  [ -d "$home/bin" ] || { echo "error: $home is not a firstmate home (missing bin/)" >&2; return 1; }
+  [ -f "$home/AGENTS.md" ] || { echo "error: $home is not a nexus home (missing AGENTS.md)" >&2; return 1; }
+  [ -d "$home/bin" ] || { echo "error: $home is not a nexus home (missing bin/)" >&2; return 1; }
   validate_operational_dirs "$home" || return 1
   printf '%s\n' "$(cd "$home" && pwd -P)"
 }
@@ -564,27 +564,27 @@ seed_rollback_target() {
   abs_home=$(resolved_path "$FM_HOME")
   abs_root=$(resolved_path "$FM_ROOT")
   if [ "$abs_target" = "$abs_home" ]; then
-    echo "REFUSED: unsafe $label rollback target $target is the active firstmate home" >&2
+    echo "REFUSED: unsafe $label rollback target $target is the active nexus home" >&2
     return 1
   fi
   if [ "$abs_target" = "$abs_root" ]; then
-    echo "REFUSED: unsafe $label rollback target $target is the firstmate repo" >&2
+    echo "REFUSED: unsafe $label rollback target $target is the nexus repo" >&2
     return 1
   fi
   if path_is_ancestor_of "$abs_target" "$abs_home"; then
-    echo "REFUSED: unsafe $label rollback target $target is an ancestor of the active firstmate home" >&2
+    echo "REFUSED: unsafe $label rollback target $target is an ancestor of the active nexus home" >&2
     return 1
   fi
   if path_is_ancestor_of "$abs_target" "$abs_root"; then
-    echo "REFUSED: unsafe $label rollback target $target is an ancestor of the firstmate repo" >&2
+    echo "REFUSED: unsafe $label rollback target $target is an ancestor of the nexus repo" >&2
     return 1
   fi
   if path_is_ancestor_of "$abs_home" "$abs_target"; then
-    echo "REFUSED: unsafe $label rollback target $target is inside the active firstmate home" >&2
+    echo "REFUSED: unsafe $label rollback target $target is inside the active nexus home" >&2
     return 1
   fi
   if path_is_ancestor_of "$abs_root" "$abs_target"; then
-    echo "REFUSED: unsafe $label rollback target $target is inside the firstmate repo" >&2
+    echo "REFUSED: unsafe $label rollback target $target is inside the nexus repo" >&2
     return 1
   fi
   printf '%s\n' "$abs_target"
@@ -879,7 +879,7 @@ seed_home() {
     SEED_HOME_ACQUIRED=1
     home=$(acquire_treehouse_home "$id")
     SEED_HOME="$home"
-    home=$(verify_firstmate_home "$home")
+    home=$(verify_nexus_home "$home")
   else
     requested_abs=$(abs_path_for_new "$requested_home")
     refuse_active_home_path "$requested_abs" || return 1

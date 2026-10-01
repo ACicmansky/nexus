@@ -241,7 +241,7 @@ foreign_stall_watch_leg() {  # <dir> <leg> <now> [observation]
   stall="$dir/state/.secondmate-wake-stall-mate"
   printf '%s\n' "$now" > "$dir/now"
   PATH="$dir/fakebin:$PATH" FM_FAKE_NOW_FILE="$dir/now" FM_HOME="$dir" FM_ROOT_OVERRIDE="$ROOT" \
-    FM_STATE_OVERRIDE="$dir/state" FM_FAKE_TMUX_WINDOW='firstmate:fm-mate' \
+    FM_STATE_OVERRIDE="$dir/state" FM_FAKE_TMUX_WINDOW='nexus:fm-mate' \
     FM_SECONDMATE_WAKE_STALL_SECS=1 FM_SECONDMATE_LIVENESS_SECS=99999999 \
     FM_POLL=1 FM_SIGNAL_GRACE=0 \
     FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
@@ -276,9 +276,9 @@ test_secondmate_foreign_queue_stall_tracks_progress_and_alerts_once() {
   state="$dir/state"
   sub="$dir/secondmate"
   mkdir -p "$sub/state" "$sub/data" "$sub/bin"
-  printf '# Firstmate\n' > "$sub/AGENTS.md"
+  printf '# Nexus\n' > "$sub/AGENTS.md"
   printf 'mate\n' > "$sub/.fm-secondmate-home"
-  printf 'window=firstmate:fm-mate\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
+  printf 'window=nexus:fm-mate\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
     "$sub" > "$state/mate.meta"
   fakebin="$dir/fakebin"
   real_date=$(command -v date)
@@ -578,7 +578,7 @@ test_secondmate_declared_pause_rows_do_not_feed_stall_escalation() {
   sub="$dir/secondmate"
   mkdir -p "$sub/state"
   printf 'mate\n' > "$sub/.fm-secondmate-home"
-  printf 'window=firstmate:fm-mate\nkind=secondmate\nhome=%s\n' "$sub" > "$state/mate.meta"
+  printf 'window=nexus:fm-mate\nkind=secondmate\nhome=%s\n' "$sub" > "$state/mate.meta"
   fakebin="$dir/fakebin"
   real_date=$(command -v date)
   cat > "$fakebin/date" <<SH
@@ -596,13 +596,13 @@ SH
 EOF
   printf '1000\n' > "$dir/now"
   PATH="$fakebin:$PATH" FM_FAKE_NOW_FILE="$dir/now" FM_HOME="$dir" FM_ROOT_OVERRIDE="$ROOT" \
-    FM_STATE_OVERRIDE="$state" FM_FAKE_TMUX_WINDOW='firstmate:fm-mate' \
+    FM_STATE_OVERRIDE="$state" FM_FAKE_TMUX_WINDOW='nexus:fm-mate' \
     FM_SECONDMATE_WAKE_STALL_SECS=1 FM_POLL=1 FM_SIGNAL_GRACE=0 \
     FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
     secondmate_stall_watch_leg "$dir" "first" cleared
   printf '5000\n' > "$dir/now"
   PATH="$fakebin:$PATH" FM_FAKE_NOW_FILE="$dir/now" FM_HOME="$dir" FM_ROOT_OVERRIDE="$ROOT" \
-    FM_STATE_OVERRIDE="$state" FM_FAKE_TMUX_WINDOW='firstmate:fm-mate' \
+    FM_STATE_OVERRIDE="$state" FM_FAKE_TMUX_WINDOW='nexus:fm-mate' \
     FM_SECONDMATE_WAKE_STALL_SECS=1 FM_POLL=1 FM_SIGNAL_GRACE=0 \
     FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
     secondmate_stall_watch_leg "$dir" "second" cleared
@@ -626,7 +626,7 @@ test_secondmate_reprovisioned_queue_starts_a_fresh_interval() {
   sub="$dir/secondmate"
   mkdir -p "$sub/state"
   printf 'mate\n' > "$sub/.fm-secondmate-home"
-  printf 'window=firstmate:fm-mate\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
+  printf 'window=nexus:fm-mate\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
     "$sub" > "$state/mate.meta"
   fakebin="$dir/fakebin"
   real_date=$(command -v date)
@@ -644,7 +644,7 @@ SH
   printf '1000\n' > "$dir/now"
   printf '100\t9\tcheck\told\tcheck: retired generation row\n' > "$sub/state/.wake-queue"
   PATH="$fakebin:$PATH" FM_FAKE_NOW_FILE="$dir/now" FM_HOME="$dir" FM_ROOT_OVERRIDE="$ROOT" \
-    FM_STATE_OVERRIDE="$state" FM_FAKE_TMUX_WINDOW='firstmate:fm-mate' \
+    FM_STATE_OVERRIDE="$state" FM_FAKE_TMUX_WINDOW='nexus:fm-mate' \
     FM_SECONDMATE_WAKE_STALL_SECS=1 FM_POLL=1 FM_SIGNAL_GRACE=0 \
     FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
     secondmate_stall_watch_leg "$dir" "old" progress mate "$(printf '1000\t100-9')"
@@ -656,7 +656,7 @@ SH
   printf '1010\n' > "$dir/now"
   printf '200\t9\tcheck\tregen\tcheck: reprovisioned row\n' > "$sub/state/.wake-queue"
   PATH="$fakebin:$PATH" FM_FAKE_NOW_FILE="$dir/now" FM_HOME="$dir" FM_ROOT_OVERRIDE="$ROOT" \
-    FM_STATE_OVERRIDE="$state" FM_FAKE_TMUX_WINDOW='firstmate:fm-mate' \
+    FM_STATE_OVERRIDE="$state" FM_FAKE_TMUX_WINDOW='nexus:fm-mate' \
     FM_SECONDMATE_WAKE_STALL_SECS=1 FM_POLL=1 FM_SIGNAL_GRACE=0 \
     FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
     secondmate_stall_watch_leg "$dir" "regen" progress mate "$(printf '1010\t200-9')"
@@ -666,7 +666,7 @@ SH
   # The restarted generation still earns its own honest no-progress episode.
   printf '1012\n' > "$dir/now"
   PATH="$fakebin:$PATH" FM_FAKE_NOW_FILE="$dir/now" FM_HOME="$dir" FM_ROOT_OVERRIDE="$ROOT" \
-    FM_STATE_OVERRIDE="$state" FM_FAKE_TMUX_WINDOW='firstmate:fm-mate' \
+    FM_STATE_OVERRIDE="$state" FM_FAKE_TMUX_WINDOW='nexus:fm-mate' \
     FM_SECONDMATE_WAKE_STALL_SECS=1 FM_POLL=1 FM_SIGNAL_GRACE=0 \
     FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
     secondmate_stall_watch_leg "$dir" "regen-frozen" alert
@@ -688,7 +688,7 @@ test_secondmate_active_turn_defers_stall_until_the_turn_ends() {
   sub="$dir/secondmate"
   mkdir -p "$sub/state"
   printf 'mate\n' > "$sub/.fm-secondmate-home"
-  printf 'window=firstmate:fm-mate\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
+  printf 'window=nexus:fm-mate\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
     "$sub" > "$state/mate.meta"
   row_epoch=$(( $(date +%s) - 10 ))
   printf '%s\t7\tcheck\trouted\tcheck: routed row\n' "$row_epoch" \
@@ -697,7 +697,7 @@ test_secondmate_active_turn_defers_stall_until_the_turn_ends() {
   cat > "$fakebin/tmux" <<'SH'
 #!/usr/bin/env bash
 case "${1:-}" in
-  list-windows) printf '%s\n' 'firstmate:fm-mate' ;;
+  list-windows) printf '%s\n' 'nexus:fm-mate' ;;
   capture-pane) printf 'working\n' ;;
   display-message) printf '0\n' ;;
   *) exit 0 ;;
@@ -754,7 +754,7 @@ test_secondmate_long_lived_mate_mid_turn_is_not_a_stall() {
   sub="$dir/secondmate"
   mkdir -p "$sub/state"
   printf 'mate\n' > "$sub/.fm-secondmate-home"
-  printf 'window=firstmate:fm-mate\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
+  printf 'window=nexus:fm-mate\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
     "$sub" > "$state/mate.meta"
   row_epoch=$(( $(date +%s) - 10 ))
   printf '%s\t7\tcheck\trouted\tcheck: routed row\n' "$row_epoch" \
@@ -763,7 +763,7 @@ test_secondmate_long_lived_mate_mid_turn_is_not_a_stall() {
   cat > "$fakebin/tmux" <<'SH'
 #!/usr/bin/env bash
 case "${1:-}" in
-  list-windows) printf '%s\n' 'firstmate:fm-mate' ;;
+  list-windows) printf '%s\n' 'nexus:fm-mate' ;;
   capture-pane) printf 'working\n' ;;
   display-message) printf '0\n' ;;
   *) exit 0 ;;
@@ -863,7 +863,7 @@ test_secondmate_proven_idle_ring_lets_the_child_drain() {
   fakebin="$dir/fakebin"
   mkdir -p "$sub/state"
   printf 'mate\n' > "$sub/.fm-secondmate-home"
-  printf 'window=firstmate:fm-mate\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
+  printf 'window=nexus:fm-mate\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
     "$sub" > "$state/mate.meta"
   printf '100\t7\tcheck\trouted\tcheck: routed row\n' > "$sub/state/.wake-queue"
   install_secondmate_alive_tmux "$fakebin"
@@ -902,8 +902,8 @@ test_secondmate_proven_idle_ring_lets_the_child_drain() {
   sed '/^--$/q' "$inbox_rec" | grep -Fx 'delivery=fire-and-forget' >/dev/null \
     || fail "the child-first ring did not write a fire-and-forget drain steer"
   inbox_body=$(sed '1,/^--$/d' "$inbox_rec")
-  [ "$(printf '%s' "$inbox_body" | "$ROOT/bin/fm-operational-input.sh" kind)" = from-firstmate ] \
-    || fail "the child-first drain steer lacks the from-firstmate marker, so the mate would read it as captain intervention: $inbox_body"
+  [ "$(printf '%s' "$inbox_body" | "$ROOT/bin/fm-operational-input.sh" kind)" = from-nexus ] \
+    || fail "the child-first drain steer lacks the from-nexus marker, so the mate would read it as captain intervention: $inbox_body"
   steer=$(printf '%s' "$inbox_body" | "$ROOT/bin/fm-operational-input.sh" body)
   [[ $steer =~ ^delivery=[0-9a-f]{16}\ (.*)$ ]] \
     || fail "the child-first drain steer does not carry a fire-and-forget delivery id: $steer"
@@ -925,7 +925,7 @@ test_secondmate_busy_and_unknown_panes_are_not_rung() {
   fakebin="$dir/fakebin"
   mkdir -p "$sub/state"
   printf 'mate\n' > "$sub/.fm-secondmate-home"
-  printf 'window=firstmate:fm-mate\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
+  printf 'window=nexus:fm-mate\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
     "$sub" > "$state/mate.meta"
   printf '100\t7\tcheck\trouted\tcheck: routed row\n' > "$sub/state/.wake-queue"
   install_secondmate_alive_tmux "$fakebin"
@@ -984,7 +984,7 @@ test_secondmate_genuine_stall_after_idle_ring_still_alarms() {
   fakebin="$dir/fakebin"
   mkdir -p "$sub/state"
   printf 'mate\n' > "$sub/.fm-secondmate-home"
-  printf 'window=firstmate:fm-mate\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
+  printf 'window=nexus:fm-mate\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
     "$sub" > "$state/mate.meta"
   printf '100\t7\tcheck\trouted\tcheck: routed row\n' > "$sub/state/.wake-queue"
   row_before="$dir/foreign-before"
@@ -1042,7 +1042,7 @@ test_secondmate_stall_marker_rejects_symlink() {
   sub="$dir/secondmate"
   mkdir -p "$sub/state"
   printf 'mate\n' > "$sub/.fm-secondmate-home"
-  printf 'window=firstmate:fm-mate\nkind=secondmate\nhome=%s\n' "$sub" > "$state/mate.meta"
+  printf 'window=nexus:fm-mate\nkind=secondmate\nhome=%s\n' "$sub" > "$state/mate.meta"
   epoch=$(( $(date +%s) - 10 ))
   printf '%s\t7\tcheck\trouted\tcheck: routed row\n' "$epoch" > "$sub/state/.wake-queue"
   outside="$dir/outside"
@@ -1055,7 +1055,7 @@ test_secondmate_stall_marker_rejects_symlink() {
   cat > "$fakebin/tmux" <<'SH'
 #!/usr/bin/env bash
 case "${1:-}" in
-  list-windows) printf '%s\n' 'firstmate:fm-mate' ;;
+  list-windows) printf '%s\n' 'nexus:fm-mate' ;;
   capture-pane) : ;;
   display-message) printf '0\n' ;;
   *) exit 0 ;;
@@ -1080,7 +1080,7 @@ test_acknowledged_stall_publication_survives_pre_marker_crash() {
   sub="$dir/secondmate"
   mkdir -p "$sub/state" "$sub/data"
   printf 'mate\n' > "$sub/.fm-secondmate-home"
-  printf 'window=firstmate:fm-mate\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
+  printf 'window=nexus:fm-mate\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
     "$sub" > "$state/mate.meta"
   epoch=$(( $(date +%s) - 10 ))
   printf '%s\t7\tcheck\trouted\tcheck: routed row\n' "$epoch" > "$sub/state/.wake-queue"
@@ -1098,7 +1098,7 @@ test_acknowledged_stall_publication_survives_pre_marker_crash() {
   fakebin="$dir/fakebin"
   out="$dir/watch-once.out"
   PATH="$fakebin:$PATH" FM_HOME="$dir" FM_ROOT_OVERRIDE="$ROOT" \
-    FM_STATE_OVERRIDE="$state" FM_FAKE_TMUX_WINDOW='firstmate:fm-mate' \
+    FM_STATE_OVERRIDE="$state" FM_FAKE_TMUX_WINDOW='nexus:fm-mate' \
     FM_FAKE_TMUX_LOG="$dir/tmux.log" FM_FAKE_TMUX_CAPTURE="$dir/fake-tmux/pane.txt" \
     FM_SECONDMATE_WAKE_STALL_SECS=1 FM_POLL=1 FM_SIGNAL_GRACE=0 \
     FM_CHECK_INTERVAL=999999 FM_HEARTBEAT=999999 \
@@ -1121,8 +1121,8 @@ test_empty_prefix_mate_preserves_other_mate_receipt() {
   mkdir -p "$empty/state" "$stalled/state"
   printf 'ios\n' > "$empty/.fm-secondmate-home"
   printf 'ios-ui\n' > "$stalled/.fm-secondmate-home"
-  printf 'window=firstmate:fm-ios\nkind=secondmate\nhome=%s\n' "$empty" > "$state/ios.meta"
-  printf 'window=firstmate:fm-ios-ui\nkind=secondmate\nhome=%s\n' "$stalled" > "$state/ios-ui.meta"
+  printf 'window=nexus:fm-ios\nkind=secondmate\nhome=%s\n' "$empty" > "$state/ios.meta"
+  printf 'window=nexus:fm-ios-ui\nkind=secondmate\nhome=%s\n' "$stalled" > "$state/ios-ui.meta"
   : > "$empty/state/.wake-queue"
   epoch=$(( $(date +%s) - 10 ))
   printf '%s\t9\tcheck\trouted\tcheck: routed row\n' "$epoch" > "$stalled/state/.wake-queue"
@@ -2895,10 +2895,10 @@ make_secondmate_liveness_case() {
   # launch whose worktree is not git.
   git init -q -b main "$home"
   printf 'sm1\n' > "$home/.fm-secondmate-home"
-  printf '# Firstmate\n' > "$home/AGENTS.md"
+  printf '# Nexus\n' > "$home/AGENTS.md"
   printf 'charter\n' > "$home/data/charter.md"
   printf 'codex\n' > "$dir/config/crew-harness"
-  printf 'window=firstmate:fm-sm1\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
+  printf 'window=nexus:fm-sm1\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
     "$home" > "$dir/state/sm1.meta"
   cat > "$fakebin/tmux" <<'SH'
 #!/usr/bin/env bash
@@ -2968,7 +2968,7 @@ kill_liveness_leg() {
 
 # drain_liveness_wakes <dir>: replay the case's durable queue through the real
 # drain and post the acknowledgement it names - the same handling boundary a
-# firstmate applies to a surfaced wake. A leg after an unacked wake would exit
+# nexus applies to a surfaced wake. A leg after an unacked wake would exit
 # on check: rearm-resurface instead of exercising the tick it is testing.
 drain_liveness_wakes() {
   local dir=$1 state="$1/state" seq gen
@@ -3046,9 +3046,9 @@ test_secondmate_liveness_tick_relaunches_every_dead_mate_before_waking() {
   mkdir -p "$home/bin" "$home/data" "$home/state" "$home/config" "$home/projects"
   git init -q -b main "$home"
   printf 'sm2\n' > "$home/.fm-secondmate-home"
-  printf '# Firstmate\n' > "$home/AGENTS.md"
+  printf '# Nexus\n' > "$home/AGENTS.md"
   printf 'charter\n' > "$home/data/charter.md"
-  printf 'window=firstmate:fm-sm2\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
+  printf 'window=nexus:fm-sm2\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
     "$home" > "$state/sm2.meta"
 
   run_liveness_leg "$dir" several FM_FAKE_WINDOW_GONE=1; pid=$LIVENESS_PID
@@ -3247,9 +3247,9 @@ test_secondmate_liveness_tick_error_keeps_scanning_and_wakes() {
   mkdir -p "$home/bin" "$home/data" "$home/state" "$home/config" "$home/projects"
   git init -q -b main "$home"
   printf 'sm2\n' > "$home/.fm-secondmate-home"
-  printf '# Firstmate\n' > "$home/AGENTS.md"
+  printf '# Nexus\n' > "$home/AGENTS.md"
   printf 'charter\n' > "$home/data/charter.md"
-  printf 'window=firstmate:fm-sm2\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
+  printf 'window=nexus:fm-sm2\nkind=secondmate\nharness=claude\nbackend=tmux\nhome=%s\n' \
     "$home" > "$state/sm2.meta"
   : > "$state/.secondmate-relaunch-sm1"
   chmod 000 "$state/.secondmate-relaunch-sm1"

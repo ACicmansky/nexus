@@ -385,7 +385,7 @@ fm_afk_daemon_owns_supervision() {
 # default: missing, empty, unreadable, or unrecognized content, and the
 # legacy bare-epoch-timestamp content written before mode existed, all read
 # as "away". Only an exact first-line "quiet" ever reads as "quiet" -
-# kunchenguid/firstmate#2356's standing captain-present quiet mode, entered
+# ACicmansky/nexus#2356's standing captain-present quiet mode, entered
 # only through /quiet and exited only through an explicit /quiet off
 # (AGENTS.md section 8's away-mode stub).
 fm_afk_mode() {
@@ -1355,21 +1355,21 @@ fm_task_set_lock_path() {  # <state-dir>
   printf '%s/.task-set.lock\n' "$state"
 }
 
-# The top-most firstmate home reachable from this one on THIS machine, used as
+# The top-most nexus home reachable from this one on THIS machine, used as
 # the single anchor every local home agrees on for machine-local shared state.
 #
 # A local parent binding is followed upward. A remote parent binding terminates
 # the walk at the current home, which is the correct answer rather than an
 # error: the parent lives on another machine, so its filesystem can neither hold
 # nor be observed by a lock taken here, and a remote-seeded home is itself the
-# top of the local tree that bin/fm-teardown.sh's collect_local_firstmate_states
+# top of the local tree that bin/fm-teardown.sh's collect_local_nexus_states
 # enumerates (that walk already skips remote registry entries for the same
 # reason). Refusing a remote binding instead made every operation anchored here
 # fail closed inside a remote secondmate home and its local descendants.
 #
 # Everything else still fails closed: an unreadable or malformed binding, an
 # unreachable local parent, a cycle, and a chain deeper than the bound.
-fm_firstmate_root_home() {
+fm_nexus_root_home() {
   local home=${1:-$FM_HOME} marker parent seen="|" depth=0
   home=$(CDPATH='' cd -- "$home" 2>/dev/null && pwd -P) || return 1
   while [ -e "$home/.fm-secondmate-parent" ] || [ -L "$home/.fm-secondmate-parent" ]; do
@@ -1405,7 +1405,7 @@ fm_firstmate_root_home() {
 fm_treehouse_project_lock_path() {  # <project-dir>
   local project=$1 root origin identity hash top
   [ -d "$project" ] || return 1
-  root=$(fm_firstmate_root_home "$FM_HOME") || return 1
+  root=$(fm_nexus_root_home "$FM_HOME") || return 1
   origin=$(git -C "$project" remote get-url origin 2>/dev/null || true)
   if [ -n "$origin" ]; then
     case "$origin" in
@@ -1445,7 +1445,7 @@ fm_treehouse_pool_slot() {  # <project-dir> <worktree>
 #
 # Treehouse can record ownership durably: `treehouse get --lease --lease-holder`
 # reserves a slot under a label until `treehouse return --if-lease-holder`
-# releases it, and Firstmate uses exactly that for secondmate homes
+# releases it, and Nexus uses exactly that for secondmate homes
 # (bin/fm-home-seed.sh). Crewmate spawns do not take that path: they acquire
 # their slot through the interactive pane-driven `treehouse get`, whose state
 # entry is a live process lease (owner_pid plus owner_started_at, and `treehouse
@@ -1453,7 +1453,7 @@ fm_treehouse_pool_slot() {  # <project-dir> <worktree>
 # That answers "is anything running here", never "which task owns this", and it
 # is released by the very event that makes a task record stale - the worker
 # exiting - so a slot whose lease has lapsed reads identical whether it is still
-# this task's or has since been handed to another one. Firstmate therefore keeps
+# this task's or has since been handed to another one. Nexus therefore keeps
 # its own claim on top: one file naming the task that took the slot, written by
 # bin/fm-spawn.sh under the same project lock that allocates the slot and
 # released by bin/fm-teardown.sh when the slot goes back to the pool. Moving
@@ -2658,7 +2658,7 @@ fm_wake_print_annotations() {  # <deduped-raw-rows> [<presentation-snapshot>]
     path="$STATE/$status_key"
     # A turn-ended-only (historical) row's annotation would show unread status
     # lines even when those bytes are fully covered by the seen marker - already
-    # surfaced to firstmate or deliberately absorbed by the signal triage.
+    # surfaced to nexus or deliberately absorbed by the signal triage.
     # Presenting such an already-announced line again makes a bare turn-end look
     # like fresh progress, so skip the annotation when the status file's
     # signature still matches its marker (a proven replay). Any uncertainty -

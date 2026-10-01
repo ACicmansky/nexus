@@ -126,7 +126,7 @@ HOME_PARENT=$(dirname "$FM_HOME")
 HOME_PARENT_REAL=$(CDPATH='' cd -- "$HOME_PARENT" 2>/dev/null && pwd -P) \
   || die "remote home parent is unavailable"
 [ "$HOME_PARENT_REAL" = "$HOME_PARENT" ] || die "remote home parent is not canonical"
-PROVISION_LOCK_STATE="$HOME_PARENT/.firstmate-provision-locks"
+PROVISION_LOCK_STATE="$HOME_PARENT/.nexus-provision-locks"
 if [ -e "$PROVISION_LOCK_STATE" ] || [ -L "$PROVISION_LOCK_STATE" ]; then
   [ -d "$PROVISION_LOCK_STATE" ] && [ ! -L "$PROVISION_LOCK_STATE" ] \
     || die "remote provisioning lock root is unsafe"
@@ -152,7 +152,7 @@ PROVISION_LOCK_HELD=1
 if [ -e "$FM_HOME" ] || [ -L "$FM_HOME" ]; then
   [ -d "$FM_HOME" ] && [ ! -L "$FM_HOME" ] || die "remote home exists but is not a safe directory"
   [ -f "$FM_HOME/AGENTS.md" ] && [ ! -L "$FM_HOME/AGENTS.md" ] \
-    && [ -d "$FM_HOME/bin" ] && [ ! -L "$FM_HOME/bin" ] || die "existing remote home is not a safe Firstmate checkout"
+    && [ -d "$FM_HOME/bin" ] && [ ! -L "$FM_HOME/bin" ] || die "existing remote home is not a safe Nexus checkout"
   for operational_dir in data state config projects; do
     operational_path="$FM_HOME/$operational_dir"
     if [ -e "$operational_path" ] || [ -L "$operational_path" ]; then
@@ -188,7 +188,7 @@ else
   # image does that copy before the destination shard directory exists, so the
   # clone dies intermittently with "failed to copy file to .../objects/xx/hash".
   # --no-local uses the normal transport and writes a pack instead.
-  git clone --no-local --quiet -- "$FM_ROOT" "$STAGE_HOME" || die "could not clone the remote Firstmate home"
+  git clone --no-local --quiet -- "$FM_ROOT" "$STAGE_HOME" || die "could not clone the remote Nexus home"
   STAGE_SENTINEL="${STAGE_HOME##*/}.owner"
   : > "$STAGE_HOME/$STAGE_SENTINEL" || die "cannot mark the remote home staging directory"
   mv -- "$STAGE_HOME" "$FM_HOME" || die "cannot install the remote home"

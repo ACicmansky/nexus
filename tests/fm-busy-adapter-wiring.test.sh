@@ -330,7 +330,7 @@ test_gemini_hooks_semantic_lifecycle() {
     jq -e ".hooks[\"$ev\"]" "$settings" >/dev/null || fail "gemini hook settings lack $ev"
   done
   # The worktree's own .gemini/settings.json is the PROJECT's committed file;
-  # firstmate must never write it, or a project's configuration is clobbered.
+  # nexus must never write it, or a project's configuration is clobbered.
   assert_absent "$WT_DIR/.gemini/settings.json" \
     "gemini spawn must not write the project's own .gemini/settings.json"
 

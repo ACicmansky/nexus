@@ -2,7 +2,7 @@
 # fm-supervisor-target-lib.sh - the single owner of supervisor-pane discovery.
 #
 # The away-mode daemon (bin/fm-supervise-daemon.sh) must know which pane runs
-# firstmate itself, both to inject escalations into it and, for the daemon, to
+# nexus itself, both to inject escalations into it and, for the daemon, to
 # validate that target at startup. The script-owned away launcher
 # (bin/fm-afk-launch.sh) must resolve the SAME captain pane BEFORE it creates a
 # separate, non-visible terminal for the daemon, so it can pass that pane in as
@@ -15,18 +15,18 @@
 # keep exercising the same names after the daemon sources this file.
 
 # Default supervisor pane target/backend when nothing is configured or detected.
-# "firstmate:0" is a tmux session:window name, so the bare fallback (nothing
+# "nexus:0" is a tmux session:window name, so the bare fallback (nothing
 # configured, nothing detected) assumes tmux - matching the daemon's pre-herdr
 # behavior byte-for-byte when run outside both tmux and herdr.
-FM_SUPERVISOR_TARGET_DEFAULT="firstmate:0"
+FM_SUPERVISOR_TARGET_DEFAULT="nexus:0"
 FM_SUPERVISOR_BACKEND_DEFAULT="tmux"
 
-# discover_supervisor_target: resolve the pane running firstmate. Priority:
+# discover_supervisor_target: resolve the pane running nexus. Priority:
 #   1. FM_SUPERVISOR_TARGET env (explicit override) - may be a tmux target or a
 #      herdr "<session>:<pane-id>" target (paired with discover_supervisor_backend
 #      to know which).
 #   2. $TMUX_PANE - tmux sets this in every pane's environment; inherited by a
-#      process launched from firstmate's own pane.
+#      process launched from nexus's own pane.
 #   3. $HERDR_ENV=1 + $HERDR_PANE_ID - herdr injects both into every process it
 #      manages a pane for; compose the "<session>:<pane-id>" target from
 #      $HERDR_SESSION (defaulting to "default", mirroring bin/backends/herdr.sh's

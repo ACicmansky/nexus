@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # fm-public-followup.sh - the deterministic consumer and delivery owner for
-# public commitments made through the myfirstmate relay (X and Discord).
+# public commitments made through the mynexus relay (X and Discord).
 #
-# THE PROBLEM THIS SOLVES: firstmate promises a public final reply, routes the
+# THE PROBLEM THIS SOLVES: nexus promises a public final reply, routes the
 # work out, and then the conversation compacts or the session restarts. Nothing
 # in memory survives, so the promise is only kept if reconciling it is a disk
 # operation. Every command here reads durable state and nothing else.
@@ -271,7 +271,7 @@ cmd_register() {
   done
 
   fm_pf_relay_active "$FM_HOME" \
-    || die "this home has not opted into the myfirstmate relay, so it cannot own a public commitment" 1
+    || die "this home has not opted into the mynexus relay, so it cannot own a public commitment" 1
   require_tools
 
   fm_pf_slug_valid "$id"       || die "unsafe obligation id: $id"
@@ -808,7 +808,7 @@ cmd_consume() {
     fi
   done
 
-  # A fresh event must be able to wake firstmate again, so drop the surfaced
+  # A fresh event must be able to wake nexus again, so drop the surfaced
   # signature once the inbox has been worked.
   rm -f -- "$(fm_pf_root "$STATE")/$FM_PF_SURFACED_BASENAME" 2>/dev/null || true
   return "$consume_rc"
@@ -1173,7 +1173,7 @@ cmd_deliver() {
 
   fm_pf_slug_valid "$id" || die "unsafe obligation id: $id"
   fm_pf_relay_active "$FM_HOME" \
-    || die "this home has not opted into the myfirstmate relay, so it cannot post a public reply" 1
+    || die "this home has not opted into the mynexus relay, so it cannot post a public reply" 1
   require_tools
 
   local payload delivery attempt request platform text tmp_text hash chunks rc receipt receipt_fields receipt_dry_run link_status link_rc
@@ -1425,7 +1425,7 @@ cmd_rechain() {
   done
 
   fm_pf_relay_active "$FM_HOME" \
-    || die "this home has not opted into the myfirstmate relay, so it cannot own a public commitment" 1
+    || die "this home has not opted into the mynexus relay, so it cannot own a public commitment" 1
   require_tools
   fm_pf_slug_valid "$new_id" || die "unsafe obligation id: $new_id"
   fm_pf_slug_valid "$from" || die "unsafe source obligation id: $from"

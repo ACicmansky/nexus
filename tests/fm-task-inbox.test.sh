@@ -19,7 +19,7 @@
 #      spacing holds, a spent budget escalates exactly once, and an
 #      acknowledgement resets the ladder for the next message.
 #   5. A real fm-watch.sh subprocess re-rings the doorbell for an unhandled
-#      aged message on an idle pane WITHOUT waking firstmate, waits on a busy
+#      aged message on an idle pane WITHOUT waking nexus, waits on a busy
 #      pane, stays silent on a healthy/empty inbox, surfaces unwritable ladder
 #      bookkeeping only while its record remains unhandled, and emits exactly
 #      one stale wake once the ring budget is spent.
@@ -173,7 +173,7 @@ test_write_is_durable_and_exact() {
   assert_contains "$doorbell" "'t1.inbox' steering inbox" "doorbell should quote and name the inbox"
   assert_contains "$doorbell" "numeric order" "doorbell should require ordered processing"
   assert_contains "$doorbell" "handled/" "doorbell should name the handled dir"
-  assert_contains "$doorbell" "Firstmate instruction waiting" "doorbell should be self-describing"
+  assert_contains "$doorbell" "Nexus instruction waiting" "doorbell should be self-describing"
   case "$doorbell" in
     *$'\n'*) fail "the doorbell must be a single line" ;;
   esac
@@ -283,13 +283,13 @@ test_ring_skips_dead_agent() {
   PATH="$dir/fakebin:$PATH" FM_SEND_LOG="$log" FM_FAKE_TMUX_AGENT=claude \
     inbox_lib "$state" fm_task_inbox_ring tmux sess:fm-t1 "$rec" fm-t1 || rc=$?
   [ "$rc" = 0 ] || fail "a live agent should still be rung, got $rc"
-  grep -qF 'Firstmate instruction waiting' "$log" || fail "a live agent did not receive the doorbell"
+  grep -qF 'Nexus instruction waiting' "$log" || fail "a live agent did not receive the doorbell"
   : > "$log"
   rc=0
   PATH="$dir/fakebin:$PATH" FM_SEND_LOG="$log" \
     inbox_lib "$state" fm_task_inbox_ring tmux sess:fm-t1 "$rec" fm-t1 || rc=$?
   [ "$rc" = 0 ] || fail "an endpoint the classifier cannot see should still be rung, got $rc"
-  grep -qF 'Firstmate instruction waiting' "$log" || fail "an unclassifiable endpoint did not receive the doorbell"
+  grep -qF 'Nexus instruction waiting' "$log" || fail "an unclassifiable endpoint did not receive the doorbell"
   pass "inbox: the ring skips dead or missing endpoints and still rings live or unclassifiable endpoints"
 }
 
@@ -673,15 +673,15 @@ test_watcher_rerings_idle_pane_quietly() {
   pid=$!
   local i=0
   while [ "$i" -lt 100 ]; do
-    grep -qF 'Firstmate instruction waiting' "$log" 2>/dev/null && break
+    grep -qF 'Nexus instruction waiting' "$log" 2>/dev/null && break
     kill -0 "$pid" 2>/dev/null || break
     sleep 0.1
     i=$((i + 1))
   done
-  grep -qF "Firstmate instruction waiting: list \"\$FM_TASK_INBOX\"/*.msg in your 't1.inbox' steering inbox" "$log" \
+  grep -qF "Nexus instruction waiting: list \"\$FM_TASK_INBOX\"/*.msg in your 't1.inbox' steering inbox" "$log" \
     || { kill "$pid" 2>/dev/null; fail "the watcher never re-rang the doorbell:"$'\n'"$(cat "$log")"; }
   kill -0 "$pid" 2>/dev/null \
-    || fail "a healthy re-ring must not wake firstmate (watcher exited):"$'\n'"$(cat "$out")"
+    || fail "a healthy re-ring must not wake nexus (watcher exited):"$'\n'"$(cat "$out")"
   [ ! -s "$state/.wake-queue" ] \
     || { kill "$pid" 2>/dev/null; fail "a healthy re-ring queued a wake:"$'\n'"$(cat "$state/.wake-queue")"; }
   # The acknowledgement silences the ladder: no further doorbells after the mv.
@@ -691,7 +691,7 @@ test_watcher_rerings_idle_pane_quietly() {
   sleep 2.5
   kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null
   [ ! -s "$log" ] || fail "the watcher kept ringing after the ack:"$'\n'"$(cat "$log")"
-  pass "watcher: an unhandled aged message on an idle pane re-rings without waking firstmate, and the ack silences it"
+  pass "watcher: an unhandled aged message on an idle pane re-rings without waking nexus, and the ack silences it"
 }
 
 test_watcher_waits_on_busy_pane() {
@@ -752,7 +752,7 @@ test_watcher_ack_silences_unwritable_ladder() {
   kill -0 "$pid" 2>/dev/null \
     || fail "the watcher escalated ladder failure after the record was acknowledged:"$'\n'"$(cat "$out")"
   kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null
-  rings=$(grep -cF 'Firstmate instruction waiting' "$log" || true)
+  rings=$(grep -cF 'Nexus instruction waiting' "$log" || true)
   [ "$rings" = 1 ] || fail "acknowledgement should silence retries, got $rings doorbells:"$'\n'"$(cat "$log")"
   [ ! -s "$state/.wake-queue" ] \
     || fail "an acknowledged record queued a bookkeeping wake:"$'\n'"$(cat "$state/.wake-queue")"
@@ -772,7 +772,7 @@ test_watcher_surfaces_unwritable_ladder() {
   pid=$!
   wait_watcher_gone "$pid" \
     || { kill "$pid" 2>/dev/null; fail "the watcher silently retried with unwritable ladder bookkeeping"; }
-  rings=$(grep -cF 'Firstmate instruction waiting' "$log" || true)
+  rings=$(grep -cF 'Nexus instruction waiting' "$log" || true)
   [ "$rings" = 1 ] || fail "expected one doorbell before the bookkeeping wake, got $rings:"$'\n'"$(cat "$log")"
   wakes=$(grep -cF 'steering-inbox ladder bookkeeping unwritable' "$state/.wake-queue" || true)
   [ "$wakes" = 1 ] \
@@ -801,16 +801,16 @@ test_watcher_pays_fire_and_forget_retry_once() {
     FM_TASK_INBOX_RING_MAX=1
   pid=$!
   while [ "$i" -lt 100 ]; do
-    grep -qF 'Firstmate instruction waiting' "$log" 2>/dev/null && break
+    grep -qF 'Nexus instruction waiting' "$log" 2>/dev/null && break
     kill -0 "$pid" 2>/dev/null || break
     sleep 0.1
     i=$((i + 1))
   done
   sleep 3
   kill -0 "$pid" 2>/dev/null \
-    || fail "a fire-and-forget retry must not wake firstmate (watcher exited):"$'\n'"$(cat "$out")"
+    || fail "a fire-and-forget retry must not wake nexus (watcher exited):"$'\n'"$(cat "$out")"
   kill "$pid" 2>/dev/null; wait "$pid" 2>/dev/null
-  rings=$(grep -cF 'Firstmate instruction waiting' "$log" || true)
+  rings=$(grep -cF 'Nexus instruction waiting' "$log" || true)
   [ "$rings" = 1 ] || fail "expected exactly one retry ring, got $rings:"$'\n'"$(cat "$log")"
   [ ! -s "$state/.wake-queue" ] || fail "a fire-and-forget retry queued a wake:"$'\n'"$(cat "$state/.wake-queue")"
   [ ! -e "$state/t1.inbox/.retry-ring" ] || fail "the watcher did not spend the retry mark"
@@ -847,7 +847,7 @@ test_watcher_holds_retry_while_the_worker_decides() {
   printf 'resolved [key=pick]: alpha\n' >> "$state/t1.status"
   steer_check_once "$dir"
   steer_check_once "$dir"
-  rings=$(grep -cF 'Firstmate instruction waiting' "$log" || true)
+  rings=$(grep -cF 'Nexus instruction waiting' "$log" || true)
   [ "$rings" = 1 ] || fail "expected exactly one retry ring once the decision closed, got $rings:"$'\n'"$(cat "$log")"
   [ ! -e "$state/t1.inbox/.retry-ring" ] || fail "the watcher did not spend the retry mark"
   unset FM_CONFIG_OVERRIDE
@@ -867,13 +867,13 @@ test_watcher_retry_keeps_a_newer_mark() {
   age_path "$state/t1.inbox/.retry-ring"
   newer=$(inbox_lib "$state" fm_task_inbox_write "$state" t1 "newer steer" fire-and-forget)
   FM_RING_MARKS_RETRY="$newer" steer_check_once "$dir"
-  rings=$(grep -cF 'Firstmate instruction waiting' "$log" || true)
+  rings=$(grep -cF 'Nexus instruction waiting' "$log" || true)
   [ "$rings" = 1 ] || fail "expected the owed retry to ring once, got $rings:"$'\n'"$(cat "$log")"
   [ "$(cat "$state/t1.inbox/.retry-ring" 2>/dev/null)" = "${newer##*/}" ] \
     || fail "the spent retry removed a newer record's mark written during its ring"
   age_path "$state/t1.inbox/.retry-ring"
   steer_check_once "$dir"
-  rings=$(grep -cF 'Firstmate instruction waiting' "$log" || true)
+  rings=$(grep -cF 'Nexus instruction waiting' "$log" || true)
   [ "$rings" = 2 ] || fail "the newer record's retry did not ring, got $rings:"$'\n'"$(cat "$log")"
   [ ! -e "$state/t1.inbox/.retry-ring" ] || fail "the watcher did not spend the newer retry mark"
   unset FM_CONFIG_OVERRIDE
@@ -892,13 +892,13 @@ test_watcher_escalates_once_after_budget() {
   pid=$!
   wait_watcher_gone "$pid" \
     || { kill "$pid" 2>/dev/null; fail "the watcher never escalated a spent ring budget"; }
-  rings=$(grep -cF 'Firstmate instruction waiting' "$log" || true)
+  rings=$(grep -cF 'Nexus instruction waiting' "$log" || true)
   [ "$rings" = 1 ] || fail "expected exactly 1 doorbell before escalation, got $rings:"$'\n'"$(cat "$log")"
-  grep -qF 'unread firstmate instruction' "$state/.wake-queue" \
+  grep -qF 'unread nexus instruction' "$state/.wake-queue" \
     || fail "the escalation should queue a stale wake naming the unread instruction:"$'\n'"$(cat "$state/.wake-queue" 2>/dev/null)"
   grep -qF "$rec" "$state/.wake-queue" \
     || fail "the stale wake should name the record path:"$'\n'"$(cat "$state/.wake-queue")"
-  [ "$(grep -cF 'unread firstmate instruction' "$state/.wake-queue")" = 1 ] \
+  [ "$(grep -cF 'unread nexus instruction' "$state/.wake-queue")" = 1 ] \
     || fail "the escalation must fire exactly once:"$'\n'"$(cat "$state/.wake-queue")"
   grep -qF 'stale:' "$out" || fail "the watcher should exit through the ordinary stale wake:"$'\n'"$(cat "$out")"
   pass "watcher: a spent ring budget emits exactly one ordinary stale wake for recovery"
@@ -917,7 +917,7 @@ test_watcher_dead_pane_escalates_once_without_ringing() {
   wait_watcher_gone "$pid" \
     || { kill "$pid" 2>/dev/null; fail "the watcher never surfaced a dead pane's unhandled instruction"; }
   [ ! -s "$log" ] || fail "a dead pane was typed into:"$'\n'"$(cat "$log")"
-  [ "$(grep -cF 'unread firstmate instruction' "$state/.wake-queue" 2>/dev/null || true)" = 1 ] \
+  [ "$(grep -cF 'unread nexus instruction' "$state/.wake-queue" 2>/dev/null || true)" = 1 ] \
     || fail "a dead pane should surface exactly one stale wake:"$'\n'"$(cat "$state/.wake-queue" 2>/dev/null)"
   grep -qF "agent has exited" "$state/.wake-queue" \
     || fail "the stale wake should say the agent has exited:"$'\n'"$(cat "$state/.wake-queue")"
@@ -947,7 +947,7 @@ test_watcher_dead_pane_ignores_stale_busy_state() {
   wait_watcher_gone "$pid" \
     || { kill "$pid" 2>/dev/null; fail "stale busy state hid a dead pane's unhandled instruction"; }
   [ ! -s "$log" ] || fail "a busy-marked dead pane was typed into:"$'\n'"$(cat "$log")"
-  [ "$(grep -cF 'unread firstmate instruction' "$state/.wake-queue" 2>/dev/null || true)" = 1 ] \
+  [ "$(grep -cF 'unread nexus instruction' "$state/.wake-queue" 2>/dev/null || true)" = 1 ] \
     || fail "a busy-marked dead pane should surface exactly once:"$'\n'"$(cat "$state/.wake-queue" 2>/dev/null)"
   [ -f "$rec" ] || fail "the durable record must survive stale busy-state recovery"
   [ "$(cat "$state/t1.inbox/.escalated")" = "${rec##*/}" ] \

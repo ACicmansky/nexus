@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# fm-tmux-lib.sh — shared tmux pane primitives for firstmate.
+# fm-tmux-lib.sh — shared tmux pane primitives for nexus.
 #
 # ONE tmux source for delivery-busy detection, composer capture primitives,
 # and verified submit.

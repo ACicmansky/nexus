@@ -131,7 +131,7 @@ test_owned_lock_is_silent() {
   pass "fm-sessionstart-nudge: a lock holder in process ancestry is already run"
 }
 
-# A firstmate running inside a PID namespace - a container, or `codex sandbox` -
+# A nexus running inside a PID namespace - a container, or `codex sandbox` -
 # holds its home lock from a harness that IS pid 1, so this hook must recognize
 # that owner. The old walk rejected a lock pid of 1 outright and stopped before
 # comparing pid 1, so the hook nudged a session that had already run.
@@ -250,7 +250,7 @@ test_run_startup_runs_the_full_digest() {
   assert_contains "$out" "lock acquired: harness pid" \
     "the portable startup fixture did not supply a real harness process"
   assert_not_contains "$out" "$REEMIT_BANNER" "startup was misrouted to a context re-emit"
-  assert_not_contains "$out" "FIRSTMATE_OP" "a run-tier open also emitted the nudge instruction"
+  assert_not_contains "$out" "NEXUS_OP" "a run-tier open also emitted the nudge instruction"
   assert_contains "$out" "NEXT STEP" "the run wrapper did not deliver a complete digest"
   pass "run wrapper: startup runs the full digest and never also nudges"
 }
@@ -269,7 +269,7 @@ test_run_clear_and_compact_reemit() {
     assert_contains "$out" "$REEMIT_BANNER$root" "$source did not re-emit the digest"
     assert_contains "$out" "are NOT repeated" "$source did not report the skipped startup sweeps"
     assert_contains "$out" "Queued wakes ARE still drained" "$source did not preserve the wake-queue drain"
-    assert_not_contains "$out" "FIRSTMATE_OP" "a $source open also emitted the nudge instruction"
+    assert_not_contains "$out" "NEXUS_OP" "a $source open also emitted the nudge instruction"
   done
   pass "run wrapper: clear and compact re-emit the digest without repeating startup sweeps"
 }
@@ -959,7 +959,7 @@ const content = result.message.content;
 if (!content.includes("PI_LARGE_DIGEST_PREFIX")) throw new Error("digest prefix was lost");
 if (!content.includes("PI SESSION-START DELIVERY TRUNCATED")) throw new Error("truncation marker was lost");
 if (content.includes("PI_LARGE_DIGEST_SUFFIX")) throw new Error("delivery exceeded its declared bound");
-if (!content.includes("FIRSTMATE_OP: v1 session-start:")) throw new Error("operational provenance was lost");
+if (!content.includes("NEXUS_OP: v1 session-start:")) throw new Error("operational provenance was lost");
 JS
   ) || status=$?
   expect_code 0 "$status" "Pi large session-start delivery"
@@ -993,7 +993,7 @@ test_run_reads_source_from_the_hook_payload() {
   status=0
   out=$(printf '{"source":"resume","cwd":"/nowhere"}' | run_hook "$root") || status=$?
   expect_code 0 "$status" "run wrapper payload resume"
-  assert_contains "$out" "FIRSTMATE_OP" "a resume hook payload did not delegate to the nudge"
+  assert_contains "$out" "NEXUS_OP" "a resume hook payload did not delegate to the nudge"
   assert_not_contains "$out" "SESSION START" "a resume hook payload still ran the digest"
   pass "run wrapper: the hook payload's source field drives routing with no explicit argument"
 }

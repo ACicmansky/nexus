@@ -958,7 +958,7 @@ command_hold() {
       repo=${repo%/}
       repo=${repo##*/}
     fi
-    [ -n "$repo" ] || repo=firstmate
+    [ -n "$repo" ] || repo=nexus
     validate_one_line repo "$repo"
     [ -z "$origin" ] || body=$(printf 'Origin: %s' "$origin")
     # tasks-axi add never passes --due. Beads due.required would refuse this

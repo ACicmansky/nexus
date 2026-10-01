@@ -8,7 +8,7 @@
 # decision the captain is owed never reaches him.
 #
 # The parse is deliberately strict, and these tests defend that strictness as
-# hard as they defend the fix: only the exact token a firstmate library writes is
+# hard as they defend the fix: only the exact token a nexus library writes is
 # read through. Prose, a malformed or wrong-length token, and an arbitrary
 # name=value word all keep their extra words and therefore stay non-transitions.
 #

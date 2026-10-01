@@ -152,7 +152,7 @@ pass "a refused remote relaunch leaves the parent's record untouched"
 
 # --- a local (non-remote) secondmate is refused, not silently mishandled ----
 fm_write_meta "$HOME_DIR/state/local1.meta" \
-  "window=firstmate:fm-local1" "endpoint_task_id=local1" \
+  "window=nexus:fm-local1" "endpoint_task_id=local1" \
   "worktree=/srv/local1" "project=/srv/local1" "harness=codex" \
   "kind=secondmate" "mode=secondmate" "yolo=off" "home=/srv/local1"
 OUT=$(run_relaunch local1 claude - -); RC=$?

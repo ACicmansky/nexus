@@ -85,19 +85,19 @@ make_lab() {
     echo "tmux_dir=$tmux_dir"
   } > "$root/.fm-live-lab"
 
-  lab_tmux "$root" new-session -d -s firstmate -n lab -c "$root" 'exec sleep 600'
+  lab_tmux "$root" new-session -d -s nexus -n lab -c "$root" 'exec sleep 600'
   record_pid "$root" "$(lab_tmux "$root" display-message -p '#{pid}')"
-  lab_tmux "$root" new-window -d -t firstmate: -n main -c "$home" "printf 'LABREADY-$NONCE\n'; exec sleep 600"
-  lab_tmux "$root" new-window -d -t firstmate: -n "fm-$MATE_ID" -c "$root/mate" 'exec sleep 600'
-  lab_tmux "$root" new-window -d -t firstmate: -n "fm-$WORKER_ID" -c "$root" 'exec sleep 600'
-  fm_write_meta "$home/state/$MATE_ID.meta" "window=firstmate:fm-$MATE_ID" "tasktmp=/tmp/fm-$MATE_ID"
-  fm_write_meta "$home/state/$WORKER_ID.meta" "window=firstmate:fm-$WORKER_ID" "worktree=$home/projects/notes" "kind=secondmate" "tasktmp=/tmp/fm-$WORKER_ID"
+  lab_tmux "$root" new-window -d -t nexus: -n main -c "$home" "printf 'LABREADY-$NONCE\n'; exec sleep 600"
+  lab_tmux "$root" new-window -d -t nexus: -n "fm-$MATE_ID" -c "$root/mate" 'exec sleep 600'
+  lab_tmux "$root" new-window -d -t nexus: -n "fm-$WORKER_ID" -c "$root" 'exec sleep 600'
+  fm_write_meta "$home/state/$MATE_ID.meta" "window=nexus:fm-$MATE_ID" "tasktmp=/tmp/fm-$MATE_ID"
+  fm_write_meta "$home/state/$WORKER_ID.meta" "window=nexus:fm-$WORKER_ID" "worktree=$home/projects/notes" "kind=secondmate" "tasktmp=/tmp/fm-$WORKER_ID"
   mkdir -p "$home/projects/notes"
   printf 'paused [at=1]: waiting on gate file %s to exist\n' "$home/data/$WORKER_ID/gate" > "$home/state/$WORKER_ID.status"
 
-  lock_pid=$(lab_tmux "$root" display-message -p -t firstmate:=main '#{pane_pid}')
+  lock_pid=$(lab_tmux "$root" display-message -p -t nexus:=main '#{pane_pid}')
   printf '%s\n' "$lock_pid" > "$home/state/.lock"
-  printf '%s\n' "$(lab_tmux "$root" display-message -p -t "firstmate:=fm-$MATE_ID" '#{pane_pid}')" > "$root/mate/state/.lock"
+  printf '%s\n' "$(lab_tmux "$root" display-message -p -t "nexus:=fm-$MATE_ID" '#{pane_pid}')" > "$root/mate/state/.lock"
   start_watcher "$home"
   printf 'host\t%s\tx\n' "$(start_sleeper)" > "$home/state/.supervision-host"
   printf '%s\n' \
@@ -173,7 +173,7 @@ printf '999999\n' > "$CH/state/.lock"
 run_check "$C"
 expect_code 1 "$CHECK_RC" "a dead session lock is not ready"
 assert_contains "$CHECK_OUT" "fail primary: the lab session lock names no live process" "primary names the dead lock"
-lab_tmux "$C" display-message -p -t firstmate:=main '#{pane_pid}' > "$CH/state/.lock"
+lab_tmux "$C" display-message -p -t nexus:=main '#{pane_pid}' > "$CH/state/.lock"
 pass "primary fails when session start never took the lab lock"
 
 # primary: a lab home that is a linked worktree is not the genuine primary
@@ -182,14 +182,14 @@ WT_CASE="$TMP_ROOT/wtcase"
 fm_git_worktree "$WT_CASE/project" "$WT_CASE/wt" lab-wt
 cp "$C/.fm-live-lab" "$WT_CASE/.fm-live-lab"
 set_record "$WT_CASE" home "$WT_CASE/wt"
-lab_tmux "$C" new-window -d -t firstmate: -n wtmain -c "$WT_CASE/wt" 'exec sleep 600'
-lab_tmux "$C" kill-window -t firstmate:=main
-lab_tmux "$C" rename-window -t firstmate:=wtmain main
+lab_tmux "$C" new-window -d -t nexus: -n wtmain -c "$WT_CASE/wt" 'exec sleep 600'
+lab_tmux "$C" kill-window -t nexus:=main
+lab_tmux "$C" rename-window -t nexus:=wtmain main
 run_check "$WT_CASE"
 assert_contains "$CHECK_OUT" "fail primary: the lab home is not a primary checkout" "primary refuses a linked-worktree home"
-lab_tmux "$C" kill-window -t firstmate:=main
-lab_tmux "$C" new-window -d -t firstmate: -n main -c "$CH" "printf 'LABREADY-$NONCE\n'; exec sleep 600"
-lab_tmux "$C" display-message -p -t firstmate:=main '#{pane_pid}' > "$CH/state/.lock"
+lab_tmux "$C" kill-window -t nexus:=main
+lab_tmux "$C" new-window -d -t nexus: -n main -c "$CH" "printf 'LABREADY-$NONCE\n'; exec sleep 600"
+lab_tmux "$C" display-message -p -t nexus:=main '#{pane_pid}' > "$CH/state/.lock"
 pass "primary fails when the primary runs in a linked worktree instead of the lab's primary checkout"
 
 # probe: the nonce reply proves the model is accepted and a turn completed.
@@ -244,14 +244,14 @@ pass "watcher fails on a stale beacon"
 
 # mate: its own window, targeted exactly. A missing window must not resolve to
 # another one (tmux falls back to the current window for an unknown name).
-lab_tmux "$C" kill-window -t "firstmate:=fm-$MATE_ID"
+lab_tmux "$C" kill-window -t "nexus:=fm-$MATE_ID"
 run_check "$C"
 assert_contains "$CHECK_OUT" "fail mate: the $MATE_ID window is not running" "mate names its missing window"
-lab_tmux "$C" new-window -d -t firstmate: -n "fm-$MATE_ID" -c "$C/mate" 'exec sleep 600'
+lab_tmux "$C" new-window -d -t nexus: -n "fm-$MATE_ID" -c "$C/mate" 'exec sleep 600'
 rm -f "$C/mate/state/.lock"
 run_check "$C"
 assert_contains "$CHECK_OUT" "fail mate: the mate holds no session lock yet" "mate needs its own session lock"
-lab_tmux "$C" display-message -p -t "firstmate:=fm-$MATE_ID" '#{pane_pid}' > "$C/mate/state/.lock"
+lab_tmux "$C" display-message -p -t "nexus:=fm-$MATE_ID" '#{pane_pid}' > "$C/mate/state/.lock"
 pass "mate fails when its window is gone or it never reached its charter"
 
 # Opt-out readiness must observe the mate's inherited material and its real
@@ -335,7 +335,7 @@ pass "down refuses anything up did not build"
 
 C_HASH=$(printf '%s' "$CH" | shasum -a 256 | awk '{print $1}')
 OTHER_ID="labt$$-other"
-fm_write_meta "$CH/state/$OTHER_ID.meta" "window=firstmate:fm-$OTHER_ID" "tasktmp=/tmp/fm-$OTHER_ID"
+fm_write_meta "$CH/state/$OTHER_ID.meta" "window=nexus:fm-$OTHER_ID" "tasktmp=/tmp/fm-$OTHER_ID"
 mkdir -p "/tmp/fm-$WORKER_ID/gotmp" "/tmp/fm-$MATE_ID" "/tmp/fm-$WORKER_ID+$C_HASH" "/tmp/fm-$OTHER_ID+$C_HASH" "/tmp/fm-$OTHER_ID"
 # An outsider opening a lab path is not owned by the lab.
 printf 'sleep 600\n' > "$C/stray.sh"
@@ -628,7 +628,7 @@ cp -R "$UPSRC" "$WORKSRC"
 cat > "$WORKSRC/bin/fm-brief.sh" <<'SH'
 #!/usr/bin/env bash
 mkdir -p "$FM_HOME/data/$1"
-printf '{TASK}\n{FIRSTMATE_SPEC}\n' > "$FM_HOME/data/$1/brief.md"
+printf '{TASK}\n{NEXUS_SPEC}\n' > "$FM_HOME/data/$1/brief.md"
 SH
 cat > "$WORKSRC/bin/fm-tasks-axi.sh" <<'SH'
 #!/usr/bin/env bash
@@ -637,17 +637,17 @@ SH
 cat > "$WORKSRC/bin/fm-spawn.sh" <<'SH'
 #!/usr/bin/env bash
 id=$1
-tmux new-window -d -t firstmate: -n "fm-$id" -c "$FM_HOME" 'exec sleep 45 >/dev/null 2>&1' || exit 1
+tmux new-window -d -t nexus: -n "fm-$id" -c "$FM_HOME" 'exec sleep 45 >/dev/null 2>&1' || exit 1
 # A missing =name can silently resolve to the current window: verify the name.
 for (( n=0; n<30; n++ )); do
-  if tmux list-windows -t firstmate -F '#{window_name}' | grep -Fxq "fm-$id"; then
-    pid=$(tmux display-message -p -t "firstmate:=fm-$id" '#{pane_pid}')
+  if tmux list-windows -t nexus -F '#{window_name}' | grep -Fxq "fm-$id"; then
+    pid=$(tmux display-message -p -t "nexus:=fm-$id" '#{pane_pid}')
     [ -z "$pid" ] || break
   fi
   sleep 0.1
 done
 [ -n "${pid:-}" ] || exit 1
-printf 'window=firstmate:fm-%s\n' "$id" > "$FM_HOME/state/$id.meta"
+printf 'window=nexus:fm-%s\n' "$id" > "$FM_HOME/state/$id.meta"
 printf 'working [at=1]: setting up\n' > "$FM_HOME/state/$id.status"
 SH
 chmod +x "$WORKSRC/bin/"{fm-brief,fm-tasks-axi,fm-spawn}.sh
@@ -676,7 +676,7 @@ pass "up launches primary after worker status without weakening final parked rea
 cat > "$WORKSRC/bin/fm-spawn.sh" <<'SH'
 #!/usr/bin/env bash
 id=$1
-printf 'window=firstmate:fm-%s\n' "$id" > "$FM_HOME/state/$id.meta"
+printf 'window=nexus:fm-%s\n' "$id" > "$FM_HOME/state/$id.meta"
 printf 'working [at=1]: setting up\n' > "$FM_HOME/state/$id.status"
 SH
 git -C "$WORKSRC" add bin/fm-spawn.sh

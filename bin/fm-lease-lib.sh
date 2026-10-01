@@ -2,7 +2,7 @@
 # fm-lease-lib.sh - the per-task supervision lease contract (one owner).
 #
 # WHY. A supervision branch (docs/pi-supervision-branch.md) is a second LLM
-# actor beside MAIN (the captain's chat) in one firstmate home - on Pi, a
+# actor beside MAIN (the captain's chat) in one nexus home - on Pi, a
 # persistent conversation inside the same pi process; beside another primary,
 # a headless engine session run by the supervision host
 # (docs/supervision-host.md) - and nothing in this contract assumes the two
@@ -18,7 +18,7 @@
 #   - Lease file: $STATE/.lease-<task>, one line "<actor>\t<pid>\t<epoch>".
 #     Written atomically (temp + ln for claim, temp + mv for a same-actor
 #     refresh), with inspection and mutation serialized by the home-local
-#     lease-command lock; leases never coordinate across firstmate homes.
+#     lease-command lock; leases never coordinate across nexus homes.
 #   - Actors: exactly "main" and "branch". The current actor is
 #     $FM_SUPERVISION_ACTOR when set, else "main". The branch's shell gets
 #     FM_SUPERVISION_ACTOR=branch injected deterministically by the process

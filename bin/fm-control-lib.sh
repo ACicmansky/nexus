@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# fm-control-lib.sh - the ONE executable owner of firstmate's agent lifecycle
+# fm-control-lib.sh - the ONE executable owner of nexus's agent lifecycle
 # CONTROL-PLANE mechanics.
 #
 # Data plane vs control plane (captain-approved root architecture, 2026-07-13).
@@ -7,7 +7,7 @@
 # always routing-marked for a kind=secondmate target so the reply comes back
 # through the status path. That marking is exactly right for a message and
 # exactly wrong for a lifecycle command: a marked "/quit" arrives as ordinary
-# chat ("[fm-from-firstmate] /quit") that the agent reasons ABOUT instead of
+# chat ("[fm-from-nexus] /quit") that the agent reasons ABOUT instead of
 # executing. bin/fm-control.sh is the CONTROL plane: allowlisted lifecycle
 # verbs addressed to an exact task id, with the per-harness mechanics owned
 # here rather than improvised per harness in agent prose.
@@ -370,7 +370,7 @@ fm_control_endpoint_absence_verdict() {  # <backend> <target>
 # changes harness (or re-arms the same one with a fresh busy generation) can
 # clear the previous incarnation's wiring instead of leaving a stale hook
 # pointing at a retired generation. Prints zero or more absolute paths, one per
-# line: worktree-resident hook files and firstmate-owned state tokens only,
+# line: worktree-resident hook files and nexus-owned state tokens only,
 # never a harness's own managed config.
 fm_control_harness_wiring_paths() {  # <harness> <worktree> <state-dir> <id>
   local harness=${1-} wt=${2-} state=${3-} id=${4-}
@@ -390,14 +390,14 @@ fm_control_harness_wiring_paths() {  # <harness> <worktree> <state-dir> <id>
       ;;
     muse)
       # muse installs no hook: its busy source is its own session event log,
-      # bound to the pane by these two firstmate-owned sidecars. A relaunch
+      # bound to the pane by these two nexus-owned sidecars. A relaunch
       # ONTO muse rewrites them, but a relaunch AWAY from muse must retire them
       # so no retired incarnation's session binding outlives the agent.
       printf '%s\n' "$state/$id.muse-session"
       printf '%s\n' "$state/$id.muse-session-current"
       ;;
     cursor) printf '%s\n' "$state/$id.cursor-session" ;;
-    # gemini's busy-state and turn-end hooks live in a firstmate-owned
+    # gemini's busy-state and turn-end hooks live in a nexus-owned
     # settings file the launch reaches through GEMINI_CLI_SYSTEM_SETTINGS_PATH,
     # so retiring that one file retires the whole incarnation's wiring. Nothing
     # is written into the worktree, whose own .gemini/settings.json belongs to
@@ -407,7 +407,7 @@ fm_control_harness_wiring_paths() {  # <harness> <worktree> <state-dir> <id>
   esac
 }
 
-# The firstmate-owned global turn-end registry entry a harness mints per task.
+# The nexus-owned global turn-end registry entry a harness mints per task.
 # grok and kimi are the two adapters whose turn-end hook is global and gated by
 # a private token file; every other adapter's wiring is fully covered by
 # fm_control_harness_wiring_paths. Prints the registry path or nothing.

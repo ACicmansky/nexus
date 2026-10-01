@@ -1191,7 +1191,7 @@ test_arm_refuses_a_disposable_validation_checkout() {
   state="$dir/state"
   fakebin="$dir/fakebin"
   armout="$dir/arm.out"
-  link="$dir/.no-mistakes/worktrees/run-1/firstmate"
+  link="$dir/.no-mistakes/worktrees/run-1/nexus"
   mkdir -p "$home/data" "$(dirname "$link")"
   ln -s "$ROOT" "$link"
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# The Claude Code Calm mod (.claude/mods/firstmate-calm) under the real installed
+# The Claude Code Calm mod (.claude/mods/nexus-calm) under the real installed
 # Claude Code: `claude plugin validate --strict` on the physical folder and on the
-# `.claude/skills/firstmate-calm` path the project auto-loads it from, then its own
+# `.claude/skills/nexus-calm` path the project auto-loads it from, then its own
 # `claude plugin test` suites (tests/*.test.ts inside the mod), which run the hooks
 # module in the engine's own host against a mocked clock, environment, file system,
 # and drawing surface. No model turn is submitted and no credential is spent, so the
@@ -17,8 +17,8 @@ set -u
 
 fm_live_gate default-on FM_CLAUDE_CALM_PLUGIN_TEST claude
 
-MOD="$ROOT/.claude/mods/firstmate-calm"
-AUTOLOAD_PATH="$ROOT/.claude/skills/firstmate-calm"
+MOD="$ROOT/.claude/mods/nexus-calm"
+AUTOLOAD_PATH="$ROOT/.claude/skills/nexus-calm"
 CLAUDE_VERSION=$(claude --version 2>/dev/null || true)
 [ -n "$CLAUDE_VERSION" ] || fail "claude is installed but reports no version"
 TMP_ROOT=$(fm_test_tmproot fm-calm-claude-mod-plugin)

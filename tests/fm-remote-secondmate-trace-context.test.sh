@@ -59,7 +59,7 @@ case "\${1:-}" in
   list-windows)
     [ -f "\$state" ] || exit 0
     name=\$(cut -d'|' -f1 "\$state")
-    case "\$*" in *'#{session_name}:#{window_name}'*) printf 'firstmate:%s\n' "\$name" ;; *) printf '%s\n' "\$name" ;; esac
+    case "\$*" in *'#{session_name}:#{window_name}'*) printf 'nexus:%s\n' "\$name" ;; *) printf '%s\n' "\$name" ;; esac
     exit 0
     ;;
   new-window)
@@ -77,7 +77,7 @@ case "\${1:-}" in
       *'#{pane_current_path}'*) cut -d'|' -f2- "\$state" ;;
       *'#{pane_current_command}'*) printf 'codex\n' ;;
       *'#{cursor_y}'*) printf '0\n' ;;
-      *'#S'*) printf 'firstmate\n' ;;
+      *'#S'*) printf 'nexus\n' ;;
       *) printf '%%1\n' ;;
     esac
     exit 0

@@ -12,7 +12,7 @@
 #
 # MECHANICAL CONSUMERS ONLY. This answers "what posture did the captain register
 # for this project", never "how does this task ship". A task's delivery mode,
-# yolo, and ship-branch prefix are resolved by firstmate at intake and passed
+# yolo, and ship-branch prefix are resolved by nexus at intake and passed
 # explicitly to bin/fm-brief.sh, bin/fm-spawn.sh, and bin/fm-promote.sh (AGENTS.md
 # section 7; bin/fm-brief.sh's own header owns the --branch-prefix flag it accepts).
 # The consumers are bin/fm-fleet-sync.sh (skip local-only clones),
@@ -39,16 +39,16 @@
 #   no-mistakes            full pipeline -> PR -> configured merge authority (default)
 #   direct-PR              push + PR via gh-axi, no pipeline
 #   local-only             local branch, no remote/PR, guarded local merge
-#   no-mistakes-prod-only  a conditional policy, not a task mode: firstmate
+#   no-mistakes-prod-only  a conditional policy, not a task mode: nexus
 #                          classifies each task's surface at intake (the
 #                          project-management skill owns that classification).
 #                          Mechanical output maps it to its most rigorous leg,
 #                          no-mistakes, so sync, seeding, and init treat such a
 #                          project as the remote-backed pipeline project it is.
-# yolo (orthogonal) = merge authority only: when on, firstmate merges green,
+# yolo (orthogonal) = merge authority only: when on, nexus merges green,
 #   in-scope work itself (AGENTS.md section 7).
 # branch=<prefix> (orthogonal) = overrides the "fm/" ship-branch prefix so a
-#   project's branch and PR do not read as firstmate-authored, e.g. for a
+#   project's branch and PR do not read as nexus-authored, e.g. for a
 #   third-party repo that does not use this tooling. Query it with
 #   --branch-prefix; it never appears in the default "<mode> <yolo>" output, so
 #   existing mechanical callers are unaffected by its presence.
@@ -70,7 +70,7 @@
 # A registered `forge=gerrit` project reports yolo=off with an explicit stderr
 # refusal, on the captain's decision of 2026-09-15: a Gerrit Code-Review+2 is a
 # positive attributed claim that a named human approved, read by colleagues and
-# by any audit, and firstmate must not manufacture one.
+# by any audit, and nexus must not manufacture one.
 #
 # --raw prints the registered mode annotation unmapped, so a caller that must
 # tell a conditional policy apart from a flat mode sees "no-mistakes-prod-only"
@@ -232,7 +232,7 @@ if [ "$WANT_FORGE" -eq 1 ]; then
   exit 0
 fi
 if [ "$forge" = gerrit ] && [ "$yolo" = on ]; then
-  echo "refused: +yolo is registered for $NAME but yolo is inactive for forge=gerrit, so this reports yolo=off: a Gerrit Code-Review+2 is a positive attributed claim that a named human approved, and firstmate must not manufacture one (captain's decision 2026-09-15)" >&2
+  echo "refused: +yolo is registered for $NAME but yolo is inactive for forge=gerrit, so this reports yolo=off: a Gerrit Code-Review+2 is a positive attributed claim that a named human approved, and nexus must not manufacture one (captain's decision 2026-09-15)" >&2
   yolo=off
 fi
 # A conditional policy is not a task mode. Mechanical callers get its most

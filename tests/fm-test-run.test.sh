@@ -4,7 +4,7 @@
 # markers, JSON artifacts, coverage guard, and aggregate exit status.
 #
 # These tests intentionally exercise the runner with fixtures, --list, and
-# focused scheduler checks, not the complete Firstmate suite.
+# focused scheduler checks, not the complete Nexus suite.
 set -u
 
 # shellcheck source=tests/lib.sh

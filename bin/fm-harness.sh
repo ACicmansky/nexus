@@ -115,7 +115,7 @@ harness_marker() {
   # omp (Oh My Pi) publishes NO harness-identity marker of its own: verified on
   # omp 18.1.11 that PI_CODING_AGENT is absent from the binary and that the
   # default profile sets neither PI_CODING_AGENT_DIR nor OMP_PROFILE in the
-  # process environment. FM_OMP_HARNESS=omp is therefore a Firstmate-OWNED
+  # process environment. FM_OMP_HARNESS=omp is therefore a Nexus-OWNED
   # launch marker, established by bin/fm-spawn.sh at the omp launch boundary
   # (which also clears every foreign marker) and by the README's primary launch
   # command. It is a PRECEDENCE override, never evidence on its own: it wins
@@ -366,7 +366,7 @@ EOF
 # (tests/fm-harness-liveness-drift-live-e2e.test.sh).
 #
 # Why the upward path and not the whole subtree: harness_ancestry only ever climbs,
-# so a SIBLING branch is a vantage firstmate's own detection can never occupy. A
+# so a SIBLING branch is a vantage nexus's own detection can never occupy. A
 # harness-spawned MCP server running as `node <home>/.claude/mcp/<server>.js` matches
 # *claude* on its script path in the bare-interpreter branch above and would report a
 # foreign harness from a process no real tool subprocess ever asks from.
@@ -444,7 +444,7 @@ detect_own() {
 }
 
 # Resolve the effective crewmate harness: config/crew-harness (a bare adapter
-# name) wins; absent or "default" mirrors firstmate's own harness.
+# name) wins; absent or "default" mirrors nexus's own harness.
 resolve_crew() {
   local crew=
   [ -f "$CONFIG/crew-harness" ] && crew=$(tr -d '[:space:]' < "$CONFIG/crew-harness" || true)

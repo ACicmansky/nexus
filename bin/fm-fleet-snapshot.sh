@@ -237,7 +237,7 @@ usage() {
 usage: fm-fleet-snapshot.sh --json
        fm-fleet-snapshot.sh --secondmate-home-summary
 
-Print a structured snapshot of the firstmate fleet.
+Print a structured snapshot of the nexus fleet.
 JSON is the stable machine-readable output contract. The default snapshot
 refreshes only its parent-side remote-summary cache as an observational side effect.
 

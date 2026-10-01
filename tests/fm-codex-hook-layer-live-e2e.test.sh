@@ -29,7 +29,7 @@ CODEX_VERSION=$(codex --version 2>&1)
 TMP_ROOT=$(fm_test_tmproot fm-codex-hook-layer-live)
 
 # capture_codex_launch <name> <extra fm-spawn args...>: spawns a codex crewmate
-# against a fake pane and echoes the literal launch command firstmate sent.
+# against a fake pane and echoes the literal launch command nexus sent.
 capture_codex_launch() {
   local name=$1
   shift
@@ -65,20 +65,20 @@ test_installed_codex_disables_hooks_for_the_captured_crewmate_launch() {
   launch=$(capture_codex_launch ship --mode no-mistakes --yolo off)
   flags=$(codex_global_flags "$launch")
 
-  # The whole point: every flag firstmate will launch with, handed to the real
+  # The whole point: every flag nexus will launch with, handed to the real
   # codex, must leave the hook layer off. `features list` reports the effective
   # state after those flags are applied and contacts no model.
   state=$(eval "codex $flags features list" 2>&1) ||
-    fail "codex $CODEX_VERSION rejected firstmate's crewmate launch flags: $state"
+    fail "codex $CODEX_VERSION rejected nexus's crewmate launch flags: $state"
   case "$state" in
     *"Unknown feature flag"*)
-      fail "codex $CODEX_VERSION no longer knows the hook feature firstmate disables: $state"
+      fail "codex $CODEX_VERSION no longer knows the hook feature nexus disables: $state"
       ;;
   esac
   printf '%s\n' "$state" | awk '$1 == "hooks" { print $NF }' | grep -qx false ||
-    fail "codex $CODEX_VERSION left hooks enabled for firstmate's crewmate launch flags, so a fresh launch can park on the hook-trust modal"
+    fail "codex $CODEX_VERSION left hooks enabled for nexus's crewmate launch flags, so a fresh launch can park on the hook-trust modal"
 
-  printf 'ok - codex %s runs a firstmate crewmate launch with its hook layer disabled\n' "$CODEX_VERSION"
+  printf 'ok - codex %s runs a nexus crewmate launch with its hook layer disabled\n' "$CODEX_VERSION"
 }
 
 test_installed_codex_still_reports_the_hook_feature() {
@@ -86,9 +86,9 @@ test_installed_codex_still_reports_the_hook_feature() {
   listing=$(codex features list 2>&1) ||
     fail "codex $CODEX_VERSION could not list its feature flags: $listing"
   printf '%s\n' "$listing" | awk '{ print $1 }' | grep -qx hooks ||
-    fail "codex $CODEX_VERSION no longer publishes a hook feature flag; firstmate's crewmate launch needs a new control"
+    fail "codex $CODEX_VERSION no longer publishes a hook feature flag; nexus's crewmate launch needs a new control"
 
-  printf 'ok - codex %s still publishes the hook feature flag firstmate disables\n' "$CODEX_VERSION"
+  printf 'ok - codex %s still publishes the hook feature flag nexus disables\n' "$CODEX_VERSION"
 }
 
 test_installed_codex_still_reports_the_hook_feature

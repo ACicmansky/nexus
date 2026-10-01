@@ -51,7 +51,7 @@ write_spawn_brief() {  # <file> <id>
 ## Captain's intent
 Exercise backend dispatch for $2.
 
-## Firstmate spec
+## Nexus spec
 Verify backend selection without changing task intent.
 EOF
 }
@@ -231,7 +231,7 @@ test_backend_detect_precedence() {
   [ "$out" = cmux ] || fail "fm_backend_detect should report cmux for CMUX_WORKSPACE_ID alone, got '$out'"
 
   # Nesting: tmux started inside a herdr pane carries BOTH markers. Innermost
-  # (tmux) must win, since that is the surface firstmate is actually running on.
+  # (tmux) must win, since that is the surface nexus is actually running on.
   out=$(unset CMUX_WORKSPACE_ID; TMUX='fake,1,0' HERDR_ENV=1 fm_backend_detect) \
     || fail "fm_backend_detect should succeed with both markers present"
   [ "$out" = tmux ] || fail "fm_backend_detect should resolve nesting innermost-first (tmux over herdr), got '$out'"
@@ -259,7 +259,7 @@ test_backend_detect_precedence() {
 
 # fm_backend_detect's cmux FALLBACK signals (docs/cmux-backend.md "Runtime
 # auto-detection"): cmux's bundled claude wrapper strips every CMUX_* env var
-# on its passthrough path, so a claude-under-cmux firstmate has no
+# on its passthrough path, so a claude-under-cmux nexus has no
 # CMUX_WORKSPACE_ID; detection then falls back to __CFBundleIdentifier and,
 # after that, a process-ancestry walk - macOS-only, and never outranking the
 # $TMUX/HERDR_ENV innermost-first checks.
@@ -475,7 +475,7 @@ test_backend_name_explicit_beats_detection() {
   [ "$out" = tmux ] || fail "config/backend=tmux should win over an ambient HERDR_ENV=1 auto-detect marker, got '$out'"
 
   # The same opt-out must work for an ambient cmux auto-detect marker: a
-  # captain who is running firstmate inside a cmux terminal but explicitly
+  # captain who is running nexus inside a cmux terminal but explicitly
   # wants tmux is never overridden by CMUX_WORKSPACE_ID.
   out=$(unset TMUX HERDR_ENV; CMUX_WORKSPACE_ID='fake-uuid' FM_BACKEND=tmux FM_BACKEND_CONFIG_DIR="$dir/config-empty" fm_backend_name)
   [ "$out" = tmux ] || fail "FM_BACKEND=tmux should win over an ambient CMUX_WORKSPACE_ID auto-detect marker, got '$out'"
@@ -595,8 +595,8 @@ test_backend_validate_spawn_accepts_orca() {
 
 test_meta_get_and_backend_of_meta() {
   local meta=$TMP_ROOT/meta-get.meta edge=$TMP_ROOT/meta-get-edge.meta
-  fm_write_meta "$meta" "window=firstmate:fm-x1" "harness=claude"
-  [ "$(fm_meta_get "$meta" window)" = "firstmate:fm-x1" ] || fail "fm_meta_get did not read window="
+  fm_write_meta "$meta" "window=nexus:fm-x1" "harness=claude"
+  [ "$(fm_meta_get "$meta" window)" = "nexus:fm-x1" ] || fail "fm_meta_get did not read window="
   [ "$(fm_meta_get "$meta" missing)" = "" ] || fail "fm_meta_get should print nothing for an absent key"
   [ "$(fm_backend_of_meta "$meta")" = tmux ] || fail "fm_backend_of_meta should default absent backend= to tmux"
 
@@ -613,7 +613,7 @@ test_meta_get_and_backend_of_meta() {
 test_resolve_selector_three_forms() {
   local state=$TMP_ROOT/resolve-state fakebin out
   mkdir -p "$state"
-  fm_write_meta "$state/task1.meta" "window=firstmate:fm-task1"
+  fm_write_meta "$state/task1.meta" "window=nexus:fm-task1"
   fm_write_meta "$state/dotfiles-d6.meta" "window=default:wA:p2" "backend=herdr"
   fm_write_meta "$state/fm-turnend-all-harnesses-v9.meta" "window=default:wB:p3" "backend=herdr"
 
@@ -634,7 +634,7 @@ test_resolve_selector_three_forms() {
   [ "$(fm_backend_expected_label_of_selector 'fm-turnend-all-harnesses-v9' "$state")" = "fm-fm-turnend-all-harnesses-v9" ] \
     || fail "exact fm-* task id should report the spawned fm-<id> label"
 
-  [ "$(fm_backend_resolve_selector 'fm-task1' "$state")" = "firstmate:fm-task1" ] \
+  [ "$(fm_backend_resolve_selector 'fm-task1' "$state")" = "nexus:fm-task1" ] \
     || fail "legacy fm-<id> label should resolve through <id>.meta's window="
   [ "$(fm_backend_expected_label_of_selector 'fm-task1' "$state")" = "fm-task1" ] \
     || fail "legacy fm-<id> label should preserve its backend label"
@@ -646,7 +646,7 @@ test_resolve_selector_three_forms() {
   cat > "$fakebin/tmux" <<'SH'
 #!/usr/bin/env bash
 case "${1:-}" in
-  list-windows) printf 'firstmate:adhoc\nother:otherwin\n' ;;
+  list-windows) printf 'nexus:adhoc\nother:otherwin\n' ;;
 esac
 exit 0
 SH
@@ -659,7 +659,7 @@ SH
   assert_contains "$out" "no metadata for fm-adhoc" "an fm-* selector must always require meta, not silently fall back to a live search"
 
   out=$(PATH="$fakebin:$PATH" fm_backend_resolve_selector 'adhoc' "$state")
-  [ "$out" = "firstmate:adhoc" ] || fail "an ad hoc bare name should resolve via the tmux live-window fallback, got '$out'"
+  [ "$out" = "nexus:adhoc" ] || fail "an ad hoc bare name should resolve via the tmux live-window fallback, got '$out'"
 
   pass "fm_backend_resolve_selector: session:window literal, exact task id first, legacy fm-<id> label fallback, ad hoc bare name via tmux list-windows"
 }
@@ -670,7 +670,7 @@ test_backend_of_selector_matches_explicit_target_meta() {
   fm_write_meta "$state/herdr-task.meta" "window=default:w1:p2" "backend=herdr"
   fm_write_meta "$state/dotfiles-d6.meta" "window=default:wA:p2" "backend=herdr"
   fm_write_meta "$state/fm-turnend-all-harnesses-v9.meta" "window=default:wB:p3" "backend=herdr"
-  fm_write_meta "$state/tmux-task.meta" "window=firstmate:fm-tmux-task"
+  fm_write_meta "$state/tmux-task.meta" "window=nexus:fm-tmux-task"
   fm_write_meta "$state/custom-window-task.meta" "window=custom-window"
   fm_write_meta "$state/orca-task.meta" "window=fm-orca-task" "terminal=term-orca-task" "backend=orca"
 
@@ -690,7 +690,7 @@ test_backend_of_selector_matches_explicit_target_meta() {
     || fail "matching an explicit Orca terminal handle should inherit metadata backend"
   [ "$(fm_backend_of_selector 'default:w1:p2' 'default:w1:p2' "$state")" = herdr ] \
     || fail "explicit backend target matching metadata should use that task's backend"
-  [ "$(fm_backend_of_selector 'firstmate:fm-tmux-task' 'firstmate:fm-tmux-task' "$state")" = tmux ] \
+  [ "$(fm_backend_of_selector 'nexus:fm-tmux-task' 'nexus:fm-tmux-task' "$state")" = tmux ] \
     || fail "explicit tmux-shaped target with absent backend= should default to tmux"
   [ "$(fm_backend_of_selector 'manual:outside' 'manual:outside' "$state")" = tmux ] \
     || fail "explicit target with no matching metadata should keep the tmux compatibility default"
@@ -857,7 +857,7 @@ set -u
 case "\${1:-}" in
   display-message)
     for a in "\$@"; do case "\$a" in *pane_current_path*) printf '%s\\n' "$wt"; exit 0 ;; esac; done
-    printf 'firstmate\\n'; exit 0 ;;
+    printf 'nexus\\n'; exit 0 ;;
   list-windows) exit 0 ;;
 esac
 exit 0
@@ -929,7 +929,7 @@ case "\${1:-}" in
       fi
       exit 0
     ;; esac; done
-    printf 'firstmate\\n'; exit 0 ;;
+    printf 'nexus\\n'; exit 0 ;;
   list-windows) exit 0 ;;
 esac
 exit 0
@@ -1058,10 +1058,10 @@ test_teardown_conformance_old_vs_new() {
   mkdir -p "$state_old" "$state_new" "$config_old" "$config_new"
 
   fm_write_meta "$state_old/$id.meta" \
-    "window=firstmate:fm-$id" "worktree=$wt" "project=$proj" "harness=claude" "kind=scout" "mode=no-mistakes" "yolo=off" \
+    "window=nexus:fm-$id" "worktree=$wt" "project=$proj" "harness=claude" "kind=scout" "mode=no-mistakes" "yolo=off" \
     "decisions_reviewed=1" "decision_keys="
   fm_write_meta "$state_new/$id.meta" \
-    "window=firstmate:fm-$id" "worktree=$wt" "project=$proj" "harness=claude" "kind=scout" "mode=no-mistakes" "yolo=off" \
+    "window=nexus:fm-$id" "worktree=$wt" "project=$proj" "harness=claude" "kind=scout" "mode=no-mistakes" "yolo=off" \
     "decisions_reviewed=1" "decision_keys="
   touch "$state_old/.last-watcher-beat" "$state_new/.last-watcher-beat"
 
@@ -1082,9 +1082,9 @@ test_teardown_conformance_old_vs_new() {
   # forever, so the '=' exactness markers are normalized away and the legacy run
   # is only required to have reached tmux window cleanup for this task. The
   # exact-selector contract belongs to the current script, asserted below.
-  assert_contains "$(tr -d '=' < "$log_old")" "tmux"$'\x1f''kill-window'$'\x1f''-t'$'\x1f'"firstmate:fm-$id" \
+  assert_contains "$(tr -d '=' < "$log_old")" "tmux"$'\x1f''kill-window'$'\x1f''-t'$'\x1f'"nexus:fm-$id" \
     "legacy teardown fixture did not exercise tmux window cleanup for the task"
-  assert_contains "$(cat "$log_new")" "tmux"$'\x1f''kill-window'$'\x1f''-t'$'\x1f'"=firstmate:=fm-$id" \
+  assert_contains "$(cat "$log_new")" "tmux"$'\x1f''kill-window'$'\x1f''-t'$'\x1f'"=nexus:=fm-$id" \
     "teardown did not call tmux kill-window with exact session and window selectors"
 
   pass "fm-teardown.sh: treehouse return remains compatible while tmux cleanup uses exact selectors"
@@ -1160,7 +1160,7 @@ test_spawn_explicit_backend_flag_beats_autodetect_herdr_env() {
   state="$TMP_ROOT/explicit-backend-state"; config="$TMP_ROOT/explicit-backend-config"
   mkdir -p "$state" "$config"
 
-  # HERDR_ENV=1 is present (as if firstmate itself were running under herdr),
+  # HERDR_ENV=1 is present (as if nexus itself were running under herdr),
   # but an explicit --backend tmux flag must still win outright.
   out=$(PATH="$fb:$PATH" FM_ROOT_OVERRIDE="$ROOT" HOME="$SPAWN_HOME" CLAUDE_CONFIG_DIR='' \
     FM_STATE_OVERRIDE="$state" FM_DATA_OVERRIDE="$data" FM_CONFIG_OVERRIDE="$config" \

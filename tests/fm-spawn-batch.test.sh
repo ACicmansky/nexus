@@ -16,7 +16,7 @@ SPAWN="$ROOT/bin/fm-spawn.sh"
 TMP_ROOT=$(fm_test_tmproot fm-spawn-batch)
 export FM_BACKEND=tmux
 
-# Clear ambient firstmate overrides so the behavior test owns its environment.
+# Clear ambient nexus overrides so the behavior test owns its environment.
 run_spawn() {
   FM_ROOT_OVERRIDE='' \
     FM_HOME='' \
@@ -75,7 +75,7 @@ ROWS
   pass "batch detection: single pair batches, non-pair rejected, single-task and slash-id stay single"
 }
 
-# A projects/ path is resolved through the firstmate home, never the caller cwd,
+# A projects/ path is resolved through the nexus home, never the caller cwd,
 # before the missing-brief check. One row per home-scoping override.
 test_projects_path_scoping() {
   local label use_override id home projects out status expected
@@ -107,7 +107,7 @@ test_projects_path_scoping() {
 FM_HOME scopes projects/|no|nope-home-z7
 FM_PROJECTS_OVERRIDE scopes projects/|yes|nope-override-z8
 ROWS
-  pass "projects/ paths are scoped through the firstmate home for single-task spawn"
+  pass "projects/ paths are scoped through the nexus home for single-task spawn"
 }
 
 # A ship batch carries one shared delivery contract. Missing flags must stop the

@@ -5,7 +5,7 @@
 # historically stayed open forever when the answer kicked off work: the worker's
 # next line is working [key=<workstream>], never resolved [key=<decision>].
 # fm-send's --resolve-key removes that writer-dependency at its source: the
-# ANSWERING firstmate closes the decision in this home's own ledger at answer
+# ANSWERING nexus closes the decision in this home's own ledger at answer
 # time - for a local target that is ENQUEUE time, because the durable inbox
 # write is delivery to the task's record. These tests drive the real fm-send
 # executable over stubbed transports and assert closure through the real
@@ -134,7 +134,7 @@ test_answer_send_closes_open_decision() {
   expect_code 0 "$rc" "an answer send with --resolve-key should succeed"
   grep -qF "go with REST" "$home/state/t1.inbox/001.msg" \
     || fail "the answer text should reach the worker's durable inbox record"
-  assert_contains "$(cat "$log")" "Firstmate instruction waiting" "the doorbell should be rung for the answer"
+  assert_contains "$(cat "$log")" "Nexus instruction waiting" "the doorbell should be rung for the answer"
   sed -E 's/ \[at=[0-9]+\]//' "$home/state/t1.status" | grep -qF 'resolved [key=api-shape]: answered: go with REST' \
     || fail "fm-send did not append the closing resolved line:"$'\n'"$(cat "$home/state/t1.status")"
   # The drain folded the worker's `working:` line but never listed it, so the
@@ -469,7 +469,7 @@ test_local_secondmate_answer_marked_and_closed() {
     "$home/state/domain.inbox/001.msg")
   case "$got" in
     "$FM_FROMFIRST_MARK"corr=*) : ;;
-    *) fail "the secondmate answer's record lost its from-firstmate marker/corr framing: $got" ;;
+    *) fail "the secondmate answer's record lost its from-nexus marker/corr framing: $got" ;;
   esac
   closing=$(grep -F 'resolved [key=fleet-split]' "$home/state/domain.status" || true)
   [ -n "$closing" ] || fail "the secondmate decision was not closed: $(cat "$home/state/domain.status")"
@@ -857,7 +857,7 @@ test_decision_answer_partition_relocates_under_the_record() {
   home=$(setup_home partition)
   fm_write_meta "$home/state/t1.meta" "window=sess:fm-t1" "kind=ship"
   printf 'needs-decision [key=api-shape]: pick REST or RPC\n' > "$home/state/t1.status"
-  printf 'blocked [key=token]: firstmate can refresh the token\n' >> "$home/state/t1.status"
+  printf 'blocked [key=token]: nexus can refresh the token\n' >> "$home/state/t1.status"
 
   # Attended branch: the decision is refused at the partition, nothing sent.
   : > "$log"

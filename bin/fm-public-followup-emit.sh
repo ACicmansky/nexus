@@ -4,7 +4,7 @@
 #
 # WHY THIS EXISTS: a public promise is kept by the home that owns the relay
 # consent and the thread binding. The home doing the work only has to report a
-# TYPED result. Firstmate must never recover the source home, work id, outcome,
+# TYPED result. Nexus must never recover the source home, work id, outcome,
 # or deliverables by parsing a free-form "done: ..." status sentence, so this
 # script is the structured channel that carries them.
 #
@@ -230,19 +230,19 @@ esac
 [ -d "$HOME_DIR" ] && [ ! -L "$HOME_DIR" ] \
   || die "$HOME_FLAG must name an existing directory, got '$HOME_DIR'"
 # A staged event is only ever found again by the collecting home reading this
-# home's state tree, so a path that is not a firstmate home would swallow the
+# home's state tree, so a path that is not a nexus home would swallow the
 # result silently. Refuse it here instead.
 if [ "$HOME_MODE" = staging ]; then
   case "$SOURCE_HOME" in
     secondmate:*) STAGING_HOME_ID=${SOURCE_HOME#secondmate:} ;;
-    *) die "--stage-in must name the secondmate firstmate home identified by --source-home" ;;
+    *) die "--stage-in must name the secondmate nexus home identified by --source-home" ;;
   esac
   [ -d "$HOME_DIR/state" ] && [ ! -L "$HOME_DIR/state" ] \
     && [ -f "$HOME_DIR/.fm-secondmate-home" ] && [ ! -L "$HOME_DIR/.fm-secondmate-home" ] \
-    || die "--stage-in must name the secondmate firstmate home identified by --source-home"
+    || die "--stage-in must name the secondmate nexus home identified by --source-home"
   STAGING_HOME_MARKER=$(sed -n '1p' "$HOME_DIR/.fm-secondmate-home" 2>/dev/null) || STAGING_HOME_MARKER=
   [ "$STAGING_HOME_MARKER" = "$STAGING_HOME_ID" ] \
-    || die "--stage-in must name the secondmate firstmate home identified by --source-home"
+    || die "--stage-in must name the secondmate nexus home identified by --source-home"
 fi
 
 STATE="$HOME_DIR/state"

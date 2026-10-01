@@ -678,7 +678,7 @@ const offer = dispatch("signal: task-9 done: PR https://example.com/pr/9 checks 
 if (!offer.accepted) throw new Error("branch did not accept the wake offer");
 await settle(() => (globalThis.__fmPrompts ?? []).length === 1, "branch wake prompt");
 const wakePrompt = globalThis.__fmPrompts[0];
-if (!wakePrompt.includes("FIRSTMATE SUPERVISION WAKE: signal: task-9 done")) {
+if (!wakePrompt.includes("NEXUS SUPERVISION WAKE: signal: task-9 done")) {
   throw new Error(`branch prompt lost the wake reason: ${wakePrompt}`);
 }
 if (mainUserMessages.length !== 0) throw new Error("accepted wake leaked to main as a user message");
@@ -826,17 +826,17 @@ outcomesTool.renderResult(legacyStockResult, { expanded: true, isPartial: false 
 if (legacyCall.children[1]?.text !== collapsedLegacyText) {
   throw new Error("legacy all-line stock capability changed expanded Calm-off output");
 }
-pi.events.emit("firstmate:calm-presentation", { active: true, stockExportRendering: false });
+pi.events.emit("nexus:calm-presentation", { active: true, stockExportRendering: false });
 const calmOnCall = outcomesTool.renderCall({}, renderTheme, renderContext);
 const calmOnResult = outcomesTool.renderResult(stockResult, { expanded: false, isPartial: false }, renderTheme, renderContext);
 if (calmOnCall.constructor.name !== "Container" || calmOnCall.render(100).length !== 0 || calmOnResult.constructor.name !== "Container" || calmOnResult.render(100).length !== 0) {
   throw new Error("fm_branch_outcomes remained visible while Calm was on");
 }
-pi.events.emit("firstmate:calm-presentation", { active: false, stockExportRendering: false });
+pi.events.emit("nexus:calm-presentation", { active: false, stockExportRendering: false });
 if (outcomesTool.renderCall({}, renderTheme, renderContext).constructor.name !== "Box" || outcomesTool.renderResult(stockResult, { expanded: false, isPartial: false }, renderTheme, renderContext).constructor.name !== "Container") {
   throw new Error("fm_branch_outcomes did not restore ordinary rendering when Calm was turned off");
 }
-pi.events.emit("firstmate:calm-presentation", { active: true, stockExportRendering: true });
+pi.events.emit("nexus:calm-presentation", { active: true, stockExportRendering: true });
 let exportCallFellBack = false;
 let exportResultFellBack = false;
 try {
@@ -1037,7 +1037,7 @@ const longRequests = [
   `${"middle context ".repeat(250)}${explicitRequest}${" middle context".repeat(250)}`,
   `${"tail context ".repeat(500)}${explicitRequest}`,
 ];
-const requestedPrompts = [...longRequests, "FIRSTMATE give me a fresh system-resource report."];
+const requestedPrompts = [...longRequests, "NEXUS give me a fresh system-resource report."];
 // Match Pi's real AgentSession.prompt ordering: before_agent_start receives
 // the expanded prompt before _runAgentPrompt appends its user message to the
 // SessionManager. Keeping entries stale at the hook boundary is the regression.
@@ -1062,7 +1062,7 @@ await fire("before_agent_start", { prompt: unsolicitedPrompt }, mainCtx);
 entries.push({ type: "message", message: { role: "user", content: unsolicitedPrompt } });
 await fire("agent_start", {}, mainCtx);
 await fire("agent_end", {}, mainCtx);
-const legacyOperational = "⁣FIRSTMATE_OP: give me a fresh system-resource report.";
+const legacyOperational = "⁣NEXUS_OP: give me a fresh system-resource report.";
 await fire("before_agent_start", { prompt: legacyOperational }, mainCtx);
 entries.push({ type: "message", message: { role: "user", content: legacyOperational } });
 await fire("agent_start", {}, mainCtx);
@@ -1117,7 +1117,7 @@ for (const content of [unsolicitedPrompt, ...requestedPrompts]) {
   if (copies !== 1) throw new Error(`current captain prompt was mirrored ${copies} times instead of once`);
 }
 if (mirroredCaptainText.some((text) =>
-  text.includes("operational watcher injection") || text.includes("FIRSTMATE_OP: give me a fresh system-resource report")
+  text.includes("operational watcher injection") || text.includes("NEXUS_OP: give me a fresh system-resource report")
 )) {
   throw new Error("canonical current or legacy operational input entered captain mirror context");
 }
@@ -1357,7 +1357,7 @@ if (mainEntries.filter((entry) => entry.customType === "fm-branch-visible-outcom
 // Only the sequence-bound acknowledgement closes it.
 const nativeTools = new Map();
 const messageTypes = new Set();
-bus.emit("firstmate:native-tools", {
+bus.emit("nexus:native-tools", {
   register: (tool) => nativeTools.set(tool.name, tool),
   allowMessageType: (type) => messageTypes.add(type),
 });
@@ -1365,7 +1365,7 @@ if ([...nativeTools.keys()].sort().join(",") !== "fm_branch_outcomes,fm_branch_p
 for (const tool of mainTools) {
   if (nativeTools.get(tool.name)?.execute !== tool.execute) throw new Error("native controls lost the original guards");
 }
-if ([...messageTypes].sort().join(",") !== "firstmate-sessionstart-nudge,fm-branch-merge,fm-branch-process") throw new Error("operational message allowlist changed");
+if ([...messageTypes].sort().join(",") !== "nexus-sessionstart-nudge,fm-branch-merge,fm-branch-process") throw new Error("operational message allowlist changed");
 const processed = nativeTools.get("fm_branch_processed");
 if (!processed) throw new Error("main did not receive its acknowledgement tool");
 const routineAck = await processed.execute("ack-routine", { through: routineSeq }, undefined, undefined, {});
@@ -1943,7 +1943,7 @@ if (nextTurnResult?.messages?.some((message) => message.customType === "fm-branc
 }
 const history = [
   { role: "user", content: "earlier captain request" },
-  { role: "assistant", content: "earlier firstmate reply" },
+  { role: "assistant", content: "earlier nexus reply" },
 ];
 aborted = false;
 const openedByCaptain = await fire("context", {
@@ -2002,7 +2002,7 @@ if (!awayOffer.accepted) throw new Error("the away wake was refused");
 await settle(() => (globalThis.__fmPrompts ?? []).length === 2, "away branch prompt");
 if (globalThis.__fmSessions.length !== 1) throw new Error("the away posture rebuilt the branch session");
 const awayPrompt = globalThis.__fmPrompts[1];
-const head = "FIRSTMATE SUPERVISION WAKE: signal: away wake\n\nHandle this per your operating procedure and finish with fm_branch_report.\n\nPOSTURE: AWAY. ";
+const head = "NEXUS SUPERVISION WAKE: signal: away wake\n\nHandle this per your operating procedure and finish with fm_branch_report.\n\nPOSTURE: AWAY. ";
 if (!awayPrompt.startsWith(head)) throw new Error(`the away wake lost its shape or its tail: ${awayPrompt}`);
 const readback = contract(["readback"]);
 if (!readback.endsWith("    merge task-d when green, then cut the prerelease\n    \n")) throw new Error(`the read-back lost the captain's words or their trailing blank line: ${JSON.stringify(readback)}`);
@@ -2995,7 +2995,7 @@ import { existsSync, readFileSync } from "node:fs";
 const entries = [
   { type: "message", message: { role: "user", content: `never merge task-7 without my word ${"h".repeat(5000)} old-history-tail` } },
   { type: "message", message: { role: "assistant", content: [{ type: "text", text: "aye, holding task-7" }, { type: "toolCall", id: "t1" }] } },
-  { type: "message", message: { role: "user", content: "⁣FIRSTMATE_OP: v1 watcher: operational injection" } },
+  { type: "message", message: { role: "user", content: "⁣NEXUS_OP: v1 watcher: operational injection" } },
   { type: "message", message: { role: "toolResult", content: "tool output stays in main" } },
   { type: "custom", message: { role: "custom", customType: "fm-branch-merge", content: "merged note" } },
   { type: "compaction", summary: "compacted" },
@@ -5202,18 +5202,18 @@ for (const expanded of [false, true]) {
     throw new Error(`${expanded ? "expanded" : "collapsed"} Calm-off fm_branch_processed rendering differs from Pi stock`);
   }
 }
-pi.events.emit("firstmate:calm-presentation", { active: true, stockExportRendering: false });
+pi.events.emit("nexus:calm-presentation", { active: true, stockExportRendering: false });
 actualRow.invalidate();
 if (actualRow.render(100).length !== 0) {
   throw new Error("Calm-on ToolExecutionComponent row remained visible");
 }
-pi.events.emit("firstmate:calm-presentation", { active: false, stockExportRendering: false });
+pi.events.emit("nexus:calm-presentation", { active: false, stockExportRendering: false });
 actualRow.invalidate();
 if (JSON.stringify(actualRow.render(100)) !== JSON.stringify(stockRow.render(100))) {
   throw new Error("ToolExecutionComponent rendering did not restore after live toggle");
 }
 
-pi.events.emit("firstmate:calm-presentation", { active: true, stockExportRendering: true });
+pi.events.emit("nexus:calm-presentation", { active: true, stockExportRendering: true });
 const stockHtml = createToolHtmlRenderer({ getToolDefinition: () => stockDefinition, theme, cwd: process.cwd() });
 const actualHtml = createToolHtmlRenderer({ getToolDefinition: () => actualDefinition, theme, cwd: process.cwd() });
 const stockCall = stockHtml.renderCall("stock-html", "fm_branch_outcomes", args);

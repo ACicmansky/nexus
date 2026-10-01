@@ -372,7 +372,7 @@ test_harness_at_namespace_pid1_is_examined() {
 # REACHABLE depends on where the question is asked from. Under an interpreter
 # shim the top of the session is the shim, whose own script path is args
 # strength, while the native binary that carries comm strength is its CHILD.
-# firstmate's own detect_own always runs from a tool subprocess below that child,
+# nexus's own detect_own always runs from a tool subprocess below that child,
 # so it sees comm; a guard that probed only the top of a real session would
 # observe args, pass, and never notice a vendor release that stopped spawning the
 # native child at all. `ancestry-descent` is what lets a probe ask from the same
@@ -441,7 +441,7 @@ EOF
 }
 
 # The other half of the vantage question: which vantages a probe must NOT ask
-# from. harness_ancestry only ever climbs, so firstmate's own detection can never
+# from. harness_ancestry only ever climbs, so nexus's own detection can never
 # occupy a SIBLING branch of the process that runs it. A harness routinely spawns
 # such branches - an MCP server started as `node <home>/.claude/mcp/<server>.js`
 # matches *claude* on its script path in the bare-interpreter branch of the walk -

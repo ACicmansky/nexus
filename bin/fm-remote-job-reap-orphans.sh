@@ -5,7 +5,7 @@
 #   --dry-run reports what would be reaped and signals nothing.
 #
 # A remote job worker (bin/fm-remote-job-worker.sh) is launched from a specific
-# Firstmate code root: the account's own checkout under the LaunchAgent, a
+# Nexus code root: the account's own checkout under the LaunchAgent, a
 # remote secondmate's checkout, a no-mistakes gate worktree, a pooled task
 # worktree, or a test fixture root. When that root is pruned while the worker is
 # running, the worker is reparented to init and, on older builds, keeps polling
@@ -47,7 +47,7 @@ reap_usage() {
   cat <<'TXT'
 Usage: fm-remote-job-reap-orphans.sh [--dry-run]
 
-Stop every remote job worker whose Firstmate code root has been pruned. A
+Stop every remote job worker whose Nexus code root has been pruned. A
 worker whose root still exists - the account's LaunchAgent worker, a live
 remote secondmate's worker - is never a candidate. --dry-run reports the
 candidates and signals nothing. Read this script's header for the full rule.

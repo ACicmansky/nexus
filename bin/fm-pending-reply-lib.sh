@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # fm-pending-reply-lib.sh - parent-owned secondmate missed-report guards.
 #
-# When the main firstmate delivers a reply-bearing marked from-firstmate request
+# When the main nexus delivers a reply-bearing marked from-nexus request
 # to a secondmate, this library records a durable parent-owned pending-reply
 # expectation BEFORE delivery, embeds a privacy-safe correlation id in the
 # outbound message, and later resolves that expectation only from a correlated
@@ -283,7 +283,7 @@ fm_pending_reply_set() {  # <record-path> <key> <value>
   mv -f "$tmp" "$rec"
 }
 
-# Embed or replace a correlation token after the from-firstmate marker.
+# Embed or replace a correlation token after the from-nexus marker.
 # Idempotent for the same corr; replaces a different leading corr token.
 # Result is assigned to <result-var>.
 # Trailing newlines in the request body are preserved: never strip via bare
@@ -292,7 +292,7 @@ fm_pending_reply_embed_corr() {  # <message> <corr_id> <result-var>
   local message=$1 corr=$2 result_var=$3 body token marked existing
   [ -n "$result_var" ] || return 2
   token=$(fm_pending_reply_corr_token "$corr")
-  fm_message_mark_from_firstmate "$message" marked
+  fm_message_mark_from_nexus "$message" marked
   body=${marked#"$FM_FROMFIRST_MARK"}
   # Strip a leading corr=<16hex> plus following blanks (space/tab only).
   existing=${body:0:21}
@@ -788,7 +788,7 @@ fm_pending_reply_fallback_idle_eligible() {  # <record-path>
 # SECONDMATE endpoint, without ever reading its conversation.
 #
 # Deliberately NOT the semantic busy-state contract (bin/fm-busy-lib.sh).
-# That contract covers ordinary task workers, whose turn lifecycle firstmate
+# That contract covers ordinary task workers, whose turn lifecycle nexus
 # wires at spawn; a secondmate has no such wiring because an idle secondmate
 # pane is healthy and it runs no supervised turn sequence of its own. This
 # observation exists only to notice a busy-then-idle transition around one

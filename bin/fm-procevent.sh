@@ -116,7 +116,7 @@
 #            a replacement generation.
 # sweep-home Retire a bounded snapshot of this home's registrations and owned
 #            claims, then refuse unless no registration, runner record, or owned
-#            claim remains. Used by supported Firstmate home retirement.
+#            claim remains. Used by supported Nexus home retirement.
 # binding-retirement-preflight
 #            Refuse while an extension registration or unhandled captured result
 #            still owns the exact enabled binding digest. Called by the tracked
@@ -204,7 +204,7 @@
 #
 # Feeding is deliberately independent of handling: it never acknowledges a result
 # and never suppresses a wake. Recording the captain's answer is transcription,
-# while ACTING on it is firstmate's judgement, so the capture stays unacknowledged
+# while ACTING on it is nexus's judgement, so the capture stays unacknowledged
 # and its `check` wake reaches the handler exactly as it would have anyway.
 #
 # A runner is bound to the HOME that owns it, not to the one session that armed
@@ -229,7 +229,7 @@
 # generation, never a script or process name, so a live source in
 # another home is untouched. See bin/fm-procevent-lib.sh for the lease itself.
 #
-# Ownership is machine-wide per canonical source, because separate Firstmate
+# Ownership is machine-wide per canonical source, because separate Nexus
 # homes can share one underlying source store. A live owner is never displaced;
 # only a claim whose stale owner and independently absent process group prove
 # its whole generation gone is reclaimed. A crashed leader or reused pid whose
@@ -576,7 +576,7 @@ cmd_register_task() {
   if [ -e "$(source_file "$id")" ] || [ -L "$(source_file "$id")" ]; then
     if [ "$(source_kind "$id" 2>/dev/null || true)" != task-owned ]; then
       fm_procevent_source_lock_release "$id"
-      die "cannot task-own firstmate-registered source $id; firstmate is the holder"
+      die "cannot task-own nexus-registered source $id; nexus is the holder"
     fi
     if [ "$(source_owner_task "$id")" != "$task" ]; then
       reply_source=$(source_owner_task "$id")
@@ -593,7 +593,7 @@ cmd_register_task() {
       pending_owner=$(fm_procevent_result_owner_task "$pending" 2>/dev/null || true)
       if [ "$pending_owner" != "$task" ]; then
         fm_procevent_source_lock_release "$id"
-        die "cannot arm source $id while its unacknowledged capture $pending belongs to ${pending_owner:-firstmate}; that owner acknowledges it first"
+        die "cannot arm source $id while its unacknowledged capture $pending belongs to ${pending_owner:-nexus}; that owner acknowledges it first"
       fi
     fi
     pending_adapter=$(fm_procevent_result_adapter "$pending" 2>/dev/null || true)
@@ -709,10 +709,10 @@ new_extension_registration_token() {
 extension_source_request_id() {  # <adapter> <source-id> <next-sequence> <registration-token> <package-digest>
   local digest
   if command -v shasum >/dev/null 2>&1; then
-    digest=$(printf 'firstmate-process-event-request-v1\n%s\n%s\n%s\n%s\n%s\n' "$@" \
+    digest=$(printf 'nexus-process-event-request-v1\n%s\n%s\n%s\n%s\n%s\n' "$@" \
       | shasum -a 256 | awk '{print $1}') || return 1
   elif command -v sha256sum >/dev/null 2>&1; then
-    digest=$(printf 'firstmate-process-event-request-v1\n%s\n%s\n%s\n%s\n%s\n' "$@" \
+    digest=$(printf 'nexus-process-event-request-v1\n%s\n%s\n%s\n%s\n%s\n' "$@" \
       | sha256sum | awk '{print $1}') || return 1
   else
     return 1
@@ -1601,7 +1601,7 @@ detach_runner() {  # <source-id>
 # The supervision cycle runs this command with its output and its exit status
 # both discarded, so a strand that only shows up in `list` as `orphaned` and in
 # this command's `uncertain=` count reaches nobody. A durable `check` wake does
-# reach firstmate through the ordinary queue, and it carries what clears the
+# reach nexus through the ordinary queue, and it carries what clears the
 # strand so acting on it needs no hunt. The caller supplies that part, because
 # the two strand shapes clear differently and naming the wrong recovery would
 # send someone to a command that reports `already owned` and changes nothing.

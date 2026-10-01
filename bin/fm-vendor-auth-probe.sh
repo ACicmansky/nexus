@@ -9,7 +9,7 @@
 # owned once by .agents/skills/quota-array-dispatch/SKILL.md.
 #
 # Why it exists rather than the agent running the vendor CLI itself: the
-# captain's 2026-07-30 `firstmate-grok-auth-preflight` decision approved exactly
+# captain's 2026-07-30 `nexus-grok-auth-preflight` decision approved exactly
 # one bounded, non-interactive probe, and that safety envelope must not depend on
 # agent memory. It is enforced here deterministically:
 #   - the argv is fixed in this file and never composed from input, so no caller

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# fm-busy-lib.sh - the ONE owner of firstmate's semantic busy-state contract.
+# fm-busy-lib.sh - the ONE owner of nexus's semantic busy-state contract.
 #
 # Design source: the captain-approved semantic busy-state redesign
 # (2026-07-28): each harness adapter reports turn lifecycle through a
@@ -39,7 +39,7 @@
 #   codex-hook, codex-appserver  reserved: Codex, gated by
 #                    fm_busy_codex_semantic_source
 #   kimi-wire, kimi-hook  reserved: standalone Kimi, gated by fm_busy_kimi_verified
-# Firstmate-owned sources accepted for every converted adapter:
+# Nexus-owned sources accepted for every converted adapter:
 #   fm-spawn         the launch-brief turn seeded at spawn
 #   fm-interrupt     the legacy Claude fm-send --key Escape idle event, and the
 #                    unknown invalidation fm-control writes after a Devin interrupt
@@ -93,7 +93,7 @@
 # rendered-text busy fallbacks that survive the redesign, because none of their
 # structured lifecycles was credited-live-verified
 # in the approved audit (Rovo's clean ACP stopReason lives outside the TUI
-# path firstmate drives, see references/harness/rovo.md; agy 1.2.0 exposes no
+# path nexus drives, see references/harness/rovo.md; agy 1.2.0 exposes no
 # hook surface at all, see references/harness/agy.md); each is scoped to
 # its own harness= and can never classify another adapter. The delivery
 # guards in bin/fm-composer-lib.sh match rendered footers for submit
@@ -141,7 +141,7 @@ FM_BUSY_LIB_VERSION=v1
 # `Interrupt` because Kimi documents that `Stop` does not fire on interrupts.
 #
 # To open the gate: install Kimi, live-verify the chosen source brackets a
-# real turn on a firstmate-launched worker including the interrupt path,
+# real turn on a nexus-launched worker including the interrupt path,
 # record the version, exact commands, and observed output in
 # docs/verification/supervision.md, add the verified version string(s) here,
 # and land the wiring in fm-spawn behind this same gate in the same change.
@@ -167,8 +167,8 @@ fm_busy_codex_appserver_observable() {
 # fm_busy_codex_hooks_verified: the sanctioned intermediate - Codex's stable
 # hooks engine (UserPromptSubmit to open a turn, Stop and SessionEnd to close
 # it). Returns 0 only once those hooks are live-verified to fire for a
-# firstmate-launched worker. codex-cli 0.145.0 verdict (live, 2026-07-28):
-# NOT verified. Firstmate-written project hooks under <worktree>/.codex/
+# nexus-launched worker. codex-cli 0.145.0 verdict (live, 2026-07-28):
+# NOT verified. Nexus-written project hooks under <worktree>/.codex/
 # never fired in an interactive pane whose directory trust was granted, nor
 # under `codex exec`, in either case with --dangerously-bypass-hook-trust,
 # while global hooks fired in the same runs. Codex additionally exposes no
@@ -215,7 +215,7 @@ fm_busy_current_gen() {  # <state-dir> <id>
 
 # fm_busy_sources_for_harness: the semantic sources trusted to classify a
 # task recorded with <harness>. One line, space-separated, possibly empty.
-# The firstmate-owned sources are appended for every converted adapter.
+# The nexus-owned sources are appended for every converted adapter.
 # Grok and muse deliberately trust nothing: neither has a semantic WRITER, so
 # neither is armed, and both read their live source on demand in the classifier
 # (grok's rendered tail, muse's session log) rather than through a stored
@@ -925,7 +925,7 @@ fm_busy_agy_tail_busy() {
 # launch; this is the backstop for when that registration did not take effect.
 # Each dialog's own question text is paired with one of its own rendered
 # option/footer lines, both required together: the question text alone is
-# plausible self-referential prose a firstmate-repo worker could easily render
+# plausible self-referential prose a nexus-repo worker could easily render
 # on its own (fm-claude-trust.sh's header literally quotes both questions),
 # but the option/footer pairing only ever renders inside the real dialog.
 fm_busy_claude_launch_prompt_tail() {

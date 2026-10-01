@@ -1,7 +1,7 @@
 # shellcheck shell=bash
-# Native W3C trace-context propagation for firstmate spawns (default-off).
+# Native W3C trace-context propagation for nexus spawns (default-off).
 #
-# When enabled, firstmate resolves one W3C `traceparent` carrier for a task,
+# When enabled, nexus resolves one W3C `traceparent` carrier for a task,
 # injects it into the agent's pane shell as the TRACEPARENT environment variable
 # before launch (bin/fm-spawn.sh, alongside GOTMPDIR, so it reaches every spawn
 # backend and every harness for ship, scout, and secondmate spawns), and records
@@ -10,7 +10,7 @@
 # the metadata sees exactly the identity the child received - no collector,
 # storage, UI, or vendor coupling.
 #
-# TRACEPARENT here is a firstmate CONVENTION that carries a W3C-formatted
+# TRACEPARENT here is a nexus CONVENTION that carries a W3C-formatted
 # traceparent value in the process environment. W3C Trace Context standardizes
 # the `traceparent` HTTP header, not an environment variable, and OpenTelemetry
 # SDKs do NOT read TRACEPARENT from the environment automatically. A downstream
@@ -68,7 +68,7 @@
 # with the trace id and span id never all-zero (W3C rejects both). New roots use
 # RANDOM ids from /dev/urandom. The root's `01` (sampled) flag records a
 # sampling DECISION that downstream parent-based samplers honor; it does not
-# guarantee any collector stores a span, and firstmate emits no spans itself.
+# guarantee any collector stores a span, and nexus emits no spans itself.
 #
 # Security / trust boundary. This feature adds no OTEL_* variables, no
 # tracestate, no arbitrary environment injection, and no configurable or
@@ -79,7 +79,7 @@
 # the spawn. Carrier-delivery failure also omits telemetry and continues when the
 # backend clears its input; if the backend reports that partial input could not be
 # cleared, fm-spawn refuses to append the launch command. Every carrier this lib
-# yields is either a firstmate-MINTED random root that reads no prompt, path,
+# yields is either a nexus-MINTED random root that reads no prompt, path,
 # task prose, credential, or arbitrary environment key, or the same task's
 # previously recorded carrier reused verbatim from its own meta. Ambient
 # TRACEPARENT is never read, so no caller-controlled bytes enter a new carrier.

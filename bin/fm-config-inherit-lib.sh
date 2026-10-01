@@ -1,5 +1,5 @@
 # shellcheck shell=bash
-# Inheritance propagation: the PRIMARY firstmate pushes a declared, extensible
+# Inheritance propagation: the PRIMARY nexus pushes a declared, extensible
 # set of LOCAL (gitignored) config items down into each secondmate home's
 # config/, so a secondmate's OWN crewmates inherit the primary's settings
 # (e.g. primary config/crew-dispatch.json makes a secondmate use the same dispatch
@@ -247,7 +247,7 @@ shared_captain_header_valid() {
   case "$head" in *main-authoritative*) ;; *) printf '%s' "main-authoritative"; return 1 ;; esac
   case "$head" in *"read-only in secondmate homes"*) ;; *) printf '%s' "read-only in secondmate homes"; return 1 ;; esac
   case "$head" in *"must not be edited there"*) ;; *) printf '%s' "must not be edited there"; return 1 ;; esac
-  case "$head" in *"main firstmate"*) ;; *) printf '%s' "main firstmate"; return 1 ;; esac
+  case "$head" in *"main nexus"*) ;; *) printf '%s' "main nexus"; return 1 ;; esac
   case "$head" in *"marked status"*|*"document pointer"*) ;; *) printf '%s' "marked status\" or \"document pointer"; return 1 ;; esac
 }
 

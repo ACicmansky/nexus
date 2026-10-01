@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# fm-control.sh - the CONTROL PLANE for a firstmate-owned agent: allowlisted
+# fm-control.sh - the CONTROL PLANE for a nexus-owned agent: allowlisted
 # lifecycle verbs addressed to an exact task id.
 #
 # Usage: fm-control.sh <task-id> interrupt
@@ -150,7 +150,7 @@ esac
 fm_refuse_if_gate_agent
 
 if [ -z "${FM_HOME+x}" ] || [ -z "${FM_HOME:-}" ]; then
-  echo "error: FM_HOME is not set; fm-control refuses to resolve a task without an explicit firstmate home" >&2
+  echo "error: FM_HOME is not set; fm-control refuses to resolve a task without an explicit nexus home" >&2
   exit 1
 fi
 [ -d "$FM_HOME" ] || {
@@ -797,7 +797,7 @@ resolve_relaunch_profile() {
     # a relaunch with no explicit harness picks up a newly configured one
     # instead of freezing whatever this incarnation happens to run. Crewmates
     # and scouts deliberately do NOT resolve config here: their harness comes
-    # from firstmate's own dispatch-profile judgment at intake, and silently
+    # from nexus's own dispatch-profile judgment at intake, and silently
     # re-resolving it would bypass that consultation.
     CONFIG_HARNESS=$("$SCRIPT_DIR/fm-harness.sh" secondmate 2>/dev/null || true)
     CONFIG_MODEL=$("$SCRIPT_DIR/fm-harness.sh" secondmate-model 2>/dev/null || true)

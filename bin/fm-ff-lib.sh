@@ -1,11 +1,11 @@
 # shellcheck shell=bash
-# Shared fast-forward machinery for firstmate self-sync.
+# Shared fast-forward machinery for nexus self-sync.
 # Usage: . bin/fm-ff-lib.sh   (after FM_ROOT and FM_HOME are set)
 #
-# This is the one implementation of "advance a firstmate checkout to a base by a
+# This is the one implementation of "advance a nexus checkout to a base by a
 # clean fast-forward, never forcing, merging, or stashing" used by every sync
 # path:
-#   - /updatefirstmate (bin/fm-update.sh) pulls from origin: base_mode "origin".
+#   - /updatenexus (bin/fm-update.sh) pulls from origin: base_mode "origin".
 #   - the local-HEAD secondmate sync (bin/fm-spawn.sh on launch, bin/fm-bootstrap.sh
 #     on startup) follows the PRIMARY checkout's current default-branch commit:
 #     base_mode is that local commit, with NO fetch and no origin dependency.
@@ -124,11 +124,11 @@ validate_operational_dirs() {
       return 1
     fi
     if [ "$abs_dir" = "$abs_active_home" ] || path_is_ancestor_of "$abs_active_home" "$abs_dir"; then
-      VALIDATION_ERROR="secondmate $name directory cannot be inside the active firstmate home"
+      VALIDATION_ERROR="secondmate $name directory cannot be inside the active nexus home"
       return 1
     fi
     if [ "$abs_dir" = "$abs_root" ] || path_is_ancestor_of "$abs_root" "$abs_dir"; then
-      VALIDATION_ERROR="secondmate $name directory cannot be inside the firstmate repo"
+      VALIDATION_ERROR="secondmate $name directory cannot be inside the nexus repo"
       return 1
     fi
   done
@@ -143,11 +143,11 @@ validate_secondmate_home() {
     return 1
   }
   abs_active_home=$(resolved_existing_dir "$FM_HOME") || {
-    VALIDATION_ERROR="active firstmate home is not a directory"
+    VALIDATION_ERROR="active nexus home is not a directory"
     return 1
   }
   abs_root=$(resolved_existing_dir "$FM_ROOT") || {
-    VALIDATION_ERROR="firstmate repo is not a directory"
+    VALIDATION_ERROR="nexus repo is not a directory"
     return 1
   }
   if [ "$abs_home" = "/" ]; then
@@ -155,27 +155,27 @@ validate_secondmate_home() {
     return 1
   fi
   if [ "$abs_home" = "$abs_active_home" ]; then
-    VALIDATION_ERROR="secondmate home cannot be the active firstmate home"
+    VALIDATION_ERROR="secondmate home cannot be the active nexus home"
     return 1
   fi
   if [ "$abs_home" = "$abs_root" ]; then
-    VALIDATION_ERROR="secondmate home cannot be the firstmate repo"
+    VALIDATION_ERROR="secondmate home cannot be the nexus repo"
     return 1
   fi
   if path_is_ancestor_of "$abs_active_home" "$abs_home"; then
-    VALIDATION_ERROR="secondmate home cannot be inside the active firstmate home"
+    VALIDATION_ERROR="secondmate home cannot be inside the active nexus home"
     return 1
   fi
   if path_is_ancestor_of "$abs_root" "$abs_home"; then
-    VALIDATION_ERROR="secondmate home cannot be inside the firstmate repo"
+    VALIDATION_ERROR="secondmate home cannot be inside the nexus repo"
     return 1
   fi
   if path_is_ancestor_of "$abs_home" "$abs_active_home"; then
-    VALIDATION_ERROR="secondmate home cannot be an ancestor of the active firstmate home"
+    VALIDATION_ERROR="secondmate home cannot be an ancestor of the active nexus home"
     return 1
   fi
   if path_is_ancestor_of "$abs_home" "$abs_root"; then
-    VALIDATION_ERROR="secondmate home cannot be an ancestor of the firstmate repo"
+    VALIDATION_ERROR="secondmate home cannot be an ancestor of the nexus repo"
     return 1
   fi
   validate_operational_dirs "$abs_home" "$abs_active_home" "$abs_root" || return 1
@@ -193,11 +193,11 @@ validate_secondmate_home() {
     return 1
   fi
   if [ ! -f "$abs_home/AGENTS.md" ]; then
-    VALIDATION_ERROR="not a firstmate home (missing AGENTS.md)"
+    VALIDATION_ERROR="not a nexus home (missing AGENTS.md)"
     return 1
   fi
   if [ ! -d "$abs_home/bin" ]; then
-    VALIDATION_ERROR="not a firstmate home (missing bin/)"
+    VALIDATION_ERROR="not a nexus home (missing bin/)"
     return 1
   fi
   VALIDATED_HOME="$abs_home"
@@ -239,13 +239,13 @@ changed_instr() {
 
 # Translate one remote home sync leg's failure into an operator-actionable
 # reason. The remote leg refuses a command shape it does not recognize with this
-# status, which on this leg can only mean that host's Firstmate copy predates the
+# status, which on this leg can only mean that host's Nexus copy predates the
 # parent-targeted sync it was just asked for; every other failure already carries
 # its own diagnostic.
 REMOTE_SYNC_UNSUPPORTED_STATUS=2
 remote_sync_failure_reason() { # <exit-status> <output>
   if [ "$1" = "$REMOTE_SYNC_UNSUPPORTED_STATUS" ]; then
-    printf '%s\n' "the Firstmate copy on that host is too old to sync to this primary's commit; run /updatefirstmate"
+    printf '%s\n' "the Nexus copy on that host is too old to sync to this primary's commit; run /updatenexus"
     return 0
   fi
   first_line "$2"
@@ -368,7 +368,7 @@ live_secondmate_meta_records() {
 #   FF_INSTR  = comma list of changed instruction paths (only when updated)
 #
 # base_mode selects where the fast-forward base comes from:
-#   origin       - fetch origin and advance to origin/<default> (the /updatefirstmate
+#   origin       - fetch origin and advance to origin/<default> (the /updatenexus
 #                  path); requires an origin remote and network reachability.
 #   <commit-ish> - advance to that LOCAL commit with NO fetch and no origin
 #                  dependency (the local-HEAD secondmate sync). The commit must
@@ -515,7 +515,7 @@ FF_SEEN_HOMES=""
 # live window. With nudge_requires_instr=yes the advance must also have changed
 # the instruction surface (FF_INSTR non-empty): an already-current home, or one
 # whose only change was non-instruction tracked files, is left undisturbed. The
-# firstmate repo itself (FM_ROOT) is never processed as its own secondmate, and
+# nexus repo itself (FM_ROOT) is never processed as its own secondmate, and
 # each resolved home is processed at most once.
 #
 # Two optional caller hooks fire from here, each at most once per resolved home:
@@ -527,7 +527,7 @@ FF_SEEN_HOMES=""
 #     live window, whether it advanced (status=updated) or was already there
 #     (status=current). A home that was SKIPPED is never settled, so a dirty,
 #     diverged, offline, or unsafe home never reaches this hook and nothing here
-#     forces, stashes, or discards its work. /updatefirstmate uses this hook to
+#     forces, stashes, or discards its work. /updatenexus uses this hook to
 #     reach every live mate that is genuinely on the new bytes, including the
 #     ones that needed no advance to get there.
 # An undefined hook is simply not called.

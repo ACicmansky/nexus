@@ -24,14 +24,14 @@
 #                 "SECONDMATE_HANDOFF: secondmate <id>: pending delivery: <n> item(s)",
 #                 "FMX: X mode on ..." or "FMX: X mode off ...".
 #          When a RUNNING secondmate home is fast-forwarded, its target is
-#          firstmate's own current default-branch commit. A local worktree uses
+#          nexus's own current default-branch commit. A local worktree uses
 #          a purely local fast-forward with no origin fetch; a remote route hands
 #          the same commit to its host, which imports that commit into the home
-#          without moving the host's Firstmate copy. If either placement changes
+#          without moving the host's Nexus copy. If either placement changes
 #          its loaded instruction surface
 #          (AGENTS.md, bin/, or .agents/skills/), bootstrap immediately nudges it
 #          via FM_HOME=<active-home> bin/fm-send.sh fm-<id> so meta resolves the
-#          current route and the standard from-firstmate marker is applied. A
+#          current route and the standard from-nexus marker is applied. A
 #          successful send prints one BOOTSTRAP_INFO line with the exact target
 #          and message sent; a failed send leaves an idempotent retry marker
 #          under state/.secondmate-nudge-pending/ and prints an actionable
@@ -50,7 +50,7 @@
 #          failed names whether the endpoint was missing or agent-less.
 #          Already-live and successfully relaunched secondmates are silent
 #          unless FM_BOOTSTRAP_VERBOSE_FACTS=1 requests BOOTSTRAP_INFO facts.
-#          A TANGLE line means the firstmate primary checkout (FM_ROOT) is stranded
+#          A TANGLE line means the nexus primary checkout (FM_ROOT) is stranded
 #          on a feature branch instead of its default branch - a crewmate's work
 #          landed in the primary instead of its own worktree; restore it per the line.
 #          treehouse is also MISSING when its installed version lacks
@@ -378,13 +378,13 @@ secondmate_sync() {
   # primary checkout's current default-branch commit. The local path is purely
   # LOCAL - no fetch, no origin dependency: a linked-worktree home already holds
   # the primary's commit (fm-ff-lib.sh), while a standalone clone without it is
-  # skipped until /updatefirstmate refreshes it from origin. A remote home is on
+  # skipped until /updatenexus refreshes it from origin. A remote home is on
   # another machine, so its host is handed that same commit and imports it there
   # (bin/fm-remote-secondmate-control.sh); this side still fetches nothing.
   # Startup sends reread nudges only for RUNNING secondmates whose instruction
   # surface (AGENTS.md, bin/, or .agents/skills/) actually changed, so a secondmate already on the primary's
   # version is never disturbed (AGENTS.md bootstrap + supervision). Unlike
-  # /updatefirstmate, startup owns the live-convergence send itself because it is
+  # /updatenexus, startup owns the live-convergence send itself because it is
   # a deterministic locked sweep and can report success as BOOTSTRAP_INFO while
   # preserving failed sends as NUDGE_SECONDMATES retry markers.
   [ -d "$STATE" ] || return 0
@@ -1441,7 +1441,7 @@ detect_local_tools() {
 }
 
 detect_local_config() {
-  # Worktree-tangle check: the firstmate primary checkout (FM_ROOT) must sit on its
+  # Worktree-tangle check: the nexus primary checkout (FM_ROOT) must sit on its
   # default branch, not a feature branch (see fm-tangle-lib.sh). Scoped to the
   # primary only; detached-HEAD worktrees and secondmate homes never trip it.
   tangle_branch=$(fm_primary_tangle_branch "$FM_ROOT" 2>/dev/null || true)

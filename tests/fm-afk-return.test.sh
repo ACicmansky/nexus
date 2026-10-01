@@ -3,7 +3,7 @@
 #
 # Covers the second half of the 2026-07-14 incident: an away-mode blocked event
 # survived in durable state, but the ordinary return request could proceed to
-# Bearings before Firstmate owned remediation. The shared script now stops,
+# Bearings before Nexus owned remediation. The shared script now stops,
 # drains, preserves evidence, and holds ordinary WORK until every live open
 # `blocked:` event is resolved or durably reclassified. Reporting is not work:
 # Bearings renders behind the catch-up gate and surfaces the catch-up posture
@@ -98,7 +98,7 @@ window=$target
 backend=$backend
 kind=ship
 EOF
-  printf 'blocked [key=%s]: firstmate can refresh the synthetic token\n' "$key" > "$dir/home/state/repair-task.status"
+  printf 'blocked [key=%s]: nexus can refresh the synthetic token\n' "$key" > "$dir/home/state/repair-task.status"
 }
 
 test_return_gate_owns_remediation_and_reports_catchup_to_bearings() {
@@ -132,7 +132,7 @@ test_return_gate_owns_remediation_and_reports_catchup_to_bearings() {
   [ "$rc" -eq 3 ] || fail "return begin should gate on a live blocker (rc=$rc): $out"
   gate="$dir/home/state/.afk-return-catchup"
   [ -s "$gate" ] || fail "return begin did not persist its fail-closed catch-up gate"
-  assert_contains "$out" 'firstmate-actionable blocker: repair-task [key=synthetic-dependency]' "return output did not assign blocker remediation to Firstmate"
+  assert_contains "$out" 'nexus-actionable blocker: repair-task [key=synthetic-dependency]' "return output did not assign blocker remediation to Nexus"
   grep -F $'evidence\twake\t1784074271' "$gate" >/dev/null || fail "drained wake evidence was not retained in the durable gate"
   grep -F $'evidence\twake\twake annotation: latest wake-EVENT observed at drain, not current state: repair-task.status: blocked synthetic dependency' "$gate" >/dev/null \
     || fail "the separate drain annotation was not retained as away-return evidence"
@@ -244,7 +244,7 @@ test_explicit_reclassification_requires_durable_reason() {
   pass "tmux and Herdr blockers require the same explicit durable reclassification before ordinary work"
 }
 
-test_captain_decision_does_not_masquerade_as_firstmate_blocker() {
+test_captain_decision_does_not_masquerade_as_nexus_blocker() {
   local dir out
   dir="$TMP_ROOT/captain-decision"
   install_runner "$dir"
@@ -256,10 +256,10 @@ EOF
   printf 'needs-decision [key=api-shape]: captain must choose the synthetic API shape\n' > "$dir/home/state/decision-task.status"
   date +%s > "$dir/home/state/.afk"
   printf '1784074271\t1\tsignal\tdecision-task.status\tsignal: synthetic decision\n' > "$dir/home/state/.fake-drain"
-  out=$(run_return "$dir" begin) || fail "approval decision should not be treated as a firstmate blocker: $out"
+  out=$(run_return "$dir" begin) || fail "approval decision should not be treated as a nexus blocker: $out"
   assert_contains "$out" 'catch-up wake:' "approval decision notification was not surfaced in catch-up"
-  [ ! -e "$dir/home/state/.afk-return-catchup" ] || fail "approval decision incorrectly opened a firstmate blocker gate"
-  pass "needs-decision remains reportable without masquerading as a firstmate-actionable blocker"
+  [ ! -e "$dir/home/state/.afk-return-catchup" ] || fail "approval decision incorrectly opened a nexus blocker gate"
+  pass "needs-decision remains reportable without masquerading as a nexus-actionable blocker"
 }
 
 test_evidence_publication_failure_preserves_wake_for_redrain() {
@@ -314,7 +314,7 @@ test_away_reentry_refuses_pending_return_gate() {
 }
 
 test_return_is_mode_agnostic_for_quiet_mode() {
-  # kunchenguid/firstmate#2356's /quiet off calls this exact script, unchanged
+  # ACicmansky/nexus#2356's /quiet off calls this exact script, unchanged
   # - it must behave identically whether state/.afk declares "away" or
   # "quiet", since return_guard/return_reconcile only ever test presence.
   local dir out
@@ -388,7 +388,7 @@ test_return_brief_composes_from_record_store_and_held_set() {
   # Two live blockers, one on a task with a captain-verdict outcome and one on a
   # task with a routine outcome. A third task failed outright.
   printf 'window=synthetic:fm-fix-windows\nbackend=tmux\nkind=ship\n' > "$dir/home/state/fix-windows.meta"
-  printf 'blocked [key=token]: firstmate can refresh the token\n' > "$dir/home/state/fix-windows.status"
+  printf 'blocked [key=token]: nexus can refresh the token\n' > "$dir/home/state/fix-windows.status"
   printf 'window=synthetic:fm-other\nbackend=tmux\nkind=ship\n' > "$dir/home/state/other.meta"
   printf 'blocked [key=dep]: needs the upstream dependency\nneeds-decision [key=pick]: choose the target\n' > "$dir/home/state/other.status"
   printf 'window=synthetic:fm-dead\nbackend=tmux\nkind=scout\n' > "$dir/home/state/dead.meta"
@@ -448,14 +448,14 @@ test_return_brief_composes_from_record_store_and_held_set() {
   assert_contains "$out" 'awaiting the captain on the merge' "the hold reason was not listed"
   assert_contains "$out" 'other [key=pick] needs your decision: choose the target' "the open decision was not listed under waiting on you"
   assert_contains "$out" 'fix-windows: blocked on a token only the captain holds; held for return' "the captain-verdict outcome was not listed"
-  assert_contains "$out" 'fix-windows [key=token] still blocked, firstmate remediates before ordinary work' "the blocker sharing a task with a captain outcome was exempted"
-  assert_contains "$out" 'other [key=dep] still blocked, firstmate remediates before ordinary work' "the unreached blocker was not listed as could-not-fix"
+  assert_contains "$out" 'fix-windows [key=token] still blocked, nexus remediates before ordinary work' "the blocker sharing a task with a captain outcome was exempted"
+  assert_contains "$out" 'other [key=dep] still blocked, nexus remediates before ordinary work' "the unreached blocker was not listed as could-not-fix"
   assert_contains "$out" 'dead: failed: the reproduction never compiled' "the failed task was not listed"
   assert_contains "$out" '4 routine outcome(s) recorded' "the routine outcome count was not reported"
   assert_contains "$out" 'other: resent the steer; worker resumed' "the routine outcome was not listed"
   assert_contains "$out" 'Cost: 6 supervision outcome(s) recorded (4 routine, 2 captain); 3 task(s) live at return.' "the cost line is wrong"
-  assert_contains "$out" 'firstmate-actionable blocker: other [key=dep]' "the unreached blocker did not gate"
-  assert_contains "$out" 'firstmate-actionable blocker: fix-windows [key=token]' "a captain outcome incorrectly exempted an open blocker"
+  assert_contains "$out" 'nexus-actionable blocker: other [key=dep]' "the unreached blocker did not gate"
+  assert_contains "$out" 'nexus-actionable blocker: fix-windows [key=token]' "a captain outcome incorrectly exempted an open blocker"
   grep -F "$(printf 'contract\t')" "$gate" >/dev/null || fail "the gate did not retain the posture-record window"
   grep -F "$(printf 'evidence\thealth\t')" "$gate" >/dev/null || fail "the gate did not retain the health snapshot"
 
@@ -1355,7 +1355,7 @@ test_missing_final_archive_keeps_retained_contract_gated() {
 
 test_return_gate_owns_remediation_and_reports_catchup_to_bearings
 test_explicit_reclassification_requires_durable_reason
-test_captain_decision_does_not_masquerade_as_firstmate_blocker
+test_captain_decision_does_not_masquerade_as_nexus_blocker
 test_evidence_publication_failure_preserves_wake_for_redrain
 test_away_reentry_refuses_pending_return_gate
 test_return_is_mode_agnostic_for_quiet_mode

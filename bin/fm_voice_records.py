@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """fm_voice_records.py - what the voice agent is allowed to know, and how it hands work over.
 
-The voice agent answers status questions from firstmate's durable records and
+The voice agent answers status questions from nexus's durable records and
 queues everything else. This module owns both halves, because both halves are
 where a mistake is expensive: one sends the captain's records to a model in
-another region, and the other writes to firstmate's wake queue.
+another region, and the other writes to nexus's wake queue.
 
 WHAT IS NEVER READ. Two whole classes of record are excluded at every scope,
 not filtered at the end:
@@ -531,7 +531,7 @@ def fleet_status(home=None, scope=None):
 
 
 def queue_request(text, home=None, root=None):
-    """Hand real work to firstmate through bin/fm-inbox.sh note."""
+    """Hand real work to nexus through bin/fm-inbox.sh note."""
     home = home or default_home()
     root = root or os.path.dirname(os.path.abspath(__file__))
     body = (text or "").strip()
@@ -560,7 +560,7 @@ def queue_request(text, home=None, root=None):
         "queued": True,
         "note_id": note_id,
         "queued_text": body,
-        "handover": "Firstmate now owns this request and will pick it up at "
+        "handover": "Nexus now owns this request and will pick it up at "
                     "its next check. You did not do the work yourself.",
     }
 
@@ -575,7 +575,7 @@ def main(argv):
     status.add_argument("--home")
     status.add_argument("--scope", choices=SCOPES)
 
-    queue = sub.add_parser("queue", help="hand a request to firstmate")
+    queue = sub.add_parser("queue", help="hand a request to nexus")
     queue.add_argument("text", nargs="+")
     queue.add_argument("--home")
 

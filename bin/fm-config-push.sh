@@ -20,7 +20,7 @@ usage() {
   cat <<'EOF'
 Usage: fm-config-push.sh [--help]
 
-Push the primary firstmate home's declared inherited local material into each
+Push the primary nexus home's declared inherited local material into each
 live secondmate home.
 
 This is local-material-only:
@@ -36,9 +36,9 @@ Live homes come from state/*.meta records with kind=secondmate.
 data/secondmates.md is only a fallback for missing home= fields in older or
 incomplete meta records.
 
-Environment overrides follow the rest of firstmate:
-  FM_HOME            active firstmate home
-  FM_ROOT_OVERRIDE  firstmate repo root
+Environment overrides follow the rest of nexus:
+  FM_HOME            active nexus home
+  FM_ROOT_OVERRIDE  nexus repo root
   FM_STATE_OVERRIDE state dir
   FM_DATA_OVERRIDE  data dir
   FM_CONFIG_OVERRIDE config dir

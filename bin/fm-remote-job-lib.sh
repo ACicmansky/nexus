@@ -3,7 +3,7 @@
 #
 # Source this file from the fixed SSH entrypoint, the long-lived worker, or the
 # remote doctor. It owns the per-account queue at
-# ~/.firstmate/remote-job (override only with FM_REMOTE_JOB_STATE_ROOT for
+# ~/.nexus/remote-job (override only with FM_REMOTE_JOB_STATE_ROOT for
 # isolated tests), the bounded job record, worker installation, and the remote
 # runtime PATH.
 #
@@ -77,8 +77,8 @@
 # of a multi-version tool wins is fixed by this composition rather than by the
 # order the filesystem happens to return.
 #
-# On macOS the worker is Firstmate's Aqua LaunchAgent
-# dev.firstmate.remote-job at ~/Library/LaunchAgents/dev.firstmate.remote-job.plist
+# On macOS the worker is Nexus's Aqua LaunchAgent
+# dev.nexus.remote-job at ~/Library/LaunchAgents/dev.nexus.remote-job.plist
 # with logs under ~/Library/Logs. Linux starts the same worker process without
 # an Aqua requirement. The launch-agent renderer and repair helpers here are
 # shared by the entrypoint and remote doctor so their ownership cannot drift.
@@ -95,7 +95,7 @@
 # bin/fm-remote-job-reap-orphans.sh uses it to reap workers that were already
 # orphaned that way.
 
-FM_REMOTE_JOB_LABEL=dev.firstmate.remote-job
+FM_REMOTE_JOB_LABEL=dev.nexus.remote-job
 FM_REMOTE_JOB_MAX_BYTES=${FM_REMOTE_JOB_MAX_BYTES:-1048576}
 FM_REMOTE_JOB_QUEUE_TIMEOUT=${FM_REMOTE_JOB_QUEUE_TIMEOUT:-360}
 FM_REMOTE_JOB_TIMEOUT=${FM_REMOTE_JOB_TIMEOUT:-360}
@@ -406,7 +406,7 @@ fm_remote_job_safe_child_dir() { # <canonical-parent> <single child basename>
 }
 
 fm_remote_job_prepare_state() { # <account-home>
-  local account_home=$1 root parent base firstmate
+  local account_home=$1 root parent base nexus
   fm_remote_job_validate_settings || {
     FM_REMOTE_JOB_ERROR="remote job bounds or timeout are invalid"
     return 1
@@ -432,11 +432,11 @@ fm_remote_job_prepare_state() { # <account-home>
       return 1
     }
   else
-    firstmate=$(fm_remote_job_safe_child_dir "$account_home" .firstmate) || {
-      FM_REMOTE_JOB_ERROR="cannot prepare $account_home/.firstmate for remote jobs"
+    nexus=$(fm_remote_job_safe_child_dir "$account_home" .nexus) || {
+      FM_REMOTE_JOB_ERROR="cannot prepare $account_home/.nexus for remote jobs"
       return 1
     }
-    root=$(fm_remote_job_safe_child_dir "$firstmate" remote-job) || {
+    root=$(fm_remote_job_safe_child_dir "$nexus" remote-job) || {
       FM_REMOTE_JOB_ERROR="cannot prepare remote job state"
       return 1
     }
@@ -942,7 +942,7 @@ fm_remote_job_process_pgid() { # <pid>
   printf '%s\n' "$value"
 }
 
-# The code root a worker serves is still a genuine Firstmate checkout. A worker
+# The code root a worker serves is still a genuine Nexus checkout. A worker
 # whose root fails this can never claim, validate, or execute another job, so
 # the same predicate decides both self-termination and orphan reaping.
 fm_remote_job_root_is_live() { # <remote-root>

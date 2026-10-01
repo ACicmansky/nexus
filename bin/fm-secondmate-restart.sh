@@ -4,7 +4,7 @@
 #
 # Usage: fm-secondmate-restart.sh <secondmate-id>... [--help]
 #
-# This is the executable half of /updatefirstmate's reload step. A running agent
+# This is the executable half of /updatenexus's reload step. A running agent
 # holds AGENTS.md and every skill it has loaded frozen from launch, and no
 # verified harness offers a reload, so a re-read steer cannot replace either -
 # it appends a second copy of the mate's own job description with no defined
@@ -81,7 +81,7 @@ case "${1:-}" in
 esac
 
 if [ -z "${FM_HOME:-}" ]; then
-  echo "error: FM_HOME is not set; fm-secondmate-restart refuses to resolve second mates without an explicit firstmate home" >&2
+  echo "error: FM_HOME is not set; fm-secondmate-restart refuses to resolve second mates without an explicit nexus home" >&2
   exit 1
 fi
 [ -d "$FM_HOME" ] || { echo "error: FM_HOME '$FM_HOME' is not a directory" >&2; exit 1; }
@@ -105,7 +105,7 @@ for arg in "$@"; do
   case "$arg" in
     -*) echo "error: unexpected argument '$arg'" >&2; usage >&2; exit 2 ;;
   esac
-  # /updatefirstmate's action line names each mate by its fm-<id> selector; the
+  # /updatenexus's action line names each mate by its fm-<id> selector; the
   # bare id is equally acceptable so a hand-run stays natural.
   id=${arg#fm-}
   case "$id" in ''|*[!A-Za-z0-9._-]*) echo "error: invalid second mate id: $arg" >&2; exit 2 ;; esac

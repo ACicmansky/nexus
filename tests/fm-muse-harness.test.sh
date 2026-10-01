@@ -81,7 +81,7 @@ case "${1:-}" in
     printf 'META_API_KEY=worker-key\n'
     exit 0
     ;;
-  display-message) printf 'firstmate\n'; exit 0 ;;
+  display-message) printf 'nexus\n'; exit 0 ;;
   list-windows) exit 0 ;;
   has-session|new-session|new-window|kill-window) exit 0 ;;
   send-keys)
@@ -138,7 +138,7 @@ make_spawn_case() {
 ## Captain's intent
 Exercise Muse dispatch.
 
-## Firstmate spec
+## Nexus spec
 Verify the Muse harness behavior under test.
 EOF
   fm_git_worktree "$proj" "$wt" "fm/$id"
@@ -256,7 +256,7 @@ EOF
   # exec-only flag: the interactive TUI exits with "unexpected argument" on it.
   assert_not_contains "$launch" '--no-foreign-personal-context' \
     "muse launch passed the exec-only foreign-context flag to the TUI"
-  # The captain accepted muse's self-update risk, so firstmate must not pin it.
+  # The captain accepted muse's self-update risk, so nexus must not pin it.
   assert_not_contains "$launch" 'MUSE_NO_AUTO_UPDATE' \
     "muse launch pinned auto-update, which the captain declined"
   assert_contains "$launch" "XDG_CONFIG_HOME='$home/xdgconfig'" \
@@ -387,7 +387,7 @@ EOF
 }
 
 # muse has no primary supervision protocol, and its Claude-compatible hook
-# dialect rejects the model-reawakening handlers a firstmate primary needs, so a
+# dialect rejects the model-reawakening handlers a nexus primary needs, so a
 # secondmate on muse could never arm a supervision cycle.
 test_spawn_refuses_secondmate() {
   local case_dir home fakebin id out status

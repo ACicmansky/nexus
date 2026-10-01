@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
-# Self-update a running firstmate and its secondmates to the latest origin.
+# Self-update a running nexus and its secondmates to the latest origin.
 #
-# Mechanical half of the /updatefirstmate skill. Fast-forwards the running
-# firstmate repo's default branch from origin, then fast-forwards every
+# Mechanical half of the /updatenexus skill. Fast-forwards the running
+# nexus repo's default branch from origin, then fast-forwards every
 # registered secondmate home. Local homes are treehouse worktrees or standalone
 # clones; remote routes update their configured code root on that host and then
 # fast-forward the persistent home to that root. FAST-FORWARD ONLY, exactly like
@@ -26,7 +26,7 @@
 # tmux actions the skill performs. The script's job is the safe git mechanics
 # plus a parseable summary telling the caller what to do next:
 #   - one status line per target (updated/already current/skipped)
-#   - reread-firstmate: yes|no    (did the running firstmate's instructions change)
+#   - reread-nexus: yes|no    (did the running nexus's instructions change)
 #   - restart-secondmates: fm-<id>...|none (every live secondmate this pass left
 #     on origin's tip - advanced OR already there - whose recorded runtime can
 #     prove a restart)
@@ -85,13 +85,13 @@ if [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ]; then
 fi
 [ $# -eq 0 ] || { usage; exit 1; }
 
-# --- main firstmate repo ---------------------------------------------------
+# --- main nexus repo ---------------------------------------------------
 
-reread_firstmate="no"
-ff_target "$FM_ROOT" "firstmate" origin no no
+reread_nexus="no"
+ff_target "$FM_ROOT" "nexus" origin no no
 if [ "$FF_STATUS" = "updated" ]; then
   if [ -n "$FF_INSTR" ]; then
-    reread_firstmate="yes"
+    reread_nexus="yes"
   fi
   # A fast-forward changes bin/'s bytes out from under any locally armed
   # fm-procevent-when watch's trust binding, with no tampering involved; left
@@ -196,7 +196,7 @@ if [ -f "$SECONDMATES_MD" ]; then
           synced:*)
             remote_detail=${remote_result#synced: }
             # The host reports its advance as "<commit> instr=<paths>"; a host
-            # whose Firstmate copy predates that suffix reports the commit alone.
+            # whose Nexus copy predates that suffix reports the commit alone.
             # The suffix is now reporting detail only: the routing below no longer
             # reads it, so an older host's silence can no longer downgrade a
             # restartable mate to a steer.
@@ -241,6 +241,6 @@ fi
 # two lines below are disjoint by construction: no mate is ever restarted and
 # then also steered about the instructions it just relaunched on.
 
-echo "reread-firstmate: $reread_firstmate"
+echo "reread-nexus: $reread_nexus"
 echo "restart-secondmates:${FF_RESTART_WINDOWS:- none}"
 echo "nudge-secondmates:${FF_STEER_WINDOWS:- none}"

@@ -31,7 +31,7 @@ make_case() {
   git init --quiet -b "$default" "$project"
   printf 'base\n' > "$project/README.md"
   git -C "$project" add README.md
-  git -C "$project" -c user.name='Firstmate Tests' -c user.email='tests@example.invalid' commit -qm initial
+  git -C "$project" -c user.name='Nexus Tests' -c user.email='tests@example.invalid' commit -qm initial
   git clone --quiet --bare "$project" "$origin"
   git -C "$project" remote add origin "file://$origin"
   initial=$(git -C "$project" rev-parse HEAD)
@@ -40,7 +40,7 @@ make_case() {
   git clone --quiet "file://$origin" "$publisher"
   printf 'must survive a newly spawned branch\n' > "$publisher/advanced-main.txt"
   git -C "$publisher" add advanced-main.txt
-  git -C "$publisher" -c user.name='Firstmate Tests' -c user.email='tests@example.invalid' commit -qm advance-main
+  git -C "$publisher" -c user.name='Nexus Tests' -c user.email='tests@example.invalid' commit -qm advance-main
   git -C "$publisher" push --quiet origin "$default"
 
   printf '%s\n' "$case_dir|$home|$project|$pool|$fakebin|$initial|$default"
@@ -231,7 +231,7 @@ make_originless_case() {  # <name> <id>
   git init --quiet -b main "$project"
   printf 'base\n' > "$project/README.md"
   git -C "$project" add README.md
-  git -C "$project" -c user.name='Firstmate Tests' -c user.email='tests@example.invalid' commit -qm initial
+  git -C "$project" -c user.name='Nexus Tests' -c user.email='tests@example.invalid' commit -qm initial
   initial=$(git -C "$project" rev-parse HEAD)
   git -C "$project" worktree add --quiet --detach "$pool" "$initial"
 
@@ -478,19 +478,19 @@ make_submodule_case() {  # <name> <id>
   git init --quiet -b main "$sub"
   printf 'pin one\n' > "$sub/lib.txt"
   git -C "$sub" add lib.txt
-  git -C "$sub" -c user.name='Firstmate Tests' -c user.email='tests@example.invalid' commit -qm sub-one
+  git -C "$sub" -c user.name='Nexus Tests' -c user.email='tests@example.invalid' commit -qm sub-one
   subpin1=$(git -C "$sub" rev-parse HEAD)
   printf 'pin two\n' > "$sub/lib.txt"
-  git -C "$sub" -c user.name='Firstmate Tests' -c user.email='tests@example.invalid' commit -qam sub-two
+  git -C "$sub" -c user.name='Nexus Tests' -c user.email='tests@example.invalid' commit -qam sub-two
   subpin2=$(git -C "$sub" rev-parse HEAD)
   git -C "$sub" checkout --quiet "$subpin1"
 
   git init --quiet -b main "$project"
   printf 'base\n' > "$project/README.md"
   git -C "$project" add README.md
-  git -C "$project" -c protocol.file.allow=always -c user.name='Firstmate Tests' -c user.email='tests@example.invalid' \
+  git -C "$project" -c protocol.file.allow=always -c user.name='Nexus Tests' -c user.email='tests@example.invalid' \
     submodule --quiet add "file://$sub" ui
-  git -C "$project" -c user.name='Firstmate Tests' -c user.email='tests@example.invalid' commit -qm initial
+  git -C "$project" -c user.name='Nexus Tests' -c user.email='tests@example.invalid' commit -qm initial
   git clone --quiet --bare "$project" "$origin"
   git -C "$project" remote add origin "file://$origin"
   git -C "$project" worktree add --quiet --detach "$pool" HEAD
@@ -500,7 +500,7 @@ make_submodule_case() {  # <name> <id>
   git clone --quiet "file://$origin" "$publisher"
   git -C "$publisher" -c protocol.file.allow=always submodule --quiet update --init
   git -C "$publisher/ui" checkout --quiet "$subpin2"
-  git -C "$publisher" -c user.name='Firstmate Tests' -c user.email='tests@example.invalid' commit -qam advance-pin
+  git -C "$publisher" -c user.name='Nexus Tests' -c user.email='tests@example.invalid' commit -qam advance-pin
   git -C "$publisher" push --quiet origin main
   advanced=$(git -C "$publisher" rev-parse HEAD)
 
@@ -577,7 +577,7 @@ test_unpushed_submodule_commit_is_still_uncommitted_work() {
   # unreferenced, so this case must keep the conservative refusal.
   printf 'unlanded submodule work\n' > "$POOL_DIR/ui/unlanded.txt"
   git -C "$POOL_DIR/ui" add unlanded.txt
-  git -C "$POOL_DIR/ui" -c user.name='Firstmate Tests' -c user.email='tests@example.invalid' \
+  git -C "$POOL_DIR/ui" -c user.name='Nexus Tests' -c user.email='tests@example.invalid' \
     commit -qm unlanded-submodule-work
   unpushed=$(git -C "$POOL_DIR/ui" rev-parse HEAD)
   [ -z "$(git -C "$POOL_DIR/ui" status --porcelain)" ] \

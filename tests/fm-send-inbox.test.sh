@@ -131,7 +131,7 @@ test_text_steer_rides_inbox() {
   body=$(record_body _ "$rec")
   [ "$body" = "please rebase onto main" ] || fail "the recorded body differs: $body"
   typed=$(cat "$dir/send.log")
-  assert_contains "$typed" "Firstmate instruction waiting: list \"\$FM_TASK_INBOX\"/*.msg in your 't1.inbox' steering inbox" \
+  assert_contains "$typed" "Nexus instruction waiting: list \"\$FM_TASK_INBOX\"/*.msg in your 't1.inbox' steering inbox" \
     "the doorbell should direct the worker to drain the inbox"
   case "$typed" in
   *"please rebase onto main"*) fail "the payload must never be typed:"$'\n'"$typed" ;;
@@ -204,7 +204,7 @@ test_resend_enqueues_new_sequence() {
   run_send "$dir" "$err" -- t1 "check the CI result" || fail "second send failed"
   [ -f "$dir/home/state/t1.inbox/001.msg" ] && [ -f "$dir/home/state/t1.inbox/002.msg" ] ||
     fail "a re-send should enqueue a new sequence:"$'\n'"$(ls "$dir/home/state/t1.inbox")"
-  doorbells=$(grep -cF 'Firstmate instruction waiting' "$dir/send.log" || true)
+  doorbells=$(grep -cF 'Nexus instruction waiting' "$dir/send.log" || true)
   [ "$doorbells" = 1 ] || fail "each send rings once (the log is truncated per send), got $doorbells"
   typed=$(cat "$dir/send.log")
   assert_contains "$typed" "numeric order" \
@@ -349,7 +349,7 @@ test_secondmate_marker_and_enqueue_delivery() {
   body=$(record_body _ "$dir/home/state/domain.inbox/001.msg")
   case "$body" in
   "$FM_FROMFIRST_MARK"corr=*) : ;;
-  *) fail "the recorded body lost the from-firstmate marker/corr framing:"$'\n'"$body" ;;
+  *) fail "the recorded body lost the from-nexus marker/corr framing:"$'\n'"$body" ;;
   esac
   corr=$(printf '%s' "$body" | grep -oE 'corr=[a-f0-9]{16}' | head -1 | cut -d= -f2)
   [ -n "$corr" ] || fail "no corr token in the recorded body"

@@ -4,10 +4,10 @@
 # disabled.
 #
 # The guarantee under test: a crewmate or scout is created in the exact Herdr
-# workspace of the firstmate or secondmate process that launched it, identified
+# workspace of the nexus or secondmate process that launched it, identified
 # from that process's own Herdr pane rather than from a workspace label. Herdr
 # enforces no workspace-label uniqueness, so two workspaces can both be labeled
-# "firstmate", and the previous label-first-match resolution put the worker in
+# "nexus", and the previous label-first-match resolution put the worker in
 # whichever one sorted first - visibly the wrong space whenever the launcher was
 # not in it.
 #
@@ -87,7 +87,7 @@ make_scratch_project() {  # <dir>
   git -C "$dir" init -q
   printf '# scratch\n' > "$dir/README.md"
   git -C "$dir" add README.md
-  git -C "$dir" -c user.name='Firstmate Tests' -c user.email='tests@example.invalid' commit -qm initial
+  git -C "$dir" -c user.name='Nexus Tests' -c user.email='tests@example.invalid' commit -qm initial
   git clone --quiet --bare "$dir" "$dir.origin.git"
   git -C "$dir" remote add origin "file://$dir.origin.git"
 }
@@ -121,7 +121,7 @@ journal_field() {  # <presentation-journal> <key>
 
 # spawn_from_launcher <launcher-pane|""> <home> <task-id> <project> [extra fm-spawn args...]
 # Composes exactly the Herdr identity Herdr itself injects into a pane's
-# processes. An empty launcher pane means "this firstmate is not running inside
+# processes. An empty launcher pane means "this nexus is not running inside
 # Herdr at all".
 SPAWN_OUT=; SPAWN_ERR=; SPAWN_RC=
 spawn_from_launcher() {
@@ -193,7 +193,7 @@ write_ship_brief() {  # <file> <id>
 ## Captain's intent
 Exercise Herdr launcher placement for $2.
 
-## Firstmate spec
+## Nexus spec
 Verify the worker is placed in the correct workspace.
 EOF
 }
@@ -232,9 +232,9 @@ UNIQA_PANE=$(grep '^herdr_pane_id=' "$UNIQA_META" | cut -d= -f2-)
 [ -n "$UNIQA_PANE" ] || fail "uniqA meta is missing herdr_pane_id"
 WS_PRIMARY=$(workspace_of_pane "$UNIQA_PANE")
 [ -n "$WS_PRIMARY" ] || fail "could not read uniqA's workspace"
-[ "$(label_of_workspace "$WS_PRIMARY")" = firstmate ] || fail "uniqA did not land in a 'firstmate' workspace"
+[ "$(label_of_workspace "$WS_PRIMARY")" = nexus ] || fail "uniqA did not land in a 'nexus' workspace"
 [ "$(focused_workspace)" = "$WS_OTHER" ] || fail "the spawn stole focus from the captain's workspace"
-pass "real herdr E2E: with one 'firstmate' workspace and no herdr parent, a crewmate still lands in this home's own workspace without stealing focus"
+pass "real herdr E2E: with one 'nexus' workspace and no herdr parent, a crewmate still lands in this home's own workspace without stealing focus"
 
 # --- 2. unique label, WITH a launcher pane: same workspace, now by identity --
 
@@ -242,7 +242,7 @@ read -r _ _ LAUNCH_PRIMARY_PANE <<EOF
 $(lab tab create --workspace "$WS_PRIMARY" --cwd "$TMP_ROOT" --label captain-shell --no-focus 2>/dev/null \
   | jq -r '["x","x", .result.root_pane.pane_id] | @tsv' | tr '\t' ' ')
 EOF
-[ -n "$LAUNCH_PRIMARY_PANE" ] || fail "could not create a launcher pane inside the 'firstmate' workspace"
+[ -n "$LAUNCH_PRIMARY_PANE" ] || fail "could not create a launcher pane inside the 'nexus' workspace"
 
 spawn_from_launcher "$LAUNCH_PRIMARY_PANE" "$PRIMARY_HOME" uniqB "$PROJ" --mode no-mistakes --yolo off
 [ "$SPAWN_RC" -eq 0 ] || fail "a primary spawn from a launcher pane failed"$'\n'"$(cat "$SPAWN_ERR")"
@@ -250,7 +250,7 @@ UNIQB_META="$PRIMARY_HOME/state/uniqB.meta"
 record_worktree "$UNIQB_META"
 UNIQB_PANE=$(grep '^herdr_pane_id=' "$UNIQB_META" | cut -d= -f2-)
 [ "$(workspace_of_pane "$UNIQB_PANE")" = "$WS_PRIMARY" ] \
-  || fail "a crewmate launched from the 'firstmate' workspace must stay in it"
+  || fail "a crewmate launched from the 'nexus' workspace must stay in it"
 pass "real herdr E2E: the normal unique-label path is unchanged when the launcher's own pane identifies the workspace"
 
 # --- 2b. presentation spaces ON: the projected child is created and bound
@@ -284,12 +284,12 @@ pass "real herdr E2E: presentation spaces still create the isolated child worksp
 #        Herdr pane so the identity comes from Herdr's own injection ----------
 
 read -r WS_PRIMARY_DUP _ LAUNCH_DUP_PANE <<EOF
-$(make_workspace firstmate)
+$(make_workspace nexus)
 EOF
-[ -n "$WS_PRIMARY_DUP" ] || fail "could not create the second 'firstmate' workspace"
-[ "$WS_PRIMARY_DUP" != "$WS_PRIMARY" ] || fail "the two 'firstmate' workspaces must be distinct"
-DUP_COUNT=$(lab workspace list 2>/dev/null | jq -r '[.result.workspaces[]? | select(.label == "firstmate")] | length')
-[ "$DUP_COUNT" = 2 ] || fail "expected exactly two 'firstmate' workspaces, got $DUP_COUNT"
+[ -n "$WS_PRIMARY_DUP" ] || fail "could not create the second 'nexus' workspace"
+[ "$WS_PRIMARY_DUP" != "$WS_PRIMARY" ] || fail "the two 'nexus' workspaces must be distinct"
+DUP_COUNT=$(lab workspace list 2>/dev/null | jq -r '[.result.workspaces[]? | select(.label == "nexus")] | length')
+[ "$DUP_COUNT" = 2 ] || fail "expected exactly two 'nexus' workspaces, got $DUP_COUNT"
 WS_PRIMARY_TABS_BEFORE=$(tab_labels_of_workspace "$WS_PRIMARY")
 
 cat > "$TMP_ROOT/spawn-in-pane.sh" <<SPAWN
@@ -314,16 +314,16 @@ record_worktree "$DUPC_META"
 DUPC_PANE=$(grep '^herdr_pane_id=' "$DUPC_META" | cut -d= -f2-)
 DUPC_WS=$(workspace_of_pane "$DUPC_PANE")
 [ "$DUPC_WS" = "$WS_PRIMARY_DUP" ] \
-  || fail "a worker launched from the second 'firstmate' workspace ($WS_PRIMARY_DUP) landed in '$DUPC_WS' instead"
+  || fail "a worker launched from the second 'nexus' workspace ($WS_PRIMARY_DUP) landed in '$DUPC_WS' instead"
 [ "$DUPC_WS" != "$WS_PRIMARY" ] || fail "the worker was placed in the first label match, the defect under test"
 [ "$DUPC_WS" != "$WS_OTHER" ] || fail "the worker was placed in the globally focused workspace"
 [ "$(grep '^herdr_workspace_id=' "$DUPC_META" | cut -d= -f2-)" = "$WS_PRIMARY_DUP" ] \
   || fail "the recorded endpoint workspace does not match the launcher's workspace"
-pass "real herdr E2E: with two 'firstmate' workspaces, a worker spawned from inside the second one lands in that exact workspace"
+pass "real herdr E2E: with two 'nexus' workspaces, a worker spawned from inside the second one lands in that exact workspace"
 
 [ "$(tab_labels_of_workspace "$WS_PRIMARY")" = "$WS_PRIMARY_TABS_BEFORE" ] \
   || fail "the other same-labeled workspace's tabs changed; it must never be adopted or mutated"
-[ "$(label_of_workspace "$WS_PRIMARY")" = firstmate ] \
+[ "$(label_of_workspace "$WS_PRIMARY")" = nexus ] \
   || fail "the other same-labeled workspace was renamed"
 [ "$(focused_workspace)" = "$WS_OTHER" ] || fail "the in-pane spawn stole focus from the captain's workspace"
 pass "real herdr E2E: the duplicate-labeled sibling workspace is left entirely untouched and focus is preserved"
@@ -360,7 +360,7 @@ pass "real herdr E2E: with a duplicated home label, a projected worker still han
 
 spawn_from_launcher "" "$PRIMARY_HOME" dupD "$PROJ" --mode no-mistakes --yolo off
 [ "$SPAWN_RC" -ne 0 ] || fail "a duplicate-labeled home workspace with no herdr parent must refuse, not guess"
-assert_contains_local "$(cat "$SPAWN_ERR")" "labeled 'firstmate'" \
+assert_contains_local "$(cat "$SPAWN_ERR")" "labeled 'nexus'" \
   "the refusal did not name the duplicated home label"
 [ ! -e "$PRIMARY_HOME/state/dupD.meta" ] || fail "a refused spawn must not publish task metadata"
 DUP_TABS=$(lab tab list --workspace "$WS_PRIMARY" 2>/dev/null | jq -r '[.result.tabs[]? | select(.label == "fm-dupD")] | length')
@@ -370,7 +370,7 @@ pass "real herdr E2E: an ambiguous home label with no launcher identity refuses 
 
 # --- 5. a STALE launcher pane refuses, even though the home label is
 #        unambiguous from the launcher's own (now closed) workspace -----------
-# A firstmate whose own pane was closed under it has an identity that no longer
+# A nexus whose own pane was closed under it has an identity that no longer
 # resolves. Guessing a workspace from the label is exactly what must not happen.
 
 read -r _ _ STALE_PANE <<EOF
@@ -440,7 +440,7 @@ if lab pane get "$DUPC_PANE" >/dev/null 2>&1; then
 fi
 lab pane get "$LAUNCH_DUP_PANE" >/dev/null 2>&1 || fail "teardown closed the launcher's own pane"
 lab pane get "$UNIQB_PANE" >/dev/null 2>&1 || fail "teardown closed an unrelated worker's pane in the other same-labeled workspace"
-[ "$(label_of_workspace "$WS_PRIMARY_DUP")" = firstmate ] || fail "teardown removed or renamed the launcher's workspace"
+[ "$(label_of_workspace "$WS_PRIMARY_DUP")" = nexus ] || fail "teardown removed or renamed the launcher's workspace"
 pass "real herdr E2E: teardown closes only the worker's own pane and leaves the launcher, its workspace, and the same-labeled sibling intact"
 
 if ! cleanup_all; then

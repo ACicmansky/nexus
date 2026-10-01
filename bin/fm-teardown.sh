@@ -67,7 +67,7 @@
 # teardown refuses rather than risk discarding unlanded work.
 # Uncommitted changes are never landed.
 # local-only projects additionally accept work merged into the local default
-# branch (firstmate performs that merge after configured approval) as a fallback
+# branch (nexus performs that merge after configured approval) as a fallback
 # for the common case where there is no remote at all.
 # Scout tasks (kind=scout in meta) carve out of that check: their worktree is
 # declared scratch and the report at data/<task-id>/report.md is the work
@@ -96,7 +96,7 @@
 # that path and hard-resets it before returning it, so releasing a slot that is
 # not genuinely this task's destroys another worker's live work. Before the first
 # cleanup step, teardown verifies record exclusivity: no OTHER task record in
-# this home or any locally registered Firstmate home may name the same live path
+# this home or any locally registered Nexus home may name the same live path
 # in its worktree= or home=. One live path with two task records is the reuse
 # collision itself, whichever record is stale. The one exception is a slot whose
 # owner claim (below) names another task: this teardown is then records-only and
@@ -135,11 +135,11 @@
 # state: the same worker remains the owner after changing directory, so cwd can
 # never veto teardown of that exact recorded endpoint.
 # The scan and destructive return hold a project-identity lock in the local root
-# Firstmate home's state directory, as resolved by bin/fm-wake-lib.sh's
-# fm_firstmate_root_home; a home seeded from another machine is its own local
+# Nexus home's state directory, as resolved by bin/fm-wake-lib.sh's
+# fm_nexus_root_home; a home seeded from another machine is its own local
 # root, since a lock on this filesystem cannot be held or observed across that
 # boundary. Fresh Treehouse spawns for that project in
-# every local Firstmate home hold the same lock from before slot allocation
+# every local Nexus home hold the same lock from before slot allocation
 # through metadata publication, closing the publication
 # gap; forced secondmate teardown takes it and runs the same checks for every
 # descendant Treehouse slot before touching any child.
@@ -1120,7 +1120,7 @@ else
 fi
 # The recorded backend, including every sibling its adapter sources, has to
 # be readable before the first destructive step. --force does not override
-# this. A forced descendant is proved in validate_firstmate_home_children_removal.
+# this. A forced descendant is proved in validate_nexus_home_children_removal.
 teardown_require_backend_prerequisites "$BACKEND" "$ID" || exit 1
 if [ "${FM_TEARDOWN_GUARD_DONE:-0}" != 1 ]; then
   "$FM_ROOT/bin/fm-guard.sh" || true
@@ -1377,7 +1377,7 @@ if [ "$BACKEND" = orca ] && [ "$KIND" != secondmate ]; then
   [ -z "$T_ORCA" ] || T=$T_ORCA
 fi
 
-# Where a harness's firstmate-owned global turn-end registry entry lives is
+# Where a harness's nexus-owned global turn-end registry entry lives is
 # owned by bin/fm-control-lib.sh, so teardown and the control plane's relaunch
 # retire the same artifact rather than each carrying its own copy of the path.
 remove_grok_turnend_auth() {
@@ -2310,12 +2310,12 @@ teardown_live_slot_path() {
   canonical_existing_dir "$WT"
 }
 
-collect_local_firstmate_states() {
+collect_local_nexus_states() {
   local record_state=$1 root home reg line child known existing i=0
   local -a homes
   TREEHOUSE_OWNER_STATES=("$record_state")
-  root=$(fm_firstmate_root_home "$FM_HOME") || {
-    echo "REFUSED: cannot resolve the root Firstmate home; nothing was changed" >&2
+  root=$(fm_nexus_root_home "$FM_HOME") || {
+    echo "REFUSED: cannot resolve the root Nexus home; nothing was changed" >&2
     return 1
   }
   homes=("$root")
@@ -2330,19 +2330,19 @@ collect_local_firstmate_states() {
     reg="$home/data/secondmates.md"
     [ ! -e "$reg" ] && [ ! -L "$reg" ] && continue
     [ -f "$reg" ] && [ ! -L "$reg" ] || {
-      echo "REFUSED: local Firstmate registry is unsafe at $reg; nothing was changed" >&2
+      echo "REFUSED: local Nexus registry is unsafe at $reg; nothing was changed" >&2
       return 1
     }
     while IFS= read -r line || [ -n "$line" ]; do
       case "$line" in
         "- "*)
           secondmate_registry_parse_line "$line" || {
-            echo "REFUSED: malformed local Firstmate registry entry in $reg; nothing was changed" >&2
+            echo "REFUSED: malformed local Nexus registry entry in $reg; nothing was changed" >&2
             return 1
           }
           [ "$SECONDMATE_REGISTRY_REMOTE" -eq 0 ] || continue
           child=$(canonical_existing_dir "$SECONDMATE_REGISTRY_HOME") || {
-            echo "REFUSED: registered local Firstmate home is unavailable: $SECONDMATE_REGISTRY_HOME; nothing was changed" >&2
+            echo "REFUSED: registered local Nexus home is unavailable: $SECONDMATE_REGISTRY_HOME; nothing was changed" >&2
             return 1
           }
           known=0
@@ -2366,7 +2366,7 @@ require_exclusive_worktree_slot_record() {
   # block the claimant's own teardown behind it.
   fm_treehouse_slot_owner_state "$slot" "$record_id"
   [ "$FM_TREEHOUSE_SLOT_OWNER" != other ] || return 0
-  collect_local_firstmate_states "$record_state" || return 1
+  collect_local_nexus_states "$record_state" || return 1
   for state_dir in "${TREEHOUSE_OWNER_STATES[@]}"; do
     for other in "$state_dir"/*.meta; do
       [ -f "$other" ] && [ ! -L "$other" ] || continue
@@ -2462,7 +2462,7 @@ teardown_owns_worktree() {
   [ "$TEARDOWN_SLOT_REASSIGNED" != 1 ]
 }
 
-firstmate_home_has_treehouse_slot() {
+nexus_home_has_treehouse_slot() {
   local home=$1
   worktree_registered_for_project "$FM_ROOT" "$home"
 }
@@ -2482,27 +2482,27 @@ validate_removal_target() {
     ''|/) echo "REFUSED: unsafe $label removal target $target" >&2; return 1 ;;
   esac
   if [ -n "$abs_home" ] && [ "$abs_target" = "$abs_home" ]; then
-    echo "REFUSED: unsafe $label removal target $target is the active firstmate home" >&2
+    echo "REFUSED: unsafe $label removal target $target is the active nexus home" >&2
     return 1
   fi
   if [ "$abs_target" = "$abs_root" ]; then
-    echo "REFUSED: unsafe $label removal target $target is the firstmate repo" >&2
+    echo "REFUSED: unsafe $label removal target $target is the nexus repo" >&2
     return 1
   fi
   if [ -n "$abs_home" ] && path_is_ancestor_of "$abs_target" "$abs_home"; then
-    echo "REFUSED: unsafe $label removal target $target is an ancestor of the active firstmate home" >&2
+    echo "REFUSED: unsafe $label removal target $target is an ancestor of the active nexus home" >&2
     return 1
   fi
   if path_is_ancestor_of "$abs_target" "$abs_root"; then
-    echo "REFUSED: unsafe $label removal target $target is an ancestor of the firstmate repo" >&2
+    echo "REFUSED: unsafe $label removal target $target is an ancestor of the nexus repo" >&2
     return 1
   fi
   if [ -n "$abs_home" ] && path_is_ancestor_of "$abs_home" "$abs_target"; then
-    echo "REFUSED: unsafe $label removal target $target is inside the active firstmate home" >&2
+    echo "REFUSED: unsafe $label removal target $target is inside the active nexus home" >&2
     return 1
   fi
   if path_is_ancestor_of "$abs_root" "$abs_target"; then
-    echo "REFUSED: unsafe $label removal target $target is inside the firstmate repo" >&2
+    echo "REFUSED: unsafe $label removal target $target is inside the nexus repo" >&2
     return 1
   fi
   printf '%s\n' "$abs_target"
@@ -2537,7 +2537,7 @@ registered_descendant_home_for_removal() {
   return 1
 }
 
-validate_firstmate_operational_dirs_for_removal() {
+validate_nexus_operational_dirs_for_removal() {
   local home=$1 label=$2 name dir abs_home abs_dir
   abs_home=$(removal_target_abs_path "$home")
   for name in data state config projects; do
@@ -2569,13 +2569,13 @@ validate_child_worktree_for_removal() {
   abs_target=$(validate_removal_target "$target" "child worktree") || return 1
   if abs_home=$(cd "$FM_HOME" 2>/dev/null && pwd -P); then
     if path_is_ancestor_of "$abs_home" "$abs_target"; then
-      echo "REFUSED: unsafe child worktree removal target $target is inside the active firstmate home" >&2
+      echo "REFUSED: unsafe child worktree removal target $target is inside the active nexus home" >&2
       return 1
     fi
   fi
   abs_root=$(cd "$FM_ROOT" && pwd -P)
   if path_is_ancestor_of "$abs_root" "$abs_target"; then
-    echo "REFUSED: unsafe child worktree removal target $target is inside the firstmate repo" >&2
+    echo "REFUSED: unsafe child worktree removal target $target is inside the nexus repo" >&2
     return 1
   fi
   if ! worktree_registered_for_project "$project" "$target"; then
@@ -2597,7 +2597,7 @@ safe_rm_rf_child_worktree() {
   rm -rf -- "$target"
 }
 
-validate_firstmate_home_for_removal() {
+validate_nexus_home_for_removal() {
   local home=$1 label=$2 expected_id=${3:-} abs_home_path marker_id conflict child_id child_home
   [ -n "$home" ] || return 0
   [ -e "$home" ] || return 0
@@ -2624,7 +2624,7 @@ validate_firstmate_home_for_removal() {
       fi
     fi
   fi
-  validate_firstmate_operational_dirs_for_removal "$abs_home_path" "$label" || return 1
+  validate_nexus_operational_dirs_for_removal "$abs_home_path" "$label" || return 1
   conflict=
   if conflict=$(registered_descendant_home_for_removal "$SECONDMATE_REG" "$abs_home_path"); then
     :
@@ -2650,29 +2650,29 @@ EOF
   printf '%s\n' "$abs_home_path"
 }
 
-remove_firstmate_home() {
+remove_nexus_home() {
   local home=$1 label=$2 expected_id=${3:-} abs_home_path process_event_backup
   [ -n "$home" ] || return 0
   [ -e "$home" ] || return 0
-  abs_home_path=$(validate_firstmate_home_for_removal "$home" "$label" "$expected_id") || return 1
+  abs_home_path=$(validate_nexus_home_for_removal "$home" "$label" "$expected_id") || return 1
   [ -n "$abs_home_path" ] || return 0
-  process_event_backup=$(snapshot_firstmate_home_process_events "$abs_home_path" "$label") || return 1
-  if ! cleanup_firstmate_home_process_events "$abs_home_path" "$label"; then
-    restore_firstmate_home_process_events "$abs_home_path" "$label" "$process_event_backup" || return $?
+  process_event_backup=$(snapshot_nexus_home_process_events "$abs_home_path" "$label") || return 1
+  if ! cleanup_nexus_home_process_events "$abs_home_path" "$label"; then
+    restore_nexus_home_process_events "$abs_home_path" "$label" "$process_event_backup" || return $?
     return 1
   fi
   # Read-only strip dirs sit at state/<id>.git-hooks, and a remote secondmate's
   # own one under state/parent-route/, so search the whole state tree.
   find "$abs_home_path/state" -type d -name '*.git-hooks' -exec chmod u+w {} + 2>/dev/null || true
-  if firstmate_home_has_treehouse_slot "$abs_home_path"; then
+  if nexus_home_has_treehouse_slot "$abs_home_path"; then
     command -v treehouse >/dev/null 2>&1 || {
       echo "error: treehouse command not found; cannot return $label $abs_home_path" >&2
-      restore_firstmate_home_process_events "$abs_home_path" "$label" "$process_event_backup" || return $?
+      restore_nexus_home_process_events "$abs_home_path" "$label" "$process_event_backup" || return $?
       return 1
     }
     teardown_treehouse_return "$abs_home_path" "$FM_ROOT" "$label" || {
       echo "error: treehouse return failed for $label $abs_home_path; lease may still be held" >&2
-      restore_firstmate_home_process_events "$abs_home_path" "$label" "$process_event_backup" || return $?
+      restore_nexus_home_process_events "$abs_home_path" "$label" "$process_event_backup" || return $?
       return 1
     }
     [ -z "$process_event_backup" ] || rm -rf -- "$process_event_backup"
@@ -2682,18 +2682,18 @@ remove_firstmate_home() {
     [ -z "$process_event_backup" ] || rm -rf -- "$process_event_backup"
     return 0
   fi
-  restore_firstmate_home_process_events "$abs_home_path" "$label" "$process_event_backup" || return $?
+  restore_nexus_home_process_events "$abs_home_path" "$label" "$process_event_backup" || return $?
   return 1
 }
 
-firstmate_home_has_process_events() {
+nexus_home_has_process_events() {
   local home=$1 path owner claim_root
   for path in "$home/state/procevent"/*.source "$home/state/procevent"/*.runner; do
     if [ -e "$path" ] || [ -L "$path" ]; then
       return 0
     fi
   done
-  claim_root=${FM_PROCEVENT_CLAIM_ROOT:-${XDG_STATE_HOME:-$HOME/.local/state}/firstmate/procevent-claims}
+  claim_root=${FM_PROCEVENT_CLAIM_ROOT:-${XDG_STATE_HOME:-$HOME/.local/state}/nexus/procevent-claims}
   for path in "$claim_root"/*.claim; do
     [ -f "$path" ] && [ ! -L "$path" ] || continue
     IFS= read -r owner < "$path" 2>/dev/null || continue
@@ -2702,9 +2702,9 @@ firstmate_home_has_process_events() {
   return 1
 }
 
-snapshot_firstmate_home_process_events() {
+snapshot_nexus_home_process_events() {
   local home=$1 label=$2 backup path
-  if ! firstmate_home_has_process_events "$home"; then
+  if ! nexus_home_has_process_events "$home"; then
     printf '\n'
     return 0
   fi
@@ -2723,7 +2723,7 @@ snapshot_firstmate_home_process_events() {
   printf '%s\n' "$backup"
 }
 
-restore_firstmate_home_process_events() {
+restore_nexus_home_process_events() {
   local home=$1 label=$2 backup=$3 reg source tmp runner
   [ -n "$backup" ] || return 0
   [ -d "$backup" ] && [ ! -L "$backup" ] || {
@@ -2766,9 +2766,9 @@ restore_firstmate_home_process_events() {
   rm -rf -- "$backup"
 }
 
-cleanup_firstmate_home_process_events() {
+cleanup_nexus_home_process_events() {
   local home=$1 label=$2 runner="$1/bin/fm-procevent.sh"
-  firstmate_home_has_process_events "$home" || return 0
+  nexus_home_has_process_events "$home" || return 0
   if [ ! -f "$runner" ] || [ -L "$runner" ] || [ ! -x "$runner" ]; then
     echo "REFUSED: $label $home has process-event state but no sweep-capable bin/fm-procevent.sh; restore the home script and rerun teardown" >&2
     return 1
@@ -2777,15 +2777,15 @@ cleanup_firstmate_home_process_events() {
     echo "REFUSED: process-event cleanup is incomplete for $label $home; preserving the home, lease, and retirement records for retry" >&2
     return 1
   fi
-  if firstmate_home_has_process_events "$home"; then
+  if nexus_home_has_process_events "$home"; then
     echo "REFUSED: process-event state remains for $label $home after its bounded sweep; preserving the home, lease, and retirement records for retry" >&2
     return 1
   fi
 }
 
-preflight_firstmate_home_process_events() {
+preflight_nexus_home_process_events() {
   local home=$1 label=$2 runner="$1/bin/fm-procevent.sh"
-  firstmate_home_has_process_events "$home" || return 0
+  nexus_home_has_process_events "$home" || return 0
   if [ ! -f "$runner" ] || [ -L "$runner" ] || [ ! -x "$runner" ]; then
     echo "REFUSED: $label $home has process-event state but no sweep-capable bin/fm-procevent.sh; restore the home script and rerun teardown" >&2
     return 1
@@ -2796,7 +2796,7 @@ preflight_firstmate_home_process_events() {
   fi
 }
 
-preflight_firstmate_home_process_event_tree() {
+preflight_nexus_home_process_event_tree() {
   local home=$1 label=$2 sub_state child_meta child_kind child_home child_wt child_id
   sub_state="$home/state"
   if [ -d "$sub_state" ]; then
@@ -2808,10 +2808,10 @@ preflight_firstmate_home_process_event_tree() {
       child_wt=$(meta_value "$child_meta" worktree)
       child_home=$(meta_value "$child_meta" home)
       [ -n "$child_home" ] || child_home=$child_wt
-      preflight_firstmate_home_process_event_tree "$child_home" "child firstmate home for $child_id" || return 1
+      preflight_nexus_home_process_event_tree "$child_home" "child nexus home for $child_id" || return 1
     done
   fi
-  preflight_firstmate_home_process_events "$home" "$label"
+  preflight_nexus_home_process_events "$home" "$label"
 }
 
 collect_descendant_task_locks() {
@@ -2992,7 +2992,7 @@ preflight_descendant_treehouse_slots() {
   done
 }
 
-validate_firstmate_home_children_removal() {
+validate_nexus_home_children_removal() {
   local home=$1 sub_state child_meta child_id child_wt child_proj child_kind child_home child_backend child_orca_worktree_id
   sub_state="$home/state"
   [ -d "$sub_state" ] || return 0
@@ -3009,8 +3009,8 @@ validate_firstmate_home_children_removal() {
     if [ "$child_kind" = secondmate ]; then
       child_home=$(meta_value "$child_meta" home)
       [ -n "$child_home" ] || child_home=$child_wt
-      validate_firstmate_home_for_removal "$child_home" "child firstmate home" "$child_id" >/dev/null || return 1
-      validate_firstmate_home_children_removal "$child_home" || return 1
+      validate_nexus_home_for_removal "$child_home" "child nexus home" "$child_id" >/dev/null || return 1
+      validate_nexus_home_children_removal "$child_home" || return 1
     elif [ "$child_backend" = orca ]; then
       child_orca_worktree_id=$(require_orca_worktree_id "$child_meta") || return 1
       if [ -n "$child_wt" ] && [ -e "$child_wt" ]; then
@@ -3133,7 +3133,7 @@ $session	$lock_path"
   return 1
 }
 
-preflight_firstmate_home_herdr_children() {  # <home>
+preflight_nexus_home_herdr_children() {  # <home>
   local home=$1 sub_state child_meta child_id child_backend child_target child_kind child_home child_wt
   sub_state="$home/state"
   [ -d "$sub_state" ] || return 0
@@ -3152,7 +3152,7 @@ preflight_firstmate_home_herdr_children() {  # <home>
       child_wt=$(meta_value "$child_meta" worktree)
       child_home=$(meta_value "$child_meta" home)
       [ -n "$child_home" ] || child_home=$child_wt
-      preflight_firstmate_home_herdr_children "$child_home" || return 1
+      preflight_nexus_home_herdr_children "$child_home" || return 1
     fi
   done
 }
@@ -3201,7 +3201,7 @@ endpoint_close_refusal() {  # <subject> <backend> <target> <honors-force>
   return 1
 }
 
-cleanup_firstmate_home_children() {
+cleanup_nexus_home_children() {
   local home=$1 sub_state child_meta child_id child_t child_wt child_proj child_kind child_home child_backend child_orca_worktree_id child_return_rc child_busy_gen child_owner_rc
   sub_state="$home/state"
   [ -d "$sub_state" ] || return 0
@@ -3250,8 +3250,8 @@ cleanup_firstmate_home_children() {
       child_home=$(meta_value "$child_meta" home)
       [ -n "$child_home" ] || child_home=$child_wt
       if [ -n "$child_home" ] && [ -d "$child_home" ]; then
-        cleanup_firstmate_home_children "$child_home" || return $?
-        remove_firstmate_home "$child_home" "child firstmate home" "$child_id" || return $?
+        cleanup_nexus_home_children "$child_home" || return $?
+        remove_nexus_home "$child_home" "child nexus home" "$child_id" || return $?
       fi
     elif [ "$child_backend" = orca ]; then
       if [ -n "$child_wt" ] && [ -d "$child_wt" ]; then
@@ -3346,16 +3346,16 @@ if [ "$KIND" = secondmate ]; then
   handoff_wake_retire_stage_recover "$HOME_PATH" || exit 1
   handoff_wake_retire_validate || exit 1
   pending_replies_recovery_validate initial || exit 1
-  validate_firstmate_home_for_removal "$HOME_PATH" "secondmate home" "$ID" >/dev/null || exit 1
+  validate_nexus_home_for_removal "$HOME_PATH" "secondmate home" "$ID" >/dev/null || exit 1
   if [ "$FORCE" = "--force" ]; then
-    validate_firstmate_home_children_removal "$HOME_PATH" || exit 1
+    validate_nexus_home_children_removal "$HOME_PATH" || exit 1
     preflight_descendant_task_locks "$HOME_PATH" || exit 1
-    validate_firstmate_home_children_removal "$HOME_PATH" || exit 1
+    validate_nexus_home_children_removal "$HOME_PATH" || exit 1
     preflight_descendant_treehouse_slots || exit 1
     if [ "$BACKEND" = herdr ]; then
       teardown_herdr_preflight_target "$T" "$ID" || exit 1
     fi
-    preflight_firstmate_home_herdr_children "$HOME_PATH" || exit 1
+    preflight_nexus_home_herdr_children "$HOME_PATH" || exit 1
   fi
 fi
 
@@ -3373,11 +3373,11 @@ if [ "$KIND" = secondmate ] && [ "$FORCE" != "--force" ]; then
 fi
 
 if [ "$KIND" = secondmate ]; then
-  preflight_firstmate_home_process_event_tree "$HOME_PATH" "secondmate home" || exit 1
+  preflight_nexus_home_process_event_tree "$HOME_PATH" "secondmate home" || exit 1
 fi
 
 if [ "$KIND" = secondmate ] && [ "$FORCE" = "--force" ]; then
-  cleanup_firstmate_home_children "$HOME_PATH" || exit $?
+  cleanup_nexus_home_children "$HOME_PATH" || exit $?
 fi
 
 if [ "$KIND" = scout ] && [ "$FORCE" != "--force" ]; then
@@ -3399,7 +3399,7 @@ fi
 # thread, and this cleanup removes the task records that make the promise
 # reconcilable. Refuse while this home still owes a public reply for exactly this
 # work. Both gates live in bin/fm-public-followup-lib.sh, so a home that never
-# opted into the myfirstmate relay runs one [ -f ] test and nothing else here.
+# opted into the mynexus relay runs one [ -f ] test and nothing else here.
 if [ "$FORCE" != "--force" ] && [ "$PUBLIC_FOLLOWUP_PARENT_UNRESOLVED" = 1 ]; then
   echo "REFUSED: cannot resolve the primary home for marked secondmate $SECOND_MATE_ID; refusing cleanup without its durable parent binding." >&2
   exit 1
@@ -3410,7 +3410,7 @@ if [ "$FORCE" != "--force" ] \
   && fm_pf_has_registrations "$PUBLIC_FOLLOWUP_STATE"; then
   if ! PUBLIC_FOLLOWUP_BLOCKING=$(FM_HOME="$PUBLIC_FOLLOWUP_HOME" FM_STATE_OVERRIDE="$PUBLIC_FOLLOWUP_STATE" \
       "$SCRIPT_DIR/fm-public-followup.sh" guard-work "$PUBLIC_FOLLOWUP_WORK_HOME" "$ID" 2>/dev/null); then
-    echo "REFUSED: task $ID still owes a public reply through the myfirstmate relay." >&2
+    echo "REFUSED: task $ID still owes a public reply through the mynexus relay." >&2
     printf '%s\n' "$PUBLIC_FOLLOWUP_BLOCKING" >&2
     echo "Deliver it with bin/fm-public-followup.sh deliver <obligation-id>, waive it with bin/fm-tasks-axi.sh public-followup waive, or use --force after explicit discard approval." >&2
     exit 1
@@ -3556,7 +3556,7 @@ fi
 # --force, and before ANY destructive step below - a still-parked run or a
 # leaked process can own live work in this exact worktree. Not for
 # kind=secondmate: a secondmate home's own runtime lifecycle is owned by the
-# dedicated process-event and firstmate-home removal machinery further below,
+# dedicated process-event and nexus-home removal machinery further below,
 # not by task-worktree cleanup.
 if [ "$KIND" != secondmate ] && teardown_owns_worktree; then
   conclude_task_no_mistakes_run "$WT"
@@ -3726,7 +3726,7 @@ if [ "$KIND" = secondmate ]; then
     || { echo "error: receiver wake cleanup could not be staged; preserving the secondmate home and route" >&2; exit 1; }
   pending_replies_recovery_validate recheck \
     || { echo "error: local pending-reply recovery paths changed; preserving the secondmate home and route" >&2; exit 1; }
-  if remove_firstmate_home "$HOME_PATH" "secondmate home" "$ID"; then
+  if remove_nexus_home "$HOME_PATH" "secondmate home" "$ID"; then
     :
   else
     rc=$?
@@ -3748,7 +3748,7 @@ fm_backend_clear_transition "$BACKEND" "$STATE" "$T" || true
 # Remove the per-task temp root (/tmp/fm-<id>/, incl. its gotmp/) recorded by spawn.
 # Read before the state-file rm below; empty (pre-fix tasks without tasktmp=) is a no-op.
 [ -n "$TASK_TMP" ] && rm -rf "$TASK_TMP"
-# Retire only this Firstmate home's launch namespace. Its never-reused per-spawn
+# Retire only this Nexus home's launch namespace. Its never-reused per-spawn
 # files leave the equal task-id namespace of every other home untouched.
 teardown_launch_home_token() {
   local home=$1 root hash
@@ -3825,7 +3825,7 @@ if [ "$BACKLOG_CLOSED" = 1 ]; then
   fi
 elif [ "$KIND" = secondmate ] && [ ! -e "$STATE" ] && [ ! -L "$STATE" ]; then
   # A nested remote retirement can keep its route record inside the home being
-  # removed. remove_firstmate_home above already performed that physical
+  # removed. remove_nexus_home above already performed that physical
   # deletion; do not turn its confirmed absence into a false cleanup failure.
   :
 else

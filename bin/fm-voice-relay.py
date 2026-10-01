@@ -3,13 +3,13 @@
 
 The captain talks into their laptop. The laptop captures audio and streams it
 over the SSH connection it already has to this desktop. This relay holds the
-Bedrock bidirectional session, answers the model's tool calls from firstmate's
+Bedrock bidirectional session, answers the model's tool calls from nexus's
 records, and streams the spoken reply back down the same connection. AWS
 credentials therefore stay on this desktop and never go near the laptop, which
 is the whole reason for the shape.
 
-The voice agent this relay runs is NOT firstmate. It stands in front of
-firstmate: it answers questions about the fleet from the records, and when the
+The voice agent this relay runs is NOT nexus. It stands in front of
+nexus: it answers questions about the fleet from the records, and when the
 captain asks for real work it says out loud that it is handing the request over
 and then queues it. It never claims to have done the work.
 
@@ -70,7 +70,7 @@ Options:
   --model <id>          Nova Sonic model id.         default from config
   --profile <name>      AWS profile.                 default from config
   --voice <id>          output voice.                default matthew
-  --home <dir>          firstmate home for records.  default $FM_HOME or this repo
+  --home <dir>          nexus home for records.  default $FM_HOME or this repo
   --scope <name>        override the read scope for this run.
   --tail-ms <int>       silence appended on talk end. default 400
   --turn-timeout <sec>  how long --self-test waits.   default 40
@@ -137,7 +137,7 @@ SYSTEM_PROMPT = (
     "When the captain asks for actual work, anything that would change code, "
     "open a pull request, investigate a bug, or start a job, you do not do it "
     "and you do not pretend to. Say out loud that you are handing it to the "
-    "Nexus, then call hand_over_to_firstmate with the captain's request in "
+    "Nexus, then call hand_over_to_nexus with the captain's request in "
     "their own words. Then confirm it is queued. Never say you have done, "
     "started, fixed or built anything yourself.\n"
     "\n"
@@ -155,7 +155,7 @@ TOOLS = {"tools": [
             {"type": "object", "properties": {}, "required": []})},
     }},
     {"toolSpec": {
-        "name": "hand_over_to_firstmate",
+        "name": "hand_over_to_nexus",
         "description": (
             "Hand a request for real work to Nexus, which will pick it "
             "up at its next check. Use this for anything you cannot answer from "
@@ -507,8 +507,8 @@ class Session:
         # that went away on its own.
         self.closing = False
         # Which tools ran, in order. The handover boundary is the whole point of
-        # this relay, so "it called hand_over_to_firstmate and did not answer
-        # for firstmate" has to be evidence in the run record, not an inference
+        # this relay, so "it called hand_over_to_nexus and did not answer
+        # for nexus" has to be evidence in the run record, not an inference
         # from a count.
         self.tool_names = []
         self.ended = asyncio.Event()
@@ -841,7 +841,7 @@ class Session:
                 # would otherwise stop the relay reading the captain's audio.
                 result = await asyncio.to_thread(
                     records.fleet_status, self.home, self.scope)
-            elif name == "hand_over_to_firstmate":
+            elif name == "hand_over_to_nexus":
                 request = (arguments.get("request") or "").strip()
                 result = await asyncio.to_thread(
                     records.queue_request, request, self.home, self.root)

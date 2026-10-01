@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# fm-send from-firstmate marker for secondmate targets.
+# fm-send from-nexus marker for secondmate targets.
 #
-# A secondmate is itself a firstmate, so a request relayed to it lands in its own
-# chat - which the main firstmate never reads (the only channel back is the terse
-# status file). fm-send therefore prepends a from-firstmate marker
+# A secondmate is itself a nexus, so a request relayed to it lands in its own
+# chat - which the main nexus never reads (the only channel back is the terse
+# status file). fm-send therefore prepends a from-nexus marker
 # (bin/fm-marker-lib.sh) when, and only when, the resolved target is a task
 # selector whose meta records kind=secondmate, so the secondmate can recognize
 # the request and route its reply via the status path. The marker now travels
@@ -125,7 +125,7 @@ test_secondmate_target_is_marked() {
   corr=$(fm_pending_reply_extract_corr "$got")
   [ -f "$(fm_pending_reply_path "$home/state" "$corr")" ] \
     || fail "marked secondmate send should create a parent pending-reply record"
-  pass "fm-send: a kind=secondmate target gets the from-firstmate marker and corr prepended"
+  pass "fm-send: a kind=secondmate target gets the from-nexus marker and corr prepended"
 }
 
 test_exact_secondmate_task_id_is_marked() {
@@ -218,31 +218,31 @@ test_key_path_is_not_marked() {
 test_marker_is_label_plus_invisible_separator() {
   local separator hex
   separator=$(printf '\342\201\243')
-  [ "$FM_FROMFIRST_MARK" = "[fm-from-firstmate]$separator" ] \
+  [ "$FM_FROMFIRST_MARK" = "[fm-from-nexus]$separator" ] \
     || fail "marker is not the expected label + U+2063 sequence"$'\n'"--- bytes ---"$'\n'"$(printf '%s' "$FM_FROMFIRST_MARK" | od -An -tx1)"
   hex=$(printf '%s' "$FM_FROMFIRST_MARK" | od -An -tx1 | tr -d ' \n')
   case "$hex" in
     *e281a3) : ;;
     *) fail "marker does not end in UTF-8 U+2063 bytes e2 81 a3; bytes were: $hex" ;;
   esac
-  fm_message_from_firstmate "${FM_FROMFIRST_MARK}do the work" \
+  fm_message_from_nexus "${FM_FROMFIRST_MARK}do the work" \
     || fail "detector should recognize a marked message"
-  fm_message_from_firstmate "do the work" \
+  fm_message_from_nexus "do the work" \
     && fail "direct captain input must remain unmarked"
-  fm_message_from_firstmate "[fm-from-firstmate]do the work" \
+  fm_message_from_nexus "[fm-from-nexus]do the work" \
     && fail "detector must reject the label without U+2063"
-  pass "fm-send: the marker is '[fm-from-firstmate]' + terminal-safe U+2063, while direct captain text stays unmarked"
+  pass "fm-send: the marker is '[fm-from-nexus]' + terminal-safe U+2063, while direct captain text stays unmarked"
 }
 
 test_marker_transformation_is_idempotent() {
   local once twice
-  fm_message_mark_from_firstmate "do the work" once
-  fm_message_mark_from_firstmate "$once" twice
+  fm_message_mark_from_nexus "do the work" once
+  fm_message_mark_from_nexus "$once" twice
   [ "$once" = "$twice" ] \
     || fail "already-marked content was double-prefixed"$'\n'"--- once ---"$'\n'"$(printf '%s' "$once" | od -An -tx1)"$'\n'"--- twice ---"$'\n'"$(printf '%s' "$twice" | od -An -tx1)"
   [ "$once" = "${FM_FROMFIRST_MARK}do the work" ] \
     || fail "marker transformation did not prefix bare content exactly once"
-  pass "fm-marker: from-firstmate transformation is idempotent"
+  pass "fm-marker: from-nexus transformation is idempotent"
 }
 
 test_marked_send_preserves_trailing_newlines() {

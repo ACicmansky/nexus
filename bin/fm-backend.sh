@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # fm-backend.sh - runtime-backend selection, meta helpers, selector resolution,
-# and dispatch for firstmate's session-provider abstraction.
+# and dispatch for nexus's session-provider abstraction.
 #
 # Design: data/fm-backend-design-d7/report.md ("Backend Interface") and
 # data/fm-backend-design-d7/herdr-addendum.md ("Events as the core
@@ -10,7 +10,7 @@
 # (tmux) path stays byte-identical. P2 adds bin/backends/herdr.sh, a verified
 # spawn-capable backend with its own required CI lane, behind `--backend
 # herdr`/`FM_BACKEND=herdr`/`config/backend`, and behind runtime auto-detection
-# when firstmate itself is running inside herdr with no explicit backend setting;
+# when nexus itself is running inside herdr with no explicit backend setting;
 # see herdr-addendum.md and data/fm-backend-design-d7/herdr-verification-p2.md for
 # its empirical basis.
 # P3 adds bin/backends/zellij.sh, also EXPERIMENTAL and spawn-capable, behind
@@ -21,7 +21,7 @@
 # for its empirical basis. P4 makes Orca spawn-capable: Orca owns both the
 # task worktree and the terminal endpoint. P5 adds bin/backends/cmux.sh, also
 # EXPERIMENTAL and spawn-capable, behind `--backend cmux`/`FM_BACKEND=cmux`/
-# `config/backend`, and behind runtime auto-detection when firstmate itself is
+# `config/backend`, and behind runtime auto-detection when nexus itself is
 # running inside a cmux-spawned terminal (primary CMUX_WORKSPACE_ID marker, or
 # the documented macOS fallback signals when cmux's claude wrapper strips that
 # marker) with no explicit backend setting - unlike Orca, which stays
@@ -39,7 +39,7 @@
 #
 # Event-source framing (herdr-addendum "Events as the core abstraction"): a
 # backend's supervision surface is conceptually an EVENT SOURCE - it produces
-# task events (status-changed, went-stale, exited) that map onto firstmate's
+# task events (status-changed, went-stale, exited) that map onto nexus's
 # existing signal/stale/check/heartbeat wake vocabulary. The tmux adapter has
 # no native event push, so fm-watch.sh's poll loop over the pull primitives
 # below (capture, list-live, busy-state via regex) IS the default event-source
@@ -88,7 +88,7 @@ fm_backend_is_known() {  # <name>
   fm_backend_list_contains "$FM_BACKEND_KNOWN" "$1"
 }
 
-# fm_backend_detect: detect the runtime firstmate itself is CURRENTLY executing
+# fm_backend_detect: detect the runtime nexus itself is CURRENTLY executing
 # inside, from verified environment markers (mirrors bin/fm-harness.sh's
 # env-marker detection layer for harnesses). Prints the detected backend name
 # and returns 0, or returns 1 when nothing is detected. Nesting resolves
@@ -118,7 +118,7 @@ fm_backend_is_known() {  # <name>
 # cmux FALLBACK signals (docs/cmux-backend.md "Runtime auto-detection" owns
 # the empirical record): cmux's bundled `claude` PATH shim routes through
 # cmux-claude-wrapper, whose passthrough path unsets every CMUX_* variable
-# before exec'ing the real binary - so a claude-harness firstmate launched in
+# before exec'ing the real binary - so a claude-harness nexus launched in
 # a cmux tab can have NO CMUX_WORKSPACE_ID at all. When that primary marker is
 # absent (and only then), two macOS-only fallback signals are consulted:
 #   1. __CFBundleIdentifier == com.cmuxterm.app - LaunchServices' app-identity
@@ -291,8 +291,8 @@ fm_backend_validate_spawn() {  # <name>
   return 1
 }
 
-# fm_backend_required_tools: the backend-SPECIFIC CLI tools a firstmate home on
-# <backend> genuinely requires, beyond firstmate's universal toolchain (owned by
+# fm_backend_required_tools: the backend-SPECIFIC CLI tools a nexus home on
+# <backend> genuinely requires, beyond nexus's universal toolchain (owned by
 # docs/configuration.md "Toolchain" and bootstrap's COMMON list). This is the
 # single owner of the per-backend dependency delta, so bootstrap follows the
 # RESOLVED backend instead of demanding an inactive backend's tools. Each set is:
@@ -387,7 +387,7 @@ fm_backend_endpoint_atom_valid() {  # <value>
 
 # An Orca worktree id is the composite `<orca id>::<absolute worktree path>`
 # that Orca itself returns, so the `:` and `/` characters every real value
-# carries make the simple-atom check reject it. Firstmate hands the id back to
+# carries make the simple-atom check reject it. Nexus hands the id back to
 # Orca opaquely and resolves it through Orca before removing anything, so this
 # proves only the shape that can name one worktree: both halves of the first
 # `::` split present, and the path half absolute.
@@ -694,7 +694,7 @@ fm_backend_source() {  # <name>
 # fm_backend_resolve_selector: resolve a raw fm-send.sh/fm-peek.sh style
 # selector to a live session-provider target. Four forms, in order:
 #   target with ":"   used as-is (the escape hatch for a window/pane outside
-#                      this firstmate home) - backend-independent, a literal string.
+#                      this nexus home) - backend-independent, a literal string.
 #   exact task id      routed through <state-dir>/<id>.meta's backend target
 #                      (`window=` normally, `terminal=` for Orca) -
 #                      backend-independent, a stored value, NOT re-verified
@@ -724,7 +724,7 @@ fm_backend_resolve_selector() {  # <raw-target> <state-dir>
   fi
   case "$raw" in
     fm-*)
-      echo "error: no metadata for $raw in $state; pass session:window to target a window outside this firstmate home" >&2
+      echo "error: no metadata for $raw in $state; pass session:window to target a window outside this nexus home" >&2
       return 1
       ;;
     *)
@@ -944,7 +944,7 @@ fm_backend_target_exists() {  # <backend> <target> [expected-label]
       # already bound on the machine - it silently queries whatever server IS
       # running instead. fm_backend_herdr_cli appends the required --session
       # flag on top, so this check is correctly scoped even when the caller's
-      # own ambient session (e.g. the primary firstmate's default session) is
+      # own ambient session (e.g. the primary nexus's default session) is
       # a DIFFERENT one than the target's.
       fm_backend_herdr_cli "$session" pane get "$pane" >/dev/null 2>&1
       ;;

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# fm-lint-workflows.sh - owner of firstmate's GitHub workflow lint.
+# fm-lint-workflows.sh - owner of nexus's GitHub workflow lint.
 #
 # Runs pinned actionlint on every .github/workflows/*.{yml,yaml} so a malformed
 # workflow, including a self-broken ci.yml, fails in the local and no-mistakes

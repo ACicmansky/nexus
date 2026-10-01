@@ -26,8 +26,8 @@
 # With <parent-commit>, sync follows the PARENT PRIMARY's default-branch commit,
 # which the parent resolves on its own checkout and passes in, so a remote home
 # tracks the primary exactly like a local one instead of stopping at whatever
-# this host's Firstmate copy happens to hold. Omitting <parent-commit> targets
-# this host's own code-root HEAD instead, which is what /updatefirstmate wants
+# this host's Nexus copy happens to hold. Omitting <parent-commit> targets
+# this host's own code-root HEAD instead, which is what /updatenexus wants
 # after it has refreshed that
 # code root from origin. Because this home is a standalone clone, the target
 # commit is imported here first and the fast-forward itself is the shared one in
@@ -82,7 +82,7 @@ validate_home() { # <id> [allow-absent]
     || die "remote home is not a seeded secondmate home"
   marker=$(cat "$TARGET_HOME/.fm-secondmate-home")
   [ "$marker" = "$id" ] || die "remote home belongs to $marker, not $id"
-  [ -f "$TARGET_HOME/AGENTS.md" ] && [ -d "$TARGET_HOME/bin" ] || die "remote home is not a Firstmate checkout"
+  [ -f "$TARGET_HOME/AGENTS.md" ] && [ -d "$TARGET_HOME/bin" ] || die "remote home is not a Nexus checkout"
 }
 
 meta_path() { printf '%s/%s.meta\n' "$CONTROL_STATE" "$1"; }
@@ -198,7 +198,7 @@ cmd_launch() {
   # The parent owns both convergence legs before it asks for this launch: it
   # already fast-forwarded this home to ITS primary commit and pushed inherited
   # local material, so this spawn must not redo either against this host's own
-  # Firstmate copy, which would target the wrong checkout.
+  # Nexus copy, which would target the wrong checkout.
   ARGS=("$id" "$TARGET_HOME" --secondmate --harness "$harness" --backend "$selected_backend")
   [ "$model" = - ] || ARGS+=(--model "$model")
   [ "$effort" = - ] || ARGS+=(--effort "$effort")
@@ -253,7 +253,7 @@ cmd_relaunch() {
   # The same launch-boundary facts cmd_launch establishes: the endpoint lives in
   # the dedicated fm-remote session, and the parent already owns both convergence
   # legs, so the host-local spawn must not re-sync or re-inherit against this
-  # host's own Firstmate copy.
+  # host's own Nexus copy.
   HERDR_SESSION="$REMOTE_HERDR_SESSION" FM_HOME="$FM_ROOT" FM_ROOT_OVERRIDE="$FM_ROOT" \
     FM_STATE_OVERRIDE="$CONTROL_STATE" FM_DATA_OVERRIDE="$CONTROL_DATA" \
     FM_CONFIG_OVERRIDE="$TARGET_HOME/config" FM_SKIP_SECONDMATE_INHERIT=1 \
@@ -341,7 +341,7 @@ cmd_observe() {
 }
 
 # Make <commit> readable in this home's own object store without moving any other
-# checkout. Ordered by cost: already present, then this host's Firstmate copy (a
+# checkout. Ordered by cost: already present, then this host's Nexus copy (a
 # read-only fetch of that one commit, which never advances that copy's HEAD), then
 # the home's own origin for that one commit. No pack transport beyond those two.
 import_home_commit() { # <home> <commit>
@@ -371,7 +371,7 @@ cmd_sync() {
     commit=$(git -C "$FM_ROOT" rev-parse HEAD 2>/dev/null) || die "remote code root HEAD is unreadable"
   fi
   import_home_commit "$TARGET_HOME" "$commit" \
-    || die "remote home could not import $commit from this host's Firstmate copy or the home's origin; run /updatefirstmate to refresh this host's copy, or push that commit first"
+    || die "remote home could not import $commit from this host's Nexus copy or the home's origin; run /updatenexus to refresh this host's copy, or push that commit first"
   # ff_target publishes its verdict in FF_STATUS, so it must run in THIS shell.
   report=$(mktemp "${TMPDIR:-/tmp}/fm-remote-sync.XXXXXX") || die "cannot stage the sync report"
   ff_target "$TARGET_HOME" "remote home" "$commit" yes yes "$id" "$TARGET_HOME/state" > "$report" 2>&1
@@ -398,9 +398,9 @@ cmd_update() {
     [ -z "$update_out" ] || printf '%s\n' "$update_out" >&2
     die "remote code root update failed"
   fi
-  root_status=$(printf '%s\n' "$update_out" | grep '^firstmate:' | tail -1)
+  root_status=$(printf '%s\n' "$update_out" | grep '^nexus:' | tail -1)
   case "$root_status" in
-    'firstmate: updated '*|'firstmate: already current'*) ;;
+    'nexus: updated '*|'nexus: already current'*) ;;
     *)
       [ -z "$update_out" ] || printf '%s\n' "$update_out" >&2
       die "remote code root did not complete a safe origin update"

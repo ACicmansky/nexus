@@ -128,11 +128,11 @@ if (!notification.includes("started Pi extension arm child")) {
 for (let i = 0; i < 250 && !prompt; i += 1) {
   await new Promise((resolve) => setTimeout(resolve, 20));
 }
-if (!prompt.startsWith("\u2063FIRSTMATE_OP: v1 watcher: ")) {
+if (!prompt.startsWith("\u2063NEXUS_OP: v1 watcher: ")) {
   console.error(`untyped operational follow-up: ${prompt}`);
   process.exit(1);
 }
-if (!prompt.includes("FIRSTMATE WATCHER WAKE")) {
+if (!prompt.includes("NEXUS WATCHER WAKE")) {
   console.error(`missing follow-up prompt: ${prompt}`);
   process.exit(1);
 }
@@ -181,7 +181,7 @@ writeFileSync(`${process.env.FM_HOME}/state/.lock`, `${process.pid}\n`);
 const mod = await import(pathToFileURL(process.env.PLUGIN).href);
 mod.default(pi);
 if (!tool) throw new Error("Pi watch tool was not registered");
-if (tool.label !== "Arm firstmate watcher") throw new Error(`unexpected label: ${tool.label}`);
+if (tool.label !== "Arm nexus watcher") throw new Error(`unexpected label: ${tool.label}`);
 if (tool.parameters?.type !== "object") throw new Error("tool parameters are not a TypeBox object schema");
 const metadata = [tool.description, tool.promptSnippet, ...(tool.promptGuidelines ?? [])].join("\n");
 if (metadata.includes("Always use this tool")) throw new Error(`broad tool-selection metadata remained visible: ${metadata}`);
@@ -605,7 +605,7 @@ if (!accepted.rows.some((row) => row.startsWith("confirmed generation=fixture-ge
 }
 const declined = await runScenario(false);
 if (declined.offers.length !== 0) throw new Error("no-acceptor scenario recorded an offer");
-if (!declined.mainPrompt.includes("FIRSTMATE WATCHER WAKE")) {
+if (!declined.mainPrompt.includes("NEXUS WATCHER WAKE")) {
   throw new Error(`unaccepted offer did not fall back to main: ${declined.mainPrompt}`);
 }
 if (!declined.mainPrompt.includes("signal: branch-offer synthetic wake")) {
@@ -876,7 +876,7 @@ for (let i = 0; i < 250 && !prompt; i += 1) {
 if (offers.length !== 1 || offers[0].eligible !== false) {
   throw new Error(`a main-only check was offered to the branch: ${JSON.stringify(offers)}`);
 }
-if (!prompt.includes(`FIRSTMATE WATCHER WAKE: ${process.env.FM_TEST_REASON}`)) {
+if (!prompt.includes(`NEXUS WATCHER WAKE: ${process.env.FM_TEST_REASON}`)) {
   throw new Error(`a main-only check did not reach main: ${prompt}`);
 }
 writeFileSync(process.env.FM_STOP_FILE, "stop\n");
@@ -971,7 +971,7 @@ for (let i = 0; i < 250 && !prompt; i += 1) {
 if (offers.length !== 1 || offers[0].eligible !== false) {
   throw new Error(`a captain-held signal trigger was offered to the branch: ${JSON.stringify(offers)}`);
 }
-if (!prompt.includes("FIRSTMATE WATCHER WAKE: signal: task-a.status")) {
+if (!prompt.includes("NEXUS WATCHER WAKE: signal: task-a.status")) {
   throw new Error(`a captain-held signal trigger did not reach main: ${prompt}`);
 }
 writeFileSync(process.env.FM_STOP_FILE, "stop\n");
@@ -1064,7 +1064,7 @@ for (let i = 0; i < 250 && !prompt; i += 1) {
 if (offers.length !== 1 || offers[0].eligible !== false) {
   throw new Error(`a later stale alias bypassed its unread decision: ${JSON.stringify(offers)}`);
 }
-if (!prompt.includes("FIRSTMATE WATCHER WAKE: stale: fm-a")) {
+if (!prompt.includes("NEXUS WATCHER WAKE: stale: fm-a")) {
   throw new Error(`a later stale alias with an unread decision did not wake main: ${prompt}`);
 }
 writeFileSync(process.env.FM_STOP_FILE, "stop\n");
@@ -1162,7 +1162,7 @@ for (let i = 0; i < 250 && !prompt; i += 1) {
 if (offers.length !== 1 || offers[0].eligible !== false) {
   throw new Error(`a distinct-file mixed batch was split, offering the routine file to the branch: ${JSON.stringify(offers)}`);
 }
-if (!prompt.includes("FIRSTMATE WATCHER WAKE: signal: task-a.status task-b.status")) {
+if (!prompt.includes("NEXUS WATCHER WAKE: signal: task-a.status task-b.status")) {
   throw new Error(`the distinct-file mixed batch did not reach main as one whole close: ${prompt}`);
 }
 writeFileSync(process.env.FM_STOP_FILE, "stop\n");
@@ -1328,7 +1328,7 @@ for (let i = 0; i < 500 && !prompt; i += 1) {
 if (offers.length !== 0) {
   throw new Error(`heartbeat restoration failure was offered to the branch: ${JSON.stringify(offers)}`);
 }
-if (!prompt.includes("FIRSTMATE WATCHER WAKE: heartbeat\n\nwatcher: FAILED")) {
+if (!prompt.includes("NEXUS WATCHER WAKE: heartbeat\n\nwatcher: FAILED")) {
   throw new Error(`main wake lost the bare heartbeat reason: ${prompt}`);
 }
 if (!prompt.includes("watcher: FAILED - Pi extension could not restore watcher continuity after 2 retries")) {
@@ -1504,7 +1504,7 @@ if (process.env.FM_TEST_EXPECT === "branch") {
   if (offers.length !== 1 || offers[0].eligible !== false) {
     throw new Error(`a broken-queue wake was offered to the branch under the record: ${JSON.stringify(offers)}`);
   }
-  if (!prompt.includes(`FIRSTMATE WATCHER WAKE: ${process.env.FM_TEST_REASON}`)) {
+  if (!prompt.includes(`NEXUS WATCHER WAKE: ${process.env.FM_TEST_REASON}`)) {
     throw new Error(`a wake the branch cannot take did not fall back to main: ${prompt}`);
   }
 }
@@ -1637,11 +1637,11 @@ await tool.execute("tool-call-handling-fail", {}, undefined, undefined, {});
 for (let i = 0; i < 250 && !prompt.includes("handling delivery confirmation was rejected"); i += 1) {
   await new Promise((resolve) => setTimeout(resolve, 20));
 }
-if (!prompt.includes("FIRSTMATE WATCHER WAKE")) throw new Error(`missing follow-up: ${prompt}`);
+if (!prompt.includes("NEXUS WATCHER WAKE")) throw new Error(`missing follow-up: ${prompt}`);
 if (!prompt.includes("handling delivery confirmation was rejected")) {
   throw new Error(`failed handshake was swallowed: ${prompt}`);
 }
-if ((prompt.match(/FIRSTMATE WATCHER WAKE/g) || []).length !== 1) {
+if ((prompt.match(/NEXUS WATCHER WAKE/g) || []).length !== 1) {
   throw new Error(`failed handshake was not a single typed message: ${prompt}`);
 }
 const rows = existsSync(process.env.FM_ARM_LOG)
@@ -2110,7 +2110,7 @@ const assertMissingLock = (result, label) => {
   if (!result.details.message.includes("bin/fm-session-start.sh") || !result.details.message.includes("re-arm")) {
     throw new Error(`${label} missing reclaim and re-arm guidance: ${result.details.message}`);
   }
-  if (result.details.message.includes("held by another firstmate session")) {
+  if (result.details.message.includes("held by another nexus session")) {
     throw new Error(`${label} was misreported as a live other holder: ${result.details.message}`);
   }
 };
@@ -2125,7 +2125,7 @@ try {
   writeFileSync(lock, `${other.pid}\n`);
   const liveOther = await callArm();
   if (liveOther.details?.ok !== false) throw new Error(`live other holder unexpectedly armed: ${JSON.stringify(liveOther.details)}`);
-  if (liveOther.details.message !== "watcher: read-only - session lock is held by another firstmate session") {
+  if (liveOther.details.message !== "watcher: read-only - session lock is held by another nexus session") {
     throw new Error(`unexpected live-other response: ${liveOther.details.message}`);
   }
 } finally {
@@ -3495,7 +3495,7 @@ await hooks.event(event);
 // coordinator rather than waiting a fixed span: refusing an unowned lock walks
 // git and ps probes that can outlast any such span, and the owned-lock event
 // below would then be answered from the refusal instead of arming.
-const refusal = await globalThis.__firstmateOpenCodeWatchArm.ensureArmed("session-test", client);
+const refusal = await globalThis.__nexusOpenCodeWatchArm.ensureArmed("session-test", client);
 if (refusal !== "read-only") {
   console.error(`expected a read-only refusal without the session lock, got ${refusal}`);
   process.exit(1);
@@ -3550,7 +3550,7 @@ await mod.FmPrimaryWatchArm({
   worktree: process.env.WORKTREE,
 });
 writeFileSync(`${process.env.FM_HOME}/state/.lock`, `${process.pid}\n`);
-const status = await globalThis.__firstmateOpenCodeWatchArm.ensureArmed("session-test", client);
+const status = await globalThis.__nexusOpenCodeWatchArm.ensureArmed("session-test", client);
 await new Promise((resolve) => setTimeout(resolve, 120));
 if (status !== "not-primary") {
   console.error(`expected not-primary, got ${status}`);

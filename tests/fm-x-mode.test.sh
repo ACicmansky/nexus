@@ -93,11 +93,11 @@ SH
 make_sample_image() {
   local path=$1
   case "$path" in
-    *.png) printf '\211PNG\r\n\032\nfirstmate-test-png' > "$path" ;;
-    *.jpg|*.jpeg) printf '\377\330\377firstmate-test-jpeg' > "$path" ;;
-    *.gif) printf 'GIF89afirstmate-test-gif' > "$path" ;;
-    *.webp) printf 'RIFF....WEBPfirstmate-test-webp' > "$path" ;;
-    *) printf 'firstmate-test-image' > "$path" ;;
+    *.png) printf '\211PNG\r\n\032\nnexus-test-png' > "$path" ;;
+    *.jpg|*.jpeg) printf '\377\330\377nexus-test-jpeg' > "$path" ;;
+    *.gif) printf 'GIF89anexus-test-gif' > "$path" ;;
+    *.webp) printf 'RIFF....WEBPnexus-test-webp' > "$path" ;;
+    *) printf 'nexus-test-image' > "$path" ;;
   esac
 }
 
@@ -186,7 +186,7 @@ test_poll_empty_env_relay_overrides_env_file() {
     "$ROOT/bin/fm-x-poll.sh"); rc=$?
   expect_code 0 "$rc" "poll empty-env-relay exit"
   [ -z "$out" ] || fail "poll 204 with empty env relay must be silent (got: $out)"
-  assert_grep "url=https://myfirstmate.io/connector/poll" "$log" \
+  assert_grep "url=https://mynexus.io/connector/poll" "$log" \
     "empty env relay must override .env and fall back to the default relay"
   pass "fm-x-poll lets an explicitly empty relay env override .env"
 }

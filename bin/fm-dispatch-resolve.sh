@@ -9,13 +9,13 @@
 #   TYPESAFE_API_KEY= line in $FM_HOME/.env read with fmx_env_get, the same
 #   accessor as FMX_PAIRING_TOKEN (bin/fm-env-lib.sh). The environment wins.
 #   Absent in both: one "dispatch-resolve: off" line on stderr, nothing on
-#   stdout, exit 0, no network call, so firstmate dispatches exactly as today.
+#   stdout, exit 0, no network call, so nexus dispatches exactly as today.
 #   The key lives in one shell variable and reaches curl as a header read from
 #   a file descriptor, never on argv; nothing logs or writes it.
 #
 # What it does when on with at least one rule: one POST to
 #   https://api.typesafe.ai/v1/systemone with the project name and the brief's
-#   `## Captain's intent` and `## Firstmate spec` sections, tagged when it is a
+#   `## Captain's intent` and `## Nexus spec` sections, tagged when it is a
 #   scout brief (the whole brief when it has neither section), as state and
 #   ONE Choice question whose options are every rule's `when` from
 #   config/crew-dispatch.json plus one fixed generic none option. Jev returns
@@ -31,7 +31,7 @@
 #   candidate is unmeasured, never blocked), and the spendPriority argmax over
 #   the eligible candidates. The model never sees quota, catalogs, approvals,
 #   confidence floors, `why`, or `use`. With no rules, it returns a non-clear
-#   result so firstmate keeps using the existing intake.
+#   result so nexus keeps using the existing intake.
 #   docs/configuration.md "Crew dispatch profiles" owns the declared fields and
 #   "Typed dispatch resolution" owns this tool's operator contract.
 #
@@ -65,7 +65,7 @@
 # Environment:
 #   TYPESAFE_API_KEY is the only resolver-specific environment setting.
 #
-# Authority: this tool never replaces firstmate's judgment, quota-array-dispatch,
+# Authority: this tool never replaces nexus's judgment, quota-array-dispatch,
 #   the captain-approval gate, or fm-spawn.sh validation; it publishes one
 #   inspectable answer plus every candidate's evidence, in code.
 set -u
@@ -293,7 +293,7 @@ brief_kind() {
 }
 task_sections() {
   local heading
-  for heading in "## Captain's intent" "## Firstmate spec"; do
+  for heading in "## Captain's intent" "## Nexus spec"; do
     fm_brief_task_heading_present "$BRIEF" "$heading" || continue
     printf '%s\n%s\n\n' "$heading" "$(fm_brief_task_heading_body "$BRIEF" "$heading")"
   done

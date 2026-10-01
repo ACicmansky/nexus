@@ -22,7 +22,7 @@ TMP_ROOT=$(fm_test_tmproot fm-cd-pretool-check)
 # A primary-shaped checkout: plain (non-worktree) git repo, AGENTS.md, bin/ with
 # the transport plus both policy files (fm-cd-command-policy.mjs imports the
 # shared classifier from fm-arm-command-policy.mjs). This is what the transport's
-# scoping treats as the real primary firstmate checkout.
+# scoping treats as the real primary nexus checkout.
 install_cd_scripts() {
   local dir=$1
   mkdir -p "$dir/bin"
@@ -226,16 +226,16 @@ test_inert_in_child_worktree() {
   pass "cd-guard: inert in a crewmate/scout task worktree (linked git worktree)"
 }
 
-test_inert_when_not_firstmate_repo() {
+test_inert_when_not_nexus_repo() {
   local dir out rc
-  dir="$TMP_ROOT/not-firstmate"
+  dir="$TMP_ROOT/not-nexus"
   git init -q "$dir"
   git -C "$dir" commit -q --allow-empty -m init
   install_cd_scripts "$dir"   # bin/ present but no AGENTS.md
   out=$("$dir/bin/fm-cd-pretool-check.sh" --claude --command 'cd projects/foo' 2>&1); rc=$?
-  expect_code 0 "$rc" "cd-guard must be inert without AGENTS.md (not a firstmate checkout)"
-  [ -z "$out" ] || fail "cd-guard produced output outside a firstmate checkout: $out"
-  pass "cd-guard: inert in a non-firstmate repo (no AGENTS.md)"
+  expect_code 0 "$rc" "cd-guard must be inert without AGENTS.md (not a nexus checkout)"
+  [ -z "$out" ] || fail "cd-guard produced output outside a nexus checkout: $out"
+  pass "cd-guard: inert in a non-nexus repo (no AGENTS.md)"
 }
 
 test_inert_when_not_a_git_repo() {
@@ -260,7 +260,7 @@ test_e2e_cwd_leak_regression() {
   printf '## In flight\n' > "$home/data/backlog.md"
 
   # Without the guard, the persistent primary shell's cwd leaks: a stray
-  # `cd projects/clone` makes the next firstmate-owned backlog write land in the
+  # `cd projects/clone` makes the next nexus-owned backlog write land in the
   # clone, and the home backlog is never updated.
   (
     cd "$home" || fail "cannot enter home"
@@ -388,7 +388,7 @@ test_scripts_are_shellcheck_clean() {
 test_full_acceptance_matrix
 test_fires_in_secondmate_home
 test_inert_in_child_worktree
-test_inert_when_not_firstmate_repo
+test_inert_when_not_nexus_repo
 test_inert_when_not_a_git_repo
 test_e2e_cwd_leak_regression
 test_fail_open_empty_stdin

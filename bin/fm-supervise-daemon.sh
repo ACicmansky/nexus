@@ -3,11 +3,11 @@
 #
 # Wraps bin/fm-watch.sh: runs it as a child, presents and classifies every
 # durable wake after an actionable close, acknowledges only after routing, and
-# either SELF-HANDLES the routine majority in bash (no firstmate turn) or
+# either SELF-HANDLES the routine majority in bash (no nexus turn) or
 # ESCALATES a batched, distilled digest to the supervisor pane on
 # captain-relevant events plus bounded declared-wait rechecks. This is the
 # token-efficient replacement for the prior always-inject daemon: routine
-# signal/stale/heartbeat wakes cost zero firstmate context; only done/
+# signal/stale/heartbeat wakes cost zero nexus context; only done/
 # needs-decision/blocked/failed/persistent-wedge/check-output events and a
 # declared-wait recheck reach the LLM, and even then as one pre-read digest per
 # batch window. That digest is byte-bounded (see escalate_flush); when it cuts
@@ -17,7 +17,7 @@
 # PRESENCE-GATING (the /afk contract). The daemon is the away-mode engine: it
 # injects ONLY when the durable away-mode flag state/.afk is present. Invoking
 # the /afk skill sets that flag and starts this daemon; any real (unmarked)
-# user message clears it and firstmate resumes full responsiveness.
+# user message clears it and nexus resumes full responsiveness.
 # When afk is off, normal fm-watch.sh always-on triage is the active mechanism.
 # Any buffered daemon escalations that remain while afk is off survive in
 # state/.subsuper-escalations and are flushed on the next "while you were out"
@@ -31,7 +31,7 @@
 # (fm_operational_harness_needs_record, Claude Code) instead receives the
 # owner's record-backed doorbell: the envelope is written to this home's
 # state/operational-inbox and only a plain doorbell line naming it is typed.
-# Firstmate's contract: a message that starts with the current prefix, a
+# Nexus's contract: a message that starts with the current prefix, a
 # legacy bare-marker daemon escalation, or a doorbell whose record this home
 # holds (a verbatim pasted copy of a live doorbell included) is internal (stay
 # afk); any other message means the captain is back
@@ -82,14 +82,14 @@
 #                                   auto-discovered per backend - $TMUX_PANE
 #                                   under tmux, "<session>:<pane-id>" from
 #                                   $HERDR_PANE_ID under herdr - then
-#                                   firstmate:0 fallback). Accepts either a
+#                                   nexus:0 fallback). Accepts either a
 #                                   tmux target or a herdr "<session>:<pane-id>"
 #                                   target; which one it's read as is decided by
 #                                   FM_SUPERVISOR_BACKEND (below), independently.
 #          FM_SUPERVISOR_BACKEND    supervisor pane BACKEND (tmux|herdr;
 #                                   override; otherwise auto-discovered the same
 #                                   way bin/fm-backend.sh's fm_backend_detect
-#                                   resolves the runtime firstmate itself is
+#                                   resolves the runtime nexus itself is
 #                                   executing inside - $TMUX_PANE selects tmux,
 #                                   $HERDR_ENV=1 selects herdr - falling back to
 #                                   tmux). zellij, orca, and cmux are not yet
@@ -175,7 +175,7 @@ FM_HOME="${FM_HOME:-${FM_ROOT_OVERRIDE:-$FM_ROOT}}"
 # shellcheck source=bin/fm-backend.sh
 . "$FM_DAEMON_DIR/fm-backend.sh"
 
-# Canonical construction and parsing for every Firstmate operational input.
+# Canonical construction and parsing for every Nexus operational input.
 # shellcheck source=bin/fm-operational-input.sh
 . "$FM_DAEMON_DIR/fm-operational-input.sh"
 
@@ -204,7 +204,7 @@ FM_HOME="${FM_HOME:-${FM_ROOT_OVERRIDE:-$FM_ROOT}}"
 
 # --- tunables ---------------------------------------------------------------
 # Supervisor backends this daemon knows how to inject into today. zellij, orca,
-# and cmux are real backends elsewhere in firstmate (bin/fm-backend.sh) but this
+# and cmux are real backends elsewhere in nexus (bin/fm-backend.sh) but this
 # daemon has no verified composer/busy primitives wired up for them yet - see
 # docs/herdr-backend.md and AGENTS.md section 4's
 # harness-verification discipline. Selecting one refuses loudly at startup
@@ -244,7 +244,7 @@ LOG_MAX_BYTES_DEFAULT=1048576
 LOG_KEEP_LINES_DEFAULT=2000
 
 # --- presence-gating --------------------------------------------------------
-# bin/fm-operational-input.sh owns the U+2063 FIRSTMATE_OP bytes and typed
+# bin/fm-operational-input.sh owns the U+2063 NEXUS_OP bytes and typed
 # away-supervisor construction. The away-exit predicate intentionally retains
 # its landed leading-U+2063 compatibility behavior.
 AFK_FLAG_NAME=".afk"
@@ -279,7 +279,7 @@ afk_active() {  # <state>
 }
 
 # afk_enter / afk_exit: write/clear the away-mode flag. Called by the /afk
-# skill (enter) and by firstmate on user return (exit). Durable: a plain file,
+# skill (enter) and by nexus on user return (exit). Durable: a plain file,
 # so recovery (§5) re-enters afk if it is present after a restart.
 afk_enter() {  # <state>
   mkdir -p "$1"
@@ -290,7 +290,7 @@ afk_exit() {  # <state>
   rm -f "$1/$AFK_FLAG_NAME"
 }
 
-# should_exit_afk: encodes firstmate's afk-exit contract as a testable function.
+# should_exit_afk: encodes nexus's afk-exit contract as a testable function.
 #   away posture inactive   -> 1 (nothing to exit; the posture is the record
 #                              bin/fm-afk-contract.sh owns, or the legacy flag)
 #   message has marker, or is a doorbell for a record in this home
@@ -312,7 +312,7 @@ should_exit_afk() {  # <state> <message-text>
 
 # message_is_injection: 0 if the given message text starts with the sentinel
 # marker, or is a record-backed doorbell whose record sits in <state>'s own
-# operational inbox (a daemon escalation), 1 otherwise (a real user message). Firstmate's
+# operational inbox (a daemon escalation), 1 otherwise (a real user message). Nexus's
 # afk-exit contract uses this: a marker or backed doorbell stays afk; other
 # messages return the captain. Bias ambiguous cases toward exit (a false exit
 # is self-correcting).
@@ -328,7 +328,7 @@ message_is_injection() {  # <message-text> [state]
 }
 
 # strip_injection_marker: remove a current typed away envelope, the landed
-# untyped FIRSTMATE_OP prefix, or the legacy bare sentinel. Current grammar is
+# untyped NEXUS_OP prefix, or the legacy bare sentinel. Current grammar is
 # delegated to its owner rather than reimplemented here.
 strip_injection_marker() {  # <message-text>
   local msg=$1 body
@@ -366,7 +366,7 @@ _collapse_newlines() {  # <text>
 # Decision protocol: every classifier prints exactly one line on stdout of the
 # form "<action>|<distilled>" where action is "self" or "escalate". The distilled
 # field for "self" is informational (logged); for "escalate" it is the pre-read
-# summary firstmate would otherwise have to re-read.
+# summary nexus would otherwise have to re-read.
 
 classify_signal() {  # <reason-after-colon> <state>
   local reason=$1 state=$2 f last event record rest endpoint ident rc distilled="" rel="" seen_rel="" task sig marker
@@ -475,7 +475,7 @@ classify_stale() {  # <window> <state> [<span-record> <span-status>]
   printf 'self|transient stale (%s): %s' "$win" "${last:-no status}"
 }
 
-classify_check() {  # <full reason>  — check scripts print only when firstmate should wake
+classify_check() {  # <full reason>  — check scripts print only when nexus should wake
   printf 'escalate|%s' "$1"
 }
 
@@ -1024,7 +1024,7 @@ wedge_alarm_via_osascript() {  # <summary>
   command -v osascript >/dev/null 2>&1 || {
     log "wedge alarm: osascript not found; cannot post a macOS notification"; return 1; }
   wedge_alarm_run_bounded osascript osascript -e 'on run argv' \
-    -e 'display notification (item 1 of argv) with title "firstmate: away-mode escalations WEDGED" sound name "Basso"' \
+    -e 'display notification (item 1 of argv) with title "nexus: away-mode escalations WEDGED" sound name "Basso"' \
     -e 'end run' "$summary" >/dev/null 2>&1 && return 0
   log "wedge alarm: osascript notification failed"
   return 1
@@ -1042,7 +1042,7 @@ wedge_alarm_via_herdr() {  # <summary>
   esac
   command -v herdr >/dev/null 2>&1 || {
     log "wedge alarm: herdr not found; cannot post a herdr notification"; return 1; }
-  wedge_alarm_run_bounded herdr herdr notification show "firstmate: away-mode escalations WEDGED" \
+  wedge_alarm_run_bounded herdr herdr notification show "nexus: away-mode escalations WEDGED" \
     --body "$summary" --sound request >/dev/null 2>&1 && return 0
   log "wedge alarm: herdr notification failed"
   return 1
@@ -1116,7 +1116,7 @@ wedge_alarm_notify() {  # <summary> <marker>
 # max-defer (the supervisor pane is genuinely busy/wedged, the initial send
 # fails, or the submit's Enter is swallowed). The daemon must NEVER silently
 # wedge: this logs an ERROR naming the last delivery failure, drops a durable
-# marker firstmate/recovery can surface, flashes the tmux supervisor client's
+# marker nexus/recovery can surface, flashes the tmux supervisor client's
 # status line when applicable, and attempts a
 # configurable backend-independent active alert (wedge_alarm_notify). Nothing
 # is lost - the buffer and the
@@ -1420,7 +1420,7 @@ inject_msg() {  # <message> [state]
   local msg=$1 state target backend retries sleep_s verdict composer encoded bytes errf err='' body
   state="${2:-$(_state_root)}"
   # (1) Presence-gate: inject ONLY when afk is active. When afk is off, the
-  # daemon self-handles and stays quiet; firstmate drives the normal always-on
+  # daemon self-handles and stays quiet; nexus drives the normal always-on
   # watcher triage. Escalations buffer and survive for the next catch-up flush.
   INJECT_LAST_FAILURE=
   INJECT_SUBMIT_ATTEMPTED=0
@@ -1815,17 +1815,17 @@ fm_super_main() {
   # harness-verification discipline). This is the clear refusal the task calls
   # for, instead of a confusing "does not resolve to a tmux pane" error.
   if ! fm_backend_list_contains "$FM_SUPERVISOR_SUPPORTED_BACKENDS" "$BACKEND"; then
-    echo "error: away-mode daemon does not support supervisor backend '$BACKEND' yet (supported: $FM_SUPERVISOR_SUPPORTED_BACKENDS); set FM_SUPERVISOR_BACKEND=tmux|herdr and FM_SUPERVISOR_TARGET to run firstmate's own pane under a supported backend" >&2
+    echo "error: away-mode daemon does not support supervisor backend '$BACKEND' yet (supported: $FM_SUPERVISOR_SUPPORTED_BACKENDS); set FM_SUPERVISOR_BACKEND=tmux|herdr and FM_SUPERVISOR_TARGET to run nexus's own pane under a supported backend" >&2
     log "startup failed: unsupported supervisor backend '$BACKEND' (source=$backend_source)"
     fm_lock_release "$LOCK" 2>/dev/null || true
     rm -f "$PIDFILE" 2>/dev/null || true
     exit 1
   fi
 
-  # --- auto-discover the supervisor target (the pane running firstmate) -----
+  # --- auto-discover the supervisor target (the pane running nexus) -----
   # Priority: FM_SUPERVISOR_TARGET override > $TMUX_PANE (tmux; inherited from
-  # the pane that launched the daemon, normally firstmate's own) >
-  # $HERDR_PANE_ID (herdr, composed into "<session>:<pane-id>") > firstmate:0
+  # the pane that launched the daemon, normally nexus's own) >
+  # $HERDR_PANE_ID (herdr, composed into "<session>:<pane-id>") > nexus:0
   # fallback. Exporting the result into FM_SUPERVISOR_TARGET makes inject_msg
   # (which reads that env var) use the discovered pane without an extra global.
   local discovered target_source
@@ -1836,13 +1836,13 @@ fm_super_main() {
     elif [ "${HERDR_ENV:-}" = "1" ] && [ -n "${HERDR_PANE_ID:-}" ]; then
       target_source="HERDR_ENV(HERDR_PANE_ID)"
     else
-      target_source="FALLBACK(firstmate:0)"
+      target_source="FALLBACK(nexus:0)"
     fi
   fi
   if discovered=$(discover_supervisor_target); then
     : # resolved cleanly
   else
-    echo "warn: could not auto-discover supervisor pane (no FM_SUPERVISOR_TARGET, TMUX_PANE, or HERDR_ENV/HERDR_PANE_ID); falling back to '$discovered' — verify this is firstmate's pane" >&2
+    echo "warn: could not auto-discover supervisor pane (no FM_SUPERVISOR_TARGET, TMUX_PANE, or HERDR_ENV/HERDR_PANE_ID); falling back to '$discovered' — verify this is nexus's pane" >&2
   fi
   FM_SUPERVISOR_TARGET="$discovered"
   local TARGET="$FM_SUPERVISOR_TARGET"
@@ -1917,7 +1917,7 @@ fm_super_main() {
     # With the #29 watcher's enqueue-before-suppress, a wake is no longer
     # swallowed by running the watcher with no injection target. We still back
     # off while the pane is gone: self-handling needs no pane, but escalation
-    # has nowhere to go, and firstmate itself is the consumer of escalations.
+    # has nowhere to go, and nexus itself is the consumer of escalations.
     # Catch-up signals persist in state/*.status and flow on the next run, so
     # this delays rather than loses work.
     if ! fm_backend_target_exists "$BACKEND" "$TARGET"; then

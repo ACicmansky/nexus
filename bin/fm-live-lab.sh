@@ -192,7 +192,7 @@ window_id() {
   esac
   window=$(sed -n 's/^window=//p' "$LAB/state/$name.meta" 2>/dev/null)
   [ -z "$window" ] || name=${window#*:}
-  lab_tmux list-windows -t firstmate -F "#{window_name}$(printf '\t')#{window_id}" 2>/dev/null \
+  lab_tmux list-windows -t nexus -F "#{window_name}$(printf '\t')#{window_id}" 2>/dev/null \
     | awk -F '\t' -v n="$name" '$1 == n { print $2; exit }'
 }
 
@@ -382,7 +382,7 @@ make_notes_project() {
   mkdir -p "$seed/notes" "$seed/tests"
   git init -q -b main "$seed"
   cat > "$seed/notes/__init__.py" <<'PY'
-"""A tiny notes library used by the firstmate live lab."""
+"""A tiny notes library used by the nexus live lab."""
 
 NOTES = []
 
@@ -437,7 +437,7 @@ spawn_worker() {
 import os, sys
 path = sys.argv[1]
 text = open(path, encoding="utf-8").read()
-text = text.replace("{TASK}", os.environ["TASK_TEXT"], 1).replace("{FIRSTMATE_SPEC}", os.environ["SPEC_TEXT"], 1)
+text = text.replace("{TASK}", os.environ["TASK_TEXT"], 1).replace("{NEXUS_SPEC}", os.environ["SPEC_TEXT"], 1)
 open(path, "w", encoding="utf-8").write(text)
 PY
   (cd "$LAB" && lab_run FM_HOME="$LAB" "$LAB/bin/fm-tasks-axi.sh" add "$WORKER_ID" "lab gated worker" --kind ship --repo notes) >/dev/null || return 1
@@ -541,7 +541,7 @@ cmd_up() {
 
   TMUX_DIR=$("$LAB_HOME_HELPER" tmux-dir "$LAB") || die "cannot create the private tmux directory"
   echo "tmux_dir=$TMUX_DIR" >> "$ROOT/$RECORD_NAME"
-  lab_run tmux -f /dev/null new-session -d -s firstmate -n lab -x 220 -y 60 -c "$ROOT" || die "cannot start the lab tmux server"
+  lab_run tmux -f /dev/null new-session -d -s nexus -n lab -x 220 -y 60 -c "$ROOT" || die "cannot start the lab tmux server"
   record_launch_pid "$(lab_tmux display-message -p '#{pid}')"
 
   if [ "$mate" = yes ]; then
@@ -571,7 +571,7 @@ cmd_up() {
   else
     primary=(pi --approve --session-dir "$ROOT/pi-sessions" --model "$model" --thinking "$effort")
   fi
-  lab_tmux new-window -d -t firstmate: -n main -c "$LAB" \
+  lab_tmux new-window -d -t nexus: -n main -c "$LAB" \
     env FM_HOME="$LAB" CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=false "${primary[@]}" \
     || die "cannot launch the lab primary"
   lab_tmux set-option -w -t "$(window_id main)" remain-on-exit on >/dev/null

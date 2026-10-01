@@ -2,8 +2,8 @@
 # Watcher liveness and worktree-tangle guard, called by supervision scripts, by
 # fm-wake-drain.sh after it empties queued wakes, and by fm-session-start.sh in
 # read-only advisory mode whenever session-lock ownership was not verified.
-# First, always warn if the firstmate primary checkout (FM_ROOT) is on a named
-# non-default branch, because that means firstmate-on-itself work landed in the
+# First, always warn if the nexus primary checkout (FM_ROOT) is on a named
+# non-default branch, because that means nexus-on-itself work landed in the
 # primary instead of an isolated worktree.
 # Then, if the home needs supervision (bin/fm-supervision-lib.sh owns that
 # condition set) and that supervision is not healthy, prints a loud, clearly
@@ -146,7 +146,7 @@ fm_guard_clear_stale_banner() {
 }
 
 # Worktree-tangle alarm, checked FIRST and independent of in-flight tasks: the
-# firstmate PRIMARY checkout (FM_ROOT) must stay on its default branch. If a
+# nexus PRIMARY checkout (FM_ROOT) must stay on its default branch. If a
 # crewmate's branch/commits landed here instead of in its own isolated worktree,
 # the primary is stranded on a feature branch - surface it loudly on the very next
 # fleet action, the same way the watcher-down banner does. Scoped to the primary

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Link a spawned task to the X-mode mention that triggered it, so firstmate can
+# Link a spawned task to the X-mode mention that triggered it, so nexus can
 # post up to THREE completion follow-ups when the task lands (within a 7-day window).
 #
 # Usage: fm-x-link.sh <task-id> <request_id> [--carry-count <n> --carry-ts <epoch> [--carry-platform <x|discord>] [--carry-max <n>]]
@@ -41,7 +41,7 @@
 # register --work-home secondmate:<id>) named, and names the secondmate home the
 # task was actually found in whenever a registered LOCAL route holds it.
 #
-# Both ids are relay/firstmate slugs that compose a filename, so they are guarded
+# Both ids are relay/nexus slugs that compose a filename, so they are guarded
 # against path traversal even though they come from trusted callers.
 set -u
 

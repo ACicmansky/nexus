@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Safe, home-scoped (re-)arm of the firstmate watcher, with honest verification.
+# Safe, home-scoped (re-)arm of the nexus watcher, with honest verification.
 #
 # The watcher (bin/fm-watch.sh) blocks until it has an actionable wake to
 # surface, then prints one reason line and exits. While state/.afk exists the
 # daemon owns triage and the watcher exits on every wake for the daemon to
 # classify. Reliability depends on arming through a mechanism that SURVIVES the
-# call and NOTIFIES on exit, so firstmate must run this script as the harness's
+# call and NOTIFIES on exit, so nexus must run this script as the harness's
 # own tracked background task (e.g. run_in_background), or - for a Claude
 # primary - inside the Stop asyncRewake hook's foreground process tree
 # (bin/fm-claude-stop-autoarm.sh), where the harness owns the process group and
@@ -65,7 +65,7 @@
 # wins the singleton while the duplicate child stands down. It
 # resolves and signals exactly that pid, so it can never touch another home's
 # watcher. NEVER `pkill -f
-# bin/fm-watch.sh`: that pattern matches every firstmate home's watcher
+# bin/fm-watch.sh`: that pattern matches every nexus home's watcher
 # (secondmate homes run the same script) and would kill siblings.
 #
 # --stop: the same home-scoped stop without re-arming, for an owner that ends
@@ -539,7 +539,7 @@ fi
 # Start a watcher as a tracked child and confirm it before settling in. The child
 # stays our child for its whole life: we wait on it, so killing this arm (the
 # harness-tracked task) tears the watcher down too, and the watcher's eventual
-# wake exit propagates out so the harness re-notifies firstmate.
+# wake exit propagates out so the harness re-notifies nexus.
 child=
 child_out=
 cleanup_child() {

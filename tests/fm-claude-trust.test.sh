@@ -115,10 +115,10 @@ node_free_path() {  # <case-dir> -> a bin dir holding the script's own tools but
 # --- secondmate homes -------------------------------------------------------
 
 # seed_secondmate_home <home> <id> [shape]: the on-disk shape bin/fm-home-seed.sh
-# leaves behind - the identity marker, the firstmate instance files, the four
+# leaves behind - the identity marker, the nexus instance files, the four
 # operational directories, and a charter for the launch to carry. "clone" (the
 # default) is the standalone-clone home an explicit ~/fm-homes/<id> path
-# produces, a primary checkout of the firstmate repo; "worktree" is the linked
+# produces, a primary checkout of the nexus repo; "worktree" is the linked
 # worktree a treehouse lease produces. Both shapes are real homes, so both must
 # be trusted.
 seed_secondmate_home() {
@@ -134,7 +134,7 @@ seed_secondmate_home() {
       ;;
   esac
   mkdir -p "$home/bin" "$home/data" "$home/state" "$home/config" "$home/projects"
-  printf '# Firstmate\n' > "$home/AGENTS.md"
+  printf '# Nexus\n' > "$home/AGENTS.md"
   printf 'charter\n' > "$home/data/charter.md"
   printf '%s\n' "$id" > "$home/.fm-secondmate-home"
 }
@@ -665,7 +665,7 @@ test_claude_spawn_pretrusts_its_worktree_and_reaches_the_brief() {
     "the launch command was not the claude worker launch"
   launch=$(cat "$launch_log")
   doorbell=$(claude_launch_doorbell "$launch")
-  record=$(printf '%s' "$doorbell" | sed -n "s/.*: Firstmate operational input waiting: read '\([^']*\)'.*/\1/p")
+  record=$(printf '%s' "$doorbell" | sed -n "s/.*: Nexus operational input waiting: read '\([^']*\)'.*/\1/p")
   [ -n "$record" ] || fail "the launch command did not carry a brief doorbell"
   [ "$(printf '%s' "$doorbell" | FM_STATE_OVERRIDE="$home/state" "$ROOT/bin/fm-operational-input.sh" doorbell-kind)" = launch-brief ] \
     || fail "the launch command's doorbell did not name a brief record in the receiving home"
@@ -697,7 +697,7 @@ test_secondmate_standalone_clone_home_is_trusted() {
     "the launch command was not the claude secondmate launch"
   launch=$(cat "$case_dir/launch.log")
   doorbell=$(claude_launch_doorbell "$launch")
-  record=$(printf '%s' "$doorbell" | sed -n "s/.*: Firstmate operational input waiting: read '\([^']*\)'.*/\1/p")
+  record=$(printf '%s' "$doorbell" | sed -n "s/.*: Nexus operational input waiting: read '\([^']*\)'.*/\1/p")
   [ -n "$record" ] || fail "the secondmate launch command did not carry a brief doorbell"
   [ "$(printf '%s' "$doorbell" | FM_STATE_OVERRIDE="$home/state" "$ROOT/bin/fm-operational-input.sh" doorbell-kind)" = launch-brief ] \
     || fail "the secondmate's doorbell did not name a brief record in its home"
@@ -743,15 +743,15 @@ test_secondmate_home_trust_refuses_everything_unseeded() {
   assert_contains "$out" "no .fm-secondmate-home marker" "the refusal did not name the missing marker"
   assert_not_trusted "$config/.claude.json" "$target" "a plain directory was trusted"
 
-  # A firstmate checkout that was never seeded as a secondmate home: every other
+  # A nexus checkout that was never seeded as a secondmate home: every other
   # structural signal matches and only the marker is missing.
   target="$case_dir/checkout"
   seed_secondmate_home "$target" checkout-n1 clone
   rm -f "$target/.fm-secondmate-home"
   out=$(run_home_trust "$config" "$target" checkout-n1)
-  expect_code 1 $? "an unseeded firstmate checkout must be refused: $out"
+  expect_code 1 $? "an unseeded nexus checkout must be refused: $out"
   assert_contains "$out" "no .fm-secondmate-home marker" "the refusal did not name the missing marker"
-  assert_not_trusted "$config/.claude.json" "$target" "an unseeded firstmate checkout was trusted"
+  assert_not_trusted "$config/.claude.json" "$target" "an unseeded nexus checkout was trusted"
 
   # A home seeded for a DIFFERENT secondmate: one home's trust must not be
   # granted while spawning another id.

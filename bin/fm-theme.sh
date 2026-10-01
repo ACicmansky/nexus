@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# bin/fm-theme.sh - Extensible persona and theme manager for Firstmate.
+# bin/fm-theme.sh - Extensible persona and theme manager for Nexus.
 #
 # Reads the active theme from $CONFIG/theme or $FM_THEME (fallback: "nautical").
 # Queries attributes and prompts from personas/<theme>.md.

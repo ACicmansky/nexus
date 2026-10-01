@@ -52,7 +52,7 @@ fm_git_identity fmtest fmtest@example.invalid
 
 # new_world <name>: a real, throwaway git repo on `main` (so the worktree-tangle
 # and default-branch checks behave exactly as they do against the real
-# firstmate repo) to use as FM_ROOT_OVERRIDE, plus an empty FM_HOME with
+# nexus repo) to use as FM_ROOT_OVERRIDE, plus an empty FM_HOME with
 # state/, data/, config/, and a fakebin. Echoes "<root-dir>|<home-dir>|<fakebin>".
 new_world() {
   local name=$1 w root home fakebin
@@ -158,7 +158,7 @@ case "${1:-}" in
     printf 'ready[%s]{id,state,kind,repo,title}:\n' "$ready_count"
     i=1
     while [ "$i" -le "$ready_count" ]; do
-      printf '  ready-%s,queued,ship,firstmate,Ready item %s\n' "$i" "$i"
+      printf '  ready-%s,queued,ship,nexus,Ready item %s\n' "$i" "$i"
       i=$((i + 1))
     done
     printf 'ready_public_followups: 0 delivery-ready obligations\n'
@@ -181,15 +181,15 @@ case "${1:-}" in
         ;;
       *'--state in_flight'*)
         task_header 1
-        printf '%s\n' '  compact-startup,in_flight,ship,firstmate,Compact startup digest,none,captain,captain choice pending'
+        printf '%s\n' '  compact-startup,in_flight,ship,nexus,Compact startup digest,none,captain,captain choice pending'
         ;;
       *'--state held'*)
         task_header 1
-        printf '%s\n' '  held-queued,queued,ship,firstmate,Held queued work,none,captain,captain choice pending'
+        printf '%s\n' '  held-queued,queued,ship,nexus,Held queued work,none,captain,captain choice pending'
         ;;
       *'--state queued'*'--blocked'*)
         task_header 1
-        printf '%s\n' '  blocked-followup,queued,scout,firstmate,Follow compact startup,compact-startup,"-","-"'
+        printf '%s\n' '  blocked-followup,queued,scout,nexus,Follow compact startup,compact-startup,"-","-"'
         ;;
       *)
         printf '%s\n' 'startup recovery must not request an unfiltered whole-backlog listing' >&2
@@ -608,7 +608,7 @@ EOF
   spawned="$w/tmux.spawned"
   mkdir -p "$mate/bin" "$mate/data" "$mate/state" "$mate/config" "$mate/projects"
   printf '%s\n' "$id" > "$mate/.fm-secondmate-home"
-  printf '# Firstmate\n' > "$mate/AGENTS.md"
+  printf '# Nexus\n' > "$mate/AGENTS.md"
   printf 'Second mate charter.\n' > "$mate/data/charter.md"
   printf '%s\n' 'projects/' 'state/' 'data/' 'config/' '.no-mistakes/' > "$mate/.gitignore"
   git -C "$mate" init -q -b main
@@ -616,7 +616,7 @@ EOF
   printf '%s\n' manual > "$home/config/backlog-backend"
   touch "$home/state/.last-watcher-beat"
   {
-    printf 'window=firstmate:fm-%s\n' "$id"
+    printf 'window=nexus:fm-%s\n' "$id"
     printf 'kind=secondmate\n'
     printf 'harness=pi\n'
     printf 'home=%s\n' "$mate"
@@ -651,7 +651,7 @@ EOF
   state="$w/herdr.state"
   mkdir -p "$mate/bin" "$mate/data" "$mate/state" "$mate/config" "$mate/projects"
   printf '%s\n' "$id" > "$mate/.fm-secondmate-home"
-  printf '# Firstmate\n' > "$mate/AGENTS.md"
+  printf '# Nexus\n' > "$mate/AGENTS.md"
   printf 'Second mate charter.\n' > "$mate/data/charter.md"
   printf '%s\n' 'projects/' 'state/' 'data/' 'config/' '.no-mistakes/' > "$mate/.gitignore"
   git -C "$mate" init -q -b main
@@ -831,7 +831,7 @@ EOF
   # line. Absence of any such line is this test's proof that
   # FM_BOOTSTRAP_DETECT_ONLY=1 actually suppressed the mutating sweep.
   mkdir -p "$home/other-secondmate/state"
-  fm_write_secondmate_meta "$home/state/sm-x.meta" "$home/other-secondmate" "firstmate:fm-sm-x" alpha
+  fm_write_secondmate_meta "$home/state/sm-x.meta" "$home/other-secondmate" "nexus:fm-sm-x" alpha
   append_wake "$home/state" signal sm-x "done: surfaced before refusal" || fail "seed wake failed"
   git -C "$root" checkout -q -B fm/read-only-tangle
 
@@ -846,7 +846,7 @@ EOF
 
   expect_code 0 "$status" "fm-session-start.sh must exit 0 even on a lock refusal"
   assert_contains "$out" "READ-ONLY SESSION" "read-only banner missing on lock refusal"
-  assert_contains "$out" "another live firstmate session holds the lock" "read-only banner did not surface fm-lock.sh's own error text"
+  assert_contains "$out" "another live nexus session holds the lock" "read-only banner did not surface fm-lock.sh's own error text"
   assert_contains "$out" "Skipping every mutating step" "read-only banner did not explain what was skipped"
   assert_contains "$out" "skipped (read-only session)" "wake-queue section did not report itself skipped"
   assert_contains "$out" "WATCHER DOWN - SUPERVISION IS OFF" "read-only guard did not surface watcher-liveness alarm"
@@ -897,7 +897,7 @@ EOF
   assert_contains "$out" "READ-ONLY SESSION" "lock publication failure did not force a read-only session"
   assert_contains "$out" "FLEET LOCK OWNERSHIP WAS NOT VERIFIED" "lock publication failure was misreported as a live holder"
   assert_contains "$out" "lacks verified fleet-lock ownership" "lock publication failure did not explain why queued wakes remain untouched"
-  assert_not_contains "$out" "ANOTHER LIVE FIRSTMATE SESSION HOLDS THE FLEET LOCK" "lock publication failure falsely claimed a live lock holder"
+  assert_not_contains "$out" "ANOTHER LIVE NEXUS SESSION HOLDS THE FLEET LOCK" "lock publication failure falsely claimed a live lock holder"
   [ -s "$home/state/.wake-queue" ] || fail "lock publication failure allowed the wake queue to mutate"
 
   pass "session start stays read-only when lock ownership cannot be published"
@@ -1316,7 +1316,7 @@ EOF
     "SECONDMATE_LIVENESS: secondmate $SESSION_START_SECOND_MATE_ID: skipped: existing endpoint has ambiguous agent process (backend=tmux)" \
     "session start did not distinguish an existing Pi-shaped process from a missing window"
   [ ! -s "$log" ] || fail "session start touched an ambiguous existing Pi process: $(cat "$log")"
-  assert_contains "$out" "endpoint: alive (backend=tmux window=firstmate:fm-$SESSION_START_SECOND_MATE_ID)" \
+  assert_contains "$out" "endpoint: alive (backend=tmux window=nexus:fm-$SESSION_START_SECOND_MATE_ID)" \
     "the later fleet read should still see the ambiguous endpoint"
   pass "session start: an existing ambiguous Pi process prevents duplicate recovery"
 }
@@ -1335,7 +1335,7 @@ EOF
     "SECONDMATE_LIVENESS: secondmate $SESSION_START_SECOND_MATE_ID: skipped: endpoint probe unreadable (backend=tmux)" \
     "session start did not distinguish transient unreadability from absence"
   [ ! -s "$log" ] || fail "session start touched a transiently unreadable target: $(cat "$log")"
-  assert_contains "$out" "endpoint: dead (backend=tmux window=firstmate:fm-$SESSION_START_SECOND_MATE_ID)" \
+  assert_contains "$out" "endpoint: dead (backend=tmux window=nexus:fm-$SESSION_START_SECOND_MATE_ID)" \
     "the later cheap presence read should preserve the visible offline symptom"
   pass "session start: transient tmux unreadability never licenses a relaunch"
 }
@@ -1352,7 +1352,7 @@ EOF
 
   out=$(network_stage_report "$home" "$root")
   assert_not_contains "$out" "SECONDMATE_LIVENESS:" "successful bare-shell recovery should stay non-actionable"
-  assert_contains "$(cat "$log")" "kill-window -t =firstmate:=fm-$SESSION_START_SECOND_MATE_ID" \
+  assert_contains "$(cat "$log")" "kill-window -t =nexus:=fm-$SESSION_START_SECOND_MATE_ID" \
     "the proven bare-shell path did not remove its existing dead endpoint"
   assert_contains "$(cat "$log")" "new-window" "the proven bare-shell path did not relaunch"
   pass "session start: the proven bare-shell recovery path remains intact"
@@ -1829,7 +1829,7 @@ SH
   chmod +x "$fakebin/no-mistakes" "$crew_state"
 
   fm_write_meta "$home/state/slow-child.meta" \
-    'window=firstmate:fm-slow-child' "worktree=$worktree" 'project=firstmate' \
+    'window=nexus:fm-slow-child' "worktree=$worktree" 'project=nexus' \
     'harness=pi' 'kind=scout' 'mode=no-mistakes' 'yolo=off' 'spawn_gen=slow-child.1'
   printf '%s\n' 'working: validating' > "$home/state/slow-child.status"
   : > "$home/state/slow-child.turn-ended"
@@ -1989,23 +1989,23 @@ write_long_body_backlog() {
 # Backlog
 
 ## In flight
-- [ ] compact-startup - Compact startup digest (repo: firstmate) (kind: ship) (since 2026-07-15) (hold: captain choice pending) (hold-kind: captain)
+- [ ] compact-startup - Compact startup digest (repo: nexus) (kind: ship) (since 2026-07-15) (hold: captain choice pending) (hold-kind: captain)
   OVERSIZED-BODY-LINE current startup leaks task note bodies into the session digest.
   Another long body line that should not be printed after the fix.
 
 ## Queued
-- [ ] blocked-followup - Follow compact startup blocked-by: compact-startup - waits for implementation (repo: firstmate) (kind: scout) (since 2026-07-15)
+- [ ] blocked-followup - Follow compact startup blocked-by: compact-startup - waits for implementation (repo: nexus) (kind: scout) (since 2026-07-15)
   QUEUED-BODY-LINE this is another long multiline note.
-- [ ] held-queued - Held queued work (repo: firstmate) (kind: ship) (hold: captain choice pending) (hold-kind: captain)
+- [ ] held-queued - Held queued work (repo: nexus) (kind: ship) (hold: captain choice pending) (hold-kind: captain)
 EOF
   while [ "$i" -le 25 ]; do
-    printf -- '- [ ] plain-%s - Plain queued item %s (repo: firstmate) (kind: ship)\n' "$i" "$i" >> "$path"
+    printf -- '- [ ] plain-%s - Plain queued item %s (repo: nexus) (kind: ship)\n' "$i" "$i" >> "$path"
     i=$((i + 1))
   done
   cat >> "$path" <<'EOF'
 
 ## Done
-- [x] landed-earlier - DONE-ROW-LINE already landed and torn down (repo: firstmate) (kind: ship)
+- [x] landed-earlier - DONE-ROW-LINE already landed and torn down (repo: nexus) (kind: ship)
 EOF
 }
 
@@ -2019,8 +2019,8 @@ EOF
   make_fake_tasks_axi_compact "$fakebin"
   make_fake_ps_claude "$fakebin"
   write_long_body_backlog "$home/data/backlog.md"
-  mkdir -p "$home/projects/firstmate"
-  printf 'window=fm-sess:compact\nworktree=%s\nproject=firstmate\nkind=ship\n' "$home/projects/firstmate" \
+  mkdir -p "$home/projects/nexus"
+  printf 'window=fm-sess:compact\nworktree=%s\nproject=nexus\nkind=ship\n' "$home/projects/nexus" \
     > "$home/state/compact-startup.meta"
   log="$home/tasks-axi.log"
 
@@ -2031,19 +2031,19 @@ EOF
     "compatible tasks-axi backend did not render the compact backlog listing"
   assert_contains "$out" "tasks[1]{id,state,kind,repo,title,blocked_by,hold_kind,hold_reason}:" \
     "tasks-axi compact listing omitted the expected structured field header"
-  assert_contains "$out" "compact-startup,in_flight,ship,firstmate,Compact startup digest,none,captain,captain choice pending" \
+  assert_contains "$out" "compact-startup,in_flight,ship,nexus,Compact startup digest,none,captain,captain choice pending" \
     "tasks-axi compact listing omitted in-flight identity, state, or hold metadata"
-  assert_contains "$out" "held-queued,queued,ship,firstmate,Held queued work,none,captain,captain choice pending" \
+  assert_contains "$out" "held-queued,queued,ship,nexus,Held queued work,none,captain,captain choice pending" \
     "tasks-axi compact listing omitted a held row or its hold metadata"
-  assert_contains "$out" 'blocked-followup,queued,scout,firstmate,Follow compact startup,compact-startup,"-","-"' \
+  assert_contains "$out" 'blocked-followup,queued,scout,nexus,Follow compact startup,compact-startup,"-","-"' \
     "tasks-axi compact listing omitted blocked-by metadata"
-  assert_contains "$out" "ready-3,queued,ship,firstmate,Ready item 3" \
+  assert_contains "$out" "ready-3,queued,ship,nexus,Ready item 3" \
     "tasks-axi compact listing omitted a dispatchable queued row inside the bound"
   assert_not_contains "$out" "OVERSIZED-BODY-LINE" "tasks-axi compact digest leaked an in-flight task body"
   assert_not_contains "$out" "QUEUED-BODY-LINE" "tasks-axi compact digest leaked a queued task body"
   assert_not_contains "$out" "DONE-ROW-LINE" "tasks-axi compact digest listed a done row at startup"
   assert_contains "$out" "--- compact-startup ---" "in-flight meta identity disappeared from startup recovery digest"
-  assert_contains "$out" "worktree=$home/projects/firstmate" "in-flight recovery worktree identity disappeared from startup digest"
+  assert_contains "$out" "worktree=$home/projects/nexus" "in-flight recovery worktree identity disappeared from startup digest"
   assert_contains "$out" "Full task bodies remain available on demand: bin/fm-tasks-axi.sh show <id> --full" \
     "compact digest omitted the full-body lookup pointer"
   assert_contains "$out" "ready_public_followups: 0 delivery-ready obligations" \
@@ -2083,7 +2083,7 @@ EOF
   out=$(FM_FAKE_TASKS_AXI_READY=7 FM_SESSION_START_QUEUED_LIMIT=3 \
     run_session_start "$home" "$root" "$fakebin:$BASE_PATH")
 
-  assert_contains "$out" "ready-3,queued,ship,firstmate,Ready item 3" \
+  assert_contains "$out" "ready-3,queued,ship,nexus,Ready item 3" \
     "the queued bound dropped a row inside its own limit"
   assert_not_contains "$out" "ready-4,queued" "the queued bound did not actually bound the ready listing"
   assert_contains "$out" "(shown 3 of 7 ready queued item(s))" \
@@ -2092,11 +2092,11 @@ EOF
     "the bounded queued listing did not disclose an exact remainder and how to see it"
 
   # The bound is for dispatchable work only: held and blocked rows stay whole.
-  assert_contains "$out" "held-queued,queued,ship,firstmate,Held queued work,none,captain,captain choice pending" \
+  assert_contains "$out" "held-queued,queued,ship,nexus,Held queued work,none,captain,captain choice pending" \
     "the queued bound swallowed a held row"
-  assert_contains "$out" 'blocked-followup,queued,scout,firstmate,Follow compact startup,compact-startup,"-","-"' \
+  assert_contains "$out" 'blocked-followup,queued,scout,nexus,Follow compact startup,compact-startup,"-","-"' \
     "the queued bound swallowed a blocked row"
-  assert_contains "$out" "compact-startup,in_flight,ship,firstmate,Compact startup digest,none,captain,captain choice pending" \
+  assert_contains "$out" "compact-startup,in_flight,ship,nexus,Compact startup digest,none,captain,captain choice pending" \
     "the queued bound swallowed an in-flight row"
 
   pass "the startup backlog bound cuts only dispatchable queued rows and discloses the remainder exactly"
@@ -2395,7 +2395,7 @@ EOF
   make_fake_toolchain "$fakebin"
   make_fake_ps_claude "$fakebin"
   mkdir -p "$home/other-secondmate/state"
-  fm_write_secondmate_meta "$home/state/sm-r.meta" "$home/other-secondmate" "firstmate:fm-sm-r" alpha
+  fm_write_secondmate_meta "$home/state/sm-r.meta" "$home/other-secondmate" "nexus:fm-sm-r" alpha
   append_wake "$home/state" signal task-r "done: queued after startup" || fail "seed wake failed"
 
   # A full startup reconciles the secondmate sweep and reports it.
@@ -2438,7 +2438,7 @@ EOF
   make_fake_toolchain "$fakebin"
   make_fake_ps_harness "$fakebin" pi
   cat > "$root/AGENTS.md" <<'EOF'
-FIRSTMATE_TEST_INSTRUCTION=original
+NEXUS_TEST_INSTRUCTION=original
 Keep this original instruction.
 EOF
 
@@ -2457,7 +2457,7 @@ EOF
     || fail "a no-drift compact rewrote the true-start baseline"
 
   cat > "$root/AGENTS.md" <<'EOF'
-FIRSTMATE_TEST_INSTRUCTION=updated
+NEXUS_TEST_INSTRUCTION=updated
 The complete updated instruction must survive every stale rebuild.
 EOF
   resume_out=$(FM_FAKE_HARNESS=pi run_pi_session_start "$home" "$root" "$fakebin:$BASE_PATH" --source resume)
@@ -2469,7 +2469,7 @@ EOF
   compact_first=$(FM_FAKE_HARNESS=pi run_pi_session_start "$home" "$root" "$fakebin:$BASE_PATH" --reemit --source compact)
   assert_contains "$compact_first" "CURRENT AGENTS.md - INSTRUCTION REFRESH" \
     "a drifted Pi compact did not emit the replacement instructions"
-  assert_contains "$compact_first" "FIRSTMATE_TEST_INSTRUCTION=updated" \
+  assert_contains "$compact_first" "NEXUS_TEST_INSTRUCTION=updated" \
     "a drifted Pi compact did not emit the complete current AGENTS content"
   refresh_line=$(printf '%s\n' "$compact_first" | grep -n '^CURRENT AGENTS.md - INSTRUCTION REFRESH$' | head -1 | cut -d: -f1)
   bootstrap_line=$(printf '%s\n' "$compact_first" | grep -n '^BOOTSTRAP$' | head -1 | cut -d: -f1)
@@ -2479,7 +2479,7 @@ EOF
     || fail "a drifted compact rebased the original-session baseline"
 
   compact_second=$(FM_FAKE_HARNESS=pi run_pi_session_start "$home" "$root" "$fakebin:$BASE_PATH" --reemit --source compact)
-  assert_contains "$compact_second" "FIRSTMATE_TEST_INSTRUCTION=updated" \
+  assert_contains "$compact_second" "NEXUS_TEST_INSTRUCTION=updated" \
     "a second drifted compact suppressed the required replacement instructions"
   [ "$(cat "$home/state/.session-start-agents-baseline")" = "$baseline" ] \
     || fail "a repeated compact rebased the original-session baseline"
@@ -2498,14 +2498,14 @@ EOF
 
   rm -f "$home/state/.session-start-agents-baseline"
   compact_first=$(FM_FAKE_HARNESS=pi run_pi_session_start "$home" "$root" "$fakebin:$BASE_PATH" --reemit --source compact)
-  assert_contains "$compact_first" "FIRSTMATE_TEST_INSTRUCTION=updated" \
+  assert_contains "$compact_first" "NEXUS_TEST_INSTRUCTION=updated" \
     "a missing baseline did not trigger first-post-fix replacement instructions"
   assert_absent "$home/state/.session-start-agents-baseline" \
     "a rebuild fabricated a baseline instead of preserving true-start-only ownership"
 
   printf 'wrong-session\n%s\n' "$(hash_file_for_test "$root/AGENTS.md")" > "$home/state/.session-start-agents-baseline"
   compact_first=$(FM_FAKE_HARNESS=pi run_pi_session_start "$home" "$root" "$fakebin:$BASE_PATH" --reemit --source compact)
-  assert_contains "$compact_first" "FIRSTMATE_TEST_INSTRUCTION=updated" \
+  assert_contains "$compact_first" "NEXUS_TEST_INSTRUCTION=updated" \
     "a wrong-session baseline did not trigger replacement instructions"
   baseline_after=$(cat "$home/state/.session-start-agents-baseline")
   [ "$baseline_after" = "wrong-session

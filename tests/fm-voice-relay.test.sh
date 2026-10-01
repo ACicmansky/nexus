@@ -4,7 +4,7 @@
 # Every case here runs offline. The three things worth protecting in this feature
 # are all offline properties: the frame format the laptop and the desktop agree
 # on, WHAT a status answer is allowed to contain, and the fact that real work is
-# handed to firstmate rather than done by the voice agent. The latency work that
+# handed to nexus rather than done by the voice agent. The latency work that
 # motivated the build is a measurement, not an assertion, so it is not here; the
 # numbers and the method live in docs/voice-relay.md.
 #
@@ -64,7 +64,7 @@ seed_home() {
 EOF
 
   fm_write_meta "$HOME_FIXTURE/state/alpha-one.meta" \
-    kind=ship mode=no-mistakes window=firstmate:fm-alpha-one \
+    kind=ship mode=no-mistakes window=nexus:fm-alpha-one \
     pr=https://github.com/example/alpha/pull/7
   fm_write_meta "$HOME_FIXTURE/state/gamma-three.meta" kind=ship mode=direct-PR
   printf 'working: reading the failing test\n' > "$HOME_FIXTURE/state/alpha-one.status"
@@ -452,17 +452,17 @@ relay = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(relay)
 
 names = sorted(t["toolSpec"]["name"] for t in relay.TOOLS["tools"])
-if names != ["get_fleet_status", "hand_over_to_firstmate"]:
+if names != ["get_fleet_status", "hand_over_to_nexus"]:
     sys.exit("relay declares unexpected tools: %s" % names)
 
 # The handover tool has to take the request text, or the agent can announce a
 # handover it never performed.
 handover = [t["toolSpec"] for t in relay.TOOLS["tools"]
-            if t["toolSpec"]["name"] == "hand_over_to_firstmate"][0]
+            if t["toolSpec"]["name"] == "hand_over_to_nexus"][0]
 import json
 schema = json.loads(handover["inputSchema"]["json"])
 if schema.get("required") != ["request"]:
-    sys.exit("hand_over_to_firstmate must require the request text")
+    sys.exit("hand_over_to_nexus must require the request text")
 
 # Push to talk is the default for this build and is meant to be one setting.
 options = relay.parse_args(["--self-test", "x.pcm"])
@@ -1317,9 +1317,9 @@ try:
 except SystemExit as exc:
     check(exc.code != 0, "a missing relay path must be a refusal, not a default")
 
-os.environ["FM_VOICE_RELAY"] = "/desktop/firstmate/bin/fm-voice-relay.py"
+os.environ["FM_VOICE_RELAY"] = "/desktop/nexus/bin/fm-voice-relay.py"
 check(client.parse_args(["--host", "desk"]).relay
-      == "/desktop/firstmate/bin/fm-voice-relay.py",
+      == "/desktop/nexus/bin/fm-voice-relay.py",
       "FM_VOICE_RELAY should supply the relay path for a whole shell")
 check(client.parse_args(["--host", "desk", "--relay", "/other/relay.py"]).relay
       == "/other/relay.py", "an explicit --relay must win over the variable")
@@ -3687,7 +3687,7 @@ pass "the configured read scope is honoured"
 
 # --- handover ---------------------------------------------------------------
 #
-# The point of the boundary: real work is queued for firstmate, not done by the
+# The point of the boundary: real work is queued for nexus, not done by the
 # voice agent. It reuses bin/fm-inbox.sh rather than carrying a second queue.
 
 before=$(find "$HOME_FIXTURE/state" -maxdepth 2 -name '*.note' | wc -l | tr -d '[:space:]')
@@ -3706,10 +3706,10 @@ note_file=$(find "$HOME_FIXTURE/state/inbox" -maxdepth 1 -name '*.note' | head -
 assert_grep 'Refactor the login module' "$note_file" \
   "the note should carry the captain's words"
 
-# Exactly one wake, so a spoken request is presented once at firstmate's next
+# Exactly one wake, so a spoken request is presented once at nexus's next
 # check rather than queued twice or lost.
 assert_present "$HOME_FIXTURE/state/.wake-queue" \
-  "handover should wake firstmate"
+  "handover should wake nexus"
 wakes=$(grep -c 'inbox:' "$HOME_FIXTURE/state/.wake-queue")
 [ "$wakes" = 1 ] || fail "handover should append exactly one wake, found $wakes"
 
@@ -3718,7 +3718,7 @@ wakes=$(grep -c 'inbox:' "$HOME_FIXTURE/state/.wake-queue")
 paired=$(records_status --scope counts) || fail "status after a handover failed"
 assert_contains "$paired" '"captain_notes_waiting": 1' \
   "the reader should count the note the handover just queued"
-pass "handover queues the request for firstmate and wakes it exactly once"
+pass "handover queues the request for nexus and wakes it exactly once"
 
 # The same pairing when the state directory is moved. bin/fm-inbox.sh resolves
 # ${FM_STATE_OVERRIDE:-$FM_HOME/state} and the handover queues through it with
@@ -3771,7 +3771,7 @@ pass "a home with no records answers nothing rather than failing"
 # Every case above holds one piece of the spoken interface still. This one runs
 # the piece the captain experiences: the laptop client opens the transport, the
 # relay answers a spoken question from the records and hands a spoken request for
-# real work to firstmate, and the reply audio and the timing come back down the
+# real work to nexus, and the reply audio and the timing come back down the
 # same stream. It is the only case that would notice the round trip stopping
 # working while all of the pieces still passed.
 #
@@ -3832,7 +3832,7 @@ cat > "$E2E/fakesdk/aws_sdk_bedrock_runtime/__init__.py" <<'PY'
 """A scripted stand-in for Nova Sonic's bidirectional stream.
 
 It answers with what the relay's own tool results contain, so a spoken answer
-here is derived from firstmate's records rather than from a fixture string, and
+here is derived from nexus's records rather than from a fixture string, and
 it appends one JSON line per session describing what that session was opened
 with and what it was asked. tests/fm-voice-relay.test.sh reads that record.
 
@@ -4088,7 +4088,7 @@ class _Stream:
         self._emit({"textOutput": {"role": "USER", "content": heard}})
         if self.kind == "handover":
             self._say("I am not Nexus, so I am handing that to it.")
-            result = await self._call_tool("hand_over_to_firstmate",
+            result = await self._call_tool("hand_over_to_nexus",
                                            {"request": REQUEST})
             self._say(_queued_sentence(result))
         else:
@@ -4222,7 +4222,7 @@ printf '0\n' > "$E2E/turn-counter"
 : > "$E2E/model-sessions.jsonl"
 
 # env -i: the laptop has PATH and HOME and nothing else. No AWS variable, no
-# interpreter that can reach Bedrock, no firstmate home.
+# interpreter that can reach Bedrock, no nexus home.
 laptop_aws=$(env -i PATH="$E2E/bin:$PATH" HOME="$E2E/laptop-home" env \
   | grep -c '^AWS_' || true)
 [ "$laptop_aws" = 0 ] || fail "the laptop end should hold no AWS variables"
@@ -4299,7 +4299,7 @@ for session in sessions:
     check(session["credential_key_id"] == key,
           "session opened with %r" % session["credential_key_id"])
     check(session["tool_names_offered"] ==
-          ["get_fleet_status", "hand_over_to_firstmate"],
+          ["get_fleet_status", "hand_over_to_nexus"],
           "tools offered were %r" % session["tool_names_offered"])
     # Trap 2: a push-to-talk release supplies no trailing silence, so the relay
     # appends its own. Without it the model truncates the turn and never answers.
@@ -4326,12 +4326,12 @@ check(never not in said and never not in json.dumps(served),
       "a note body or finished title reached a spoken answer")
 check(said in transcript, "the captain never saw the answer: %r" % transcript)
 
-# The handover turn queues real work and says so. The note is firstmate's own
+# The handover turn queues real work and says so. The note is nexus's own
 # queue, written by bin/fm-inbox.sh, and the agent's confirmation carries the id
 # that queue gave it, so it cannot be claiming to have queued something it did
 # not.
 handover = sessions[1]
-check([c["name"] for c in handover["tool_calls"]] == ["hand_over_to_firstmate"],
+check([c["name"] for c in handover["tool_calls"]] == ["hand_over_to_nexus"],
       "the handover turn called %r" % [c["name"] for c in handover["tool_calls"]])
 check(handover["tool_calls"][0]["arguments"]["request"] == request,
       "the captain's words were rewritten: %r"
@@ -4400,7 +4400,7 @@ check("the relay signed off" in transcript,
       "but the end of the session should still be said, in wording that cannot be "
       "read as a fault: %r" % transcript)
 PY
-pass "a spoken turn goes out and comes back: the records answer, firstmate gets the work"
+pass "a spoken turn goes out and comes back: the records answer, nexus gets the work"
 
 # --- a model session that ends while the captain is still talking ------------
 #

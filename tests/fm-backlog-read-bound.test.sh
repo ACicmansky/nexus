@@ -215,7 +215,7 @@ pass "a bound hit stops a captain hold loudly instead of being read as a missing
 # The teardown gate reaches a row read through the same resolver, so the bound
 # hit has to survive the command substitution that carries the resolved id.
 fm_write_meta "$CAPTAIN/state/wedged-origin.meta" \
-  'window=firstmate:fm-wedged-origin' \
+  'window=nexus:fm-wedged-origin' \
   'worktree=/nonexistent/wedged-origin' \
   'project=alpha' \
   'harness=claude' \
@@ -334,7 +334,7 @@ binary = "bd"
 TOML
 printf '# Backlog\n' > "$MIG/data/backlog.md"
 fm_write_meta "$MIG/state/wedged-origin.meta" \
-  'window=firstmate:fm-wedged-origin' \
+  'window=nexus:fm-wedged-origin' \
   'worktree=/nonexistent/wedged-origin' \
   'project=alpha' \
   'harness=claude' \
@@ -399,7 +399,7 @@ fm_fake_version_tool "$E2E_FAKEBIN" no-mistakes FM_FAKE_NO_MISTAKES_VERSION \
 printf '# Backlog\n' > "$E2E_HOME/data/backlog.md"
 # One owned record, so the reconcile sweep actually reads the wedged backend.
 fm_write_meta "$E2E_HOME/state/wedged-task.meta" \
-  'window=firstmate:fm-wedged-task' \
+  'window=nexus:fm-wedged-task' \
   'worktree=/nonexistent/wedged-task' \
   'project=alpha' \
   'harness=claude' \

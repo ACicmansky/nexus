@@ -310,7 +310,7 @@ SH
   printf '%s\n' "$fakebin"
 }
 
-# new_world <name>: a scratch firstmate HOME (state/, watcher beacon, pinned
+# new_world <name>: a scratch nexus HOME (state/, watcher beacon, pinned
 # harness) with no kind=secondmate meta yet. FM_ROOT is left to resolve
 # naturally to the real checkout under test ($ROOT), exactly as production
 # always has it - this sweep's own fm-spawn.sh invocation resolves the
@@ -337,7 +337,7 @@ add_sm_home() {
   local home="$w/$id"
   mkdir -p "$home/bin" "$home/data" "$home/state" "$home/config" "$home/projects"
   printf '%s\n' "$id" > "$home/.fm-secondmate-home"
-  printf '# Firstmate\n' > "$home/AGENTS.md"
+  printf '# Nexus\n' > "$home/AGENTS.md"
   printf 'charter\n' > "$home/data/charter.md"
   printf '%s\n' 'projects/' 'state/' 'data/' 'config/' '.no-mistakes/' > "$home/.gitignore"
   git -C "$home" init -q -b main
@@ -359,7 +359,7 @@ run_bootstrap() {  # <fakebin> <home> <pane-cmd> <call-log> [extra env...] -> st
 test_sweep_respawns_confirmed_dead_secondmate() {
   local w fb tmuxfb log out
   w=$(new_world sweep-dead)
-  add_sm_home "$w" sm1 firstmate:fm-sm1
+  add_sm_home "$w" sm1 nexus:fm-sm1
   fb=$(make_toolchain "$w"); tmuxfb=$(make_liveness_tmux "$w")
   log="$w/calls.log"; : > "$log"
 
@@ -367,7 +367,7 @@ test_sweep_respawns_confirmed_dead_secondmate() {
 
   assert_not_contains "$out" "SECONDMATE_LIVENESS: secondmate sm1: respawned" \
     "a successfully respawned secondmate should be handled silently"
-  assert_contains "$(cat "$log")" "kill-window -t =firstmate:=fm-sm1" \
+  assert_contains "$(cat "$log")" "kill-window -t =nexus:=fm-sm1" \
     "the stale endpoint must be killed before respawn (tmux refuses a same-named window over a live one)"
   assert_contains "$(cat "$log")" "new-window" \
     "a confirmed-dead secondmate should actually be relaunched"
@@ -379,7 +379,7 @@ test_sweep_respawns_confirmed_dead_secondmate() {
 test_sweep_skips_mate_whose_liveness_lock_is_held() {
   local w fb tmuxfb log out holder i=0
   w=$(new_world sweep-lock-held)
-  add_sm_home "$w" sm1 firstmate:fm-sm1
+  add_sm_home "$w" sm1 nexus:fm-sm1
   fb=$(make_toolchain "$w"); tmuxfb=$(make_liveness_tmux "$w")
   log="$w/calls.log"; : > "$log"
 
@@ -414,7 +414,7 @@ test_sweep_refuses_relaunch_on_ledger_errors() {
   for mode in 200 444; do
     case "$mode" in 200) word=unreadable ;; *) word=unwritable ;; esac
     w=$(new_world "sweep-ledger-$mode")
-    add_sm_home "$w" sm1 firstmate:fm-sm1
+    add_sm_home "$w" sm1 nexus:fm-sm1
     fb=$(make_toolchain "$w"); tmuxfb=$(make_liveness_tmux "$w")
     log="$w/calls.log"; : > "$log"
     ledger="$w/home/state/.secondmate-relaunch-sm1"
@@ -435,7 +435,7 @@ test_sweep_refuses_relaunch_on_ledger_errors() {
 test_sweep_leaves_alive_secondmate_untouched() {
   local w fb tmuxfb log out
   w=$(new_world sweep-alive)
-  add_sm_home "$w" sm1 firstmate:fm-sm1
+  add_sm_home "$w" sm1 nexus:fm-sm1
   fb=$(make_toolchain "$w"); tmuxfb=$(make_liveness_tmux "$w")
   log="$w/calls.log"; : > "$log"
 
@@ -455,7 +455,7 @@ test_sweep_leaves_alive_secondmate_untouched() {
 test_sweep_respawns_authoritatively_missing_pi_secondmate() {
   local w fb tmuxfb log out
   w=$(new_world sweep-missing-pi)
-  add_sm_home "$w" sm1 firstmate:fm-sm1 pi
+  add_sm_home "$w" sm1 nexus:fm-sm1 pi
   fb=$(make_toolchain "$w"); tmuxfb=$(make_liveness_tmux "$w")
   log="$w/calls.log"; : > "$log"
 
@@ -471,7 +471,7 @@ test_sweep_respawns_authoritatively_missing_pi_signed_secondmate() {
   local w fb tmuxfb log out
   w=$(new_world sweep-missing-pi-signed)
   printf '%s\n' pi-signed > "$w/home/config/secondmate-harness"
-  add_sm_home "$w" sm1 firstmate:fm-sm1 pi-signed
+  add_sm_home "$w" sm1 nexus:fm-sm1 pi-signed
   fb=$(make_toolchain "$w"); tmuxfb=$(make_liveness_tmux "$w")
   log="$w/calls.log"; : > "$log"
 
@@ -489,7 +489,7 @@ test_sweep_respawns_authoritatively_missing_pi_signed_secondmate() {
 test_sweep_never_acts_on_ambiguous_existing_process() {
   local w fb tmuxfb log out
   w=$(new_world sweep-ambiguous)
-  add_sm_home "$w" sm1 firstmate:fm-sm1 pi
+  add_sm_home "$w" sm1 nexus:fm-sm1 pi
   fb=$(make_toolchain "$w"); tmuxfb=$(make_liveness_tmux "$w")
   log="$w/calls.log"; : > "$log"
 
@@ -504,7 +504,7 @@ test_sweep_never_acts_on_ambiguous_existing_process() {
 test_sweep_never_acts_on_transient_unreadability() {
   local w fb tmuxfb log out
   w=$(new_world sweep-unreadable)
-  add_sm_home "$w" sm1 firstmate:fm-sm1 pi
+  add_sm_home "$w" sm1 nexus:fm-sm1 pi
   fb=$(make_toolchain "$w"); tmuxfb=$(make_liveness_tmux "$w")
   log="$w/calls.log"; : > "$log"
 
@@ -519,7 +519,7 @@ test_sweep_never_acts_on_transient_unreadability() {
 test_sweep_reports_missing_endpoint_relaunch_failure() {
   local w fb tmuxfb log out
   w=$(new_world sweep-missing-failure)
-  add_sm_home "$w" sm1 firstmate:fm-sm1 pi
+  add_sm_home "$w" sm1 nexus:fm-sm1 pi
   fb=$(make_toolchain "$w"); tmuxfb=$(make_liveness_tmux "$w")
   log="$w/calls.log"; : > "$log"
 
@@ -533,7 +533,7 @@ test_sweep_reports_missing_endpoint_relaunch_failure() {
 test_sweep_never_acts_on_unverified_harness_dead_reading() {
   local w fb tmuxfb log out
   w=$(new_world sweep-unverified-harness)
-  add_sm_home "$w" sm1 firstmate:fm-sm1 custom-agent
+  add_sm_home "$w" sm1 nexus:fm-sm1 custom-agent
   fb=$(make_toolchain "$w"); tmuxfb=$(make_liveness_tmux "$w")
   log="$w/calls.log"; : > "$log"
 
@@ -548,7 +548,7 @@ test_sweep_never_acts_on_unverified_harness_dead_reading() {
 test_sweep_converges_no_retouch_once_alive() {
   local w fb tmuxfb log out1 out2
   w=$(new_world sweep-idempotent)
-  add_sm_home "$w" sm1 firstmate:fm-sm1
+  add_sm_home "$w" sm1 nexus:fm-sm1
   fb=$(make_toolchain "$w"); tmuxfb=$(make_liveness_tmux "$w")
   log="$w/calls.log"; : > "$log"
 
@@ -569,7 +569,7 @@ test_sweep_converges_no_retouch_once_alive() {
 test_sweep_skipped_under_detect_only() {
   local w fb tmuxfb log out
   w=$(new_world sweep-detect-only)
-  add_sm_home "$w" sm1 firstmate:fm-sm1
+  add_sm_home "$w" sm1 nexus:fm-sm1
   mkdir -p "$w/home/config"
   printf 'codex\n' > "$w/home/config/crew-harness"
   fb=$(make_toolchain "$w"); tmuxfb=$(make_liveness_tmux "$w")

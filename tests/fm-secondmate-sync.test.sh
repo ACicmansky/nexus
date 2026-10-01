@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Tests for the local-HEAD secondmate sync: every secondmate home tracks the
-# PRIMARY firstmate checkout's current default-branch commit by a purely LOCAL
+# PRIMARY nexus checkout's current default-branch commit by a purely LOCAL
 # fast-forward (no origin fetch). Two hook points drive it - bin/fm-spawn.sh
 # (before launching a secondmate) and bin/fm-bootstrap.sh (a startup sweep of
 # every live secondmate home) - and both share the ff machinery in
@@ -21,10 +21,10 @@
 #   - Spawning a secondmate fast-forwards its worktree to the primary's HEAD
 #     before launch, or warns and launches unchanged when the sync is skipped.
 #   - A REMOTE secondmate home follows that same primary commit rather than the
-#     Firstmate copy on its own host: the parent resolves the commit and the host
+#     Nexus copy on its own host: the parent resolves the commit and the host
 #     imports it (from the home, that copy, or the home's origin) before running
 #     the same ff guards, skipping with an actionable reason when it cannot. The
-#     host's own copy is never moved, /updatefirstmate's code-root-relative sync
+#     host's own copy is never moved, /updatenexus's code-root-relative sync
 #     is unchanged, and a launch never re-targets that copy.
 set -u
 
@@ -46,7 +46,7 @@ export FM_BACKEND=tmux
 
 # --- world builders --------------------------------------------------------
 
-# new_world <name>: a PRIMARY firstmate repo on `main` with one commit (the
+# new_world <name>: a PRIMARY nexus repo on `main` with one commit (the
 # instruction surface seeded) and a home dir with state/ and data/. NO origin
 # remote: the local-HEAD sync never needs one. Echoes the world dir.
 new_world() {
@@ -78,7 +78,7 @@ add_sm_worktree() {
   git -C "$w/main" worktree add -q --detach "$w/$id" "$commit"
   printf '%s\n' "$id" > "$w/$id/.fm-secondmate-home"
   {
-    printf 'window=firstmate:fm-%s\n' "$id"
+    printf 'window=nexus:fm-%s\n' "$id"
     printf 'kind=secondmate\n'
     printf 'harness=codex\n'
     printf 'home=%s/%s\n' "$w" "$id"
@@ -107,7 +107,7 @@ head_of() { git -C "$1" rev-parse HEAD; }
 
 # ignore_marker_commit <w>: land THE FIX in the primary - add the seed marker to
 # the tracked .gitignore and commit it on main. The marker (.fm-secondmate-home)
-# is firstmate-generic, written by bin/fm-home-seed.sh into every seeded home; once
+# is nexus-generic, written by bin/fm-home-seed.sh into every seeded home; once
 # a home fast-forwards past this commit the marker is git-ignored and can no longer
 # read as a dirty working tree to any `git status --porcelain` dirtiness check.
 ignore_marker_commit() {
@@ -430,18 +430,18 @@ test_bootstrap_sweep_nudges_only_instruction_change() {
 
   info_line=$(printf '%s\n' "$out" | grep '^BOOTSTRAP_INFO: nudged fm-sm-instr ' || true)
   [ -n "$info_line" ] || fail "no BOOTSTRAP_INFO nudge line emitted (got: $out)"
-  assert_contains "$info_line" "firstmate was updated to the latest - please re-read your AGENTS.md to pick up the new instructions." \
+  assert_contains "$info_line" "nexus was updated to the latest - please re-read your AGENTS.md to pick up the new instructions." \
     "successful nudge report should include the exact message sent"
-  assert_not_contains "$out" "NUDGE_SECONDMATES:" "successful nudge must not leave a firstmate action item"
+  assert_not_contains "$out" "NUDGE_SECONDMATES:" "successful nudge must not leave a nexus action item"
   assert_not_contains "$out" "sm-readme" "readme-only advance is not nudged"
   assert_not_contains "$out" "sm-current" "already-current secondmate is not nudged"
   # The nudge rides fm-send's durable inbox plane: the marked message lands in
   # the secondmate task's steering-inbox record while only the doorbell is typed.
-  assert_contains "$(cat "$w/home/state/sm-instr.inbox/001.msg")" "[fm-from-firstmate]" \
+  assert_contains "$(cat "$w/home/state/sm-instr.inbox/001.msg")" "[fm-from-nexus]" \
     "nudge send should use the marked fm-send secondmate path"
-  assert_contains "$(cat "$w/home/state/sm-instr.inbox/001.msg")" "firstmate was updated to the latest - please re-read your AGENTS.md" \
+  assert_contains "$(cat "$w/home/state/sm-instr.inbox/001.msg")" "nexus was updated to the latest - please re-read your AGENTS.md" \
     "nudge send should enqueue the exact re-read message"
-  assert_contains "$(cat "$log")" "Firstmate instruction waiting" \
+  assert_contains "$(cat "$log")" "Nexus instruction waiting" \
     "nudge send should ring the doorbell at the secondmate pane"
   marker_dir="$w/home/state/.secondmate-nudge-pending"
   [ ! -e "$marker_dir/sm-instr.pending" ] || fail "successful nudge should clear its retry marker"
@@ -476,7 +476,7 @@ test_bootstrap_nudge_send_uses_state_override() {
     "nudge send should resolve fm-sm-instr through the effective state dir"
   assert_not_contains "$out" "NUDGE_SECONDMATES:" \
     "effective-state nudge should not fail through FM_HOME/state"
-  assert_contains "$(cat "$override_state/sm-instr.inbox/001.msg")" "[fm-from-firstmate]" \
+  assert_contains "$(cat "$override_state/sm-instr.inbox/001.msg")" "[fm-from-nexus]" \
     "effective-state nudge should still use secondmate marker metadata"
   marker="$override_state/.secondmate-nudge-pending/sm-instr.pending"
   assert_absent "$marker" "successful effective-state nudge should clear its retry marker"
@@ -498,10 +498,10 @@ test_bootstrap_nudge_retry_rejects_malformed_marker_id() {
     printf 'home=%s\n' "$evil"
     printf 'commit=%s\n' "$c1"
     printf 'instructions=AGENTS.md\n'
-    printf 'message=firstmate was updated to the latest - please re-read your AGENTS.md to pick up the new instructions.\n'
+    printf 'message=nexus was updated to the latest - please re-read your AGENTS.md to pick up the new instructions.\n'
   } > "$marker"
   {
-    printf 'window=firstmate:fm-evil\n'
+    printf 'window=nexus:fm-evil\n'
     printf 'kind=secondmate\n'
     printf 'home=%s\n' "$evil"
   } > "$w/home/escape.meta"
@@ -541,7 +541,7 @@ test_bootstrap_nudge_failure_records_retry_marker() {
   marker="$w/home/state/.secondmate-nudge-pending/sm-instr.pending"
   assert_present "$marker" "failed nudge should leave a retry marker"
   assert_grep "selector=fm-sm-instr" "$marker" "retry marker should pin the stable selector"
-  assert_grep "message=firstmate was updated to the latest - please re-read your AGENTS.md to pick up the new instructions." \
+  assert_grep "message=nexus was updated to the latest - please re-read your AGENTS.md to pick up the new instructions." \
     "$marker" "retry marker should pin the exact message"
   pass "T8c failed bootstrap nudge is surfaced and recorded for retry"
 }
@@ -854,7 +854,7 @@ test_seed_marker_clean_when_gitignored() {
 # is still untracked-and-unignored, and the fix itself only arrives by fast-forward.
 # The marker-tolerant ff-skip (ignore_seed_marker=yes) bridges the gap for
 # linked-worktree homes, which bootstrap/spawn fast-forward from the primary's local HEAD.
-# Standalone-clone homes converge through /updatefirstmate's origin fetch instead.
+# Standalone-clone homes converge through /updatenexus's origin fetch instead.
 # Once advanced, the now-ignored marker reads clean with no hand intervention.
 test_seed_marker_converges_existing_home() {
   local w c0 base
@@ -906,8 +906,8 @@ test_seed_marker_does_not_mask_real_dirt() {
 # then runs the SAME ff_target guards above. These cases drive the real
 # host-local leg (bin/fm-remote-secondmate-control.sh) directly.
 
-# new_remote_world <name>: a PRIMARY firstmate repo with a bare forge origin, a
-# host "Firstmate copy" clone (the code root), and a persistent remote home clone
+# new_remote_world <name>: a PRIMARY nexus repo with a bare forge origin, a
+# host "Nexus copy" clone (the code root), and a persistent remote home clone
 # of that copy - the topology bin/fm-remote-home-provision.sh lays down. Echoes
 # the world dir. The primary starts one commit ahead of both clones.
 new_remote_world() {
@@ -963,7 +963,7 @@ rargs=()
 while IFS= read -r -d '' a; do rargs+=("$a"); done < <(decode "$argv_b64")
 cmd=${rargs[0]}
 [ "$cmd" != fm-remote-doctor.sh ] || exit 0
-# An older remote Firstmate copy rejects a command shape it does not know with
+# An older remote Nexus copy rejects a command shape it does not know with
 # the usage status, which is exactly what a parent-targeted sync meets there.
 if [ "${FM_TEST_REMOTE_LEG_REJECT_SYNC:-0}" = 1 ] \
   && [ "$cmd" = fm-remote-secondmate-control.sh ] && [ "${rargs[1]:-}" = sync ]; then
@@ -992,7 +992,7 @@ remote_sync() {
 }
 
 # --- R1: a remote home follows the PARENT primary, not the host's own copy ----
-# The reported incident: the home had already advanced past the host's Firstmate
+# The reported incident: the home had already advanced past the host's Nexus
 # copy, so a sync aimed at that copy refused as a non-fast-forward and the home
 # stayed behind the primary. Aimed at the primary's own commit it advances, and
 # the host's copy is not touched at all.
@@ -1015,14 +1015,14 @@ test_remote_sync_targets_primary_not_host_copy() {
   assert_contains "$REMOTE_SYNC_OUT" "synced: $c3" "remote sync did not report the primary commit"
   [ "$(head_of "$w/sm")" = "$c3" ] || fail "remote home did not advance to the primary's commit"
   [ "$(head_of "$w/coderoot")" = "$coderoot_before" ] \
-    || fail "remote sync moved the host's own Firstmate copy"
-  pass "R1 a remote home ahead of the host's Firstmate copy still advances to the primary's commit"
+    || fail "remote sync moved the host's own Nexus copy"
+  pass "R1 a remote home ahead of the host's Nexus copy still advances to the primary's commit"
 }
 
 # --- R2: the target is imported from the host's copy when the home lacks it ----
 # --- R1b: a remote sync reports WHICH instruction paths its advance changed ----
 # The parent cannot diff a checkout it cannot read, so the host's own result is
-# the only place that fact can come from. /updatefirstmate needs it to decide
+# the only place that fact can come from. /updatenexus needs it to decide
 # whether the running remote agent must be replaced to reload, or whether the
 # advance reloads itself.
 test_remote_sync_reports_the_changed_instruction_surface() {
@@ -1077,7 +1077,7 @@ test_remote_sync_imports_from_host_copy() {
   [ "$(head_of "$w/sm")" = "$c2" ] || fail "remote home did not advance to the imported commit"
   [ "$(head_of "$w/coderoot")" = "$coderoot_before" ] \
     || fail "importing from the host's copy moved that copy's HEAD"
-  pass "R2 a missing target is imported from the host's Firstmate copy without moving it"
+  pass "R2 a missing target is imported from the host's Nexus copy without moving it"
 }
 
 # --- R3: the target is imported from the home's own origin ---------------------
@@ -1138,7 +1138,7 @@ test_remote_sync_skips_unimportable_target() {
   [ "$REMOTE_SYNC_RC" -ne 0 ] || fail "remote sync claimed success on an unreachable commit"
   assert_contains "$REMOTE_SYNC_OUT" "could not import $c2" \
     "the skip does not name the commit that could not be imported"
-  assert_contains "$REMOTE_SYNC_OUT" "/updatefirstmate" \
+  assert_contains "$REMOTE_SYNC_OUT" "/updatenexus" \
     "the skip does not name the command that refreshes the host's copy"
   [ "$(head_of "$w/sm")" = "$before" ] || fail "an unreachable target still moved the home"
   pass "R5 a target neither the host copy nor the origin holds skips with an actionable reason"
@@ -1187,18 +1187,18 @@ test_remote_sync_skips_dirty_diverged_and_feature_branch() {
   pass "R6 dirty, diverged, and feature-branch remote homes skip and are left untouched"
 }
 
-# --- R7: /updatefirstmate's contract is unchanged ------------------------------
-# That path refreshes the host's own Firstmate copy from origin first and then
+# --- R7: /updatenexus's contract is unchanged ------------------------------
+# That path refreshes the host's own Nexus copy from origin first and then
 # syncs the home to THAT copy, so the no-target call must still target the copy.
 test_remote_sync_without_target_follows_host_copy() {
   local w c1 c2
-  w=$(new_remote_world remote-updatefirstmate)
+  w=$(new_remote_world remote-updatenexus)
   c1=$(head_of "$w/main")
   add_remote_home "$w" sm "$w/coderoot" "$c1"
   bump_primary "$w" instr
   c2=$(head_of "$w/main")
   git -C "$w/main" push -q origin main
-  git -C "$w/coderoot" pull -q --ff-only        # what /updatefirstmate does first
+  git -C "$w/coderoot" pull -q --ff-only        # what /updatenexus does first
   [ "$(head_of "$w/coderoot")" = "$c2" ] || fail "precondition: the host copy should be refreshed"
 
   remote_sync "$w" sm
@@ -1206,7 +1206,7 @@ test_remote_sync_without_target_follows_host_copy() {
   [ "$REMOTE_SYNC_RC" -eq 0 ] || fail "the no-target sync failed: $REMOTE_SYNC_OUT"
   assert_contains "$REMOTE_SYNC_OUT" "synced: $c2" "the no-target sync did not follow the host copy"
   [ "$(head_of "$w/sm")" = "$c2" ] || fail "the no-target sync did not advance the home"
-  pass "R7 a sync with no target still follows the host's own refreshed Firstmate copy"
+  pass "R7 a sync with no target still follows the host's own refreshed Nexus copy"
 }
 
 # --- R8: session start hands the remote host the PRIMARY's commit --------------
@@ -1253,12 +1253,12 @@ test_bootstrap_syncs_remote_home_to_primary_commit() {
   [ "$(head_of "$w/sm")" = "$c2" ] \
     || fail "session start left the remote home off the primary's commit (out: $out)"
   [ "$(head_of "$w/coderoot")" = "$coderoot_before" ] \
-    || fail "session start moved the host's own Firstmate copy"
+    || fail "session start moved the host's own Nexus copy"
   pass "R8 session start converges a remote home on the primary's default-branch commit"
 }
 
 # --- R10: an outdated host refuses, and the report says how to fix it ----------
-# A host still running an older Firstmate copy rejects a command shape it does
+# A host still running an older Nexus copy rejects a command shape it does
 # not know, which for this leg can only mean it predates the parent-targeted
 # sync. Session start must name the command that refreshes that copy rather than
 # echoing an unexplained refusal.
@@ -1290,13 +1290,13 @@ test_bootstrap_reports_outdated_host_actionably() {
 
   assert_contains "$out" "SECONDMATE_SYNC: secondmate sm: skipped:" \
     "an outdated host did not produce its own convergence line"
-  assert_contains "$out" "too old to sync to this primary's commit; run /updatefirstmate" \
+  assert_contains "$out" "too old to sync to this primary's commit; run /updatenexus" \
     "the outdated-host report does not say how to fix it"
   pass "R10 a host too old for a parent-targeted sync is reported with the command that fixes it"
 }
 
-# --- R9: a remote launch never re-targets the host's own Firstmate copy --------
-# The launch leg runs a host-local spawn whose FM_ROOT is that host's Firstmate
+# --- R9: a remote launch never re-targets the host's own Nexus copy --------
+# The launch leg runs a host-local spawn whose FM_ROOT is that host's Nexus
 # copy. Once the parent has synced the home to ITS commit, that spawn must leave
 # the home there. The control home proves the suppressed step is otherwise live:
 # the ordinary secondmate spawn contract does move an identical home onto the
@@ -1327,7 +1327,7 @@ test_remote_launch_does_not_retarget_host_copy() {
     FM_HOME="$w/launched" FM_ROOT_OVERRIDE="$w/coderoot" FM_SPAWN_NO_GUARD=1 \
     "$ROOT/bin/fm-remote-secondmate-control.sh" launch launched codex - - herdr 2>&1) || true
   [ "$(head_of "$w/launched")" = "$c1" ] \
-    || fail "a remote launch moved the home onto the host's own Firstmate copy (out: $launch_out)"
+    || fail "a remote launch moved the home onto the host's own Nexus copy (out: $launch_out)"
 
   # Divergence control: the ordinary secondmate spawn contract DOES follow its
   # FM_ROOT, so the suppressed step above is not vacuously absent.

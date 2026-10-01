@@ -64,13 +64,13 @@ chmod +x "$FAKEBIN/tmux" "$FAKEBIN/no-mistakes"
 mkdir -p "$HOME_DIR/state" "$HOME_DIR/data" "$HOME_DIR/config" \
   "$HOME_DIR/projects/task" "$HOME_DIR/bin"
 HOME_DIR=$(cd "$HOME_DIR" && pwd -P)
-printf '# Seeded Firstmate home\n' > "$HOME_DIR/AGENTS.md"
+printf '# Seeded Nexus home\n' > "$HOME_DIR/AGENTS.md"
 printf 'mate\n' > "$HOME_DIR/.fm-secondmate-home"
 fm_git_init_commit "$HOME_DIR/projects/task"
 git -C "$HOME_DIR/projects/task" checkout -q -b fm/ledger-task
 cat > "$HOME_DIR/data/backlog.md" <<'EOF'
 ## In flight
-- [ ] ledger-task - Publish the home ledger (repo: firstmate) (kind: ship) (since 2026-08-28)
+- [ ] ledger-task - Publish the home ledger (repo: nexus) (kind: ship) (since 2026-08-28)
 
 ## Queued
 
@@ -79,7 +79,7 @@ EOF
 fm_write_meta "$HOME_DIR/state/ledger-task.meta" \
   "window=fmtest:fm-ledger-task" \
   "worktree=$HOME_DIR/projects/task" \
-  "project=firstmate" \
+  "project=nexus" \
   "harness=claude" \
   "kind=ship" \
   "mode=no-mistakes" \
@@ -166,14 +166,14 @@ pass "watcher-carried status append publishes the real home summary"
 # publishable through both fleet snapshot modes and the real home-summary writer.
 mkdir -p "$LARGE_HOME/state" "$LARGE_HOME/data" "$LARGE_HOME/config" \
   "$LARGE_HOME/projects"
-printf '# Seeded Firstmate home\n' > "$LARGE_HOME/AGENTS.md"
+printf '# Seeded Nexus home\n' > "$LARGE_HOME/AGENTS.md"
 printf 'large\n' > "$LARGE_HOME/.fm-secondmate-home"
 large_id_suffix=$(printf 'i%.0s' $(seq 1 110))
 {
   printf '%s\n' '## In flight'
   i=1
   while [ "$i" -le 1200 ]; do
-    printf '%s\n' "- [ ] orphan-$i-$large_id_suffix - Missing metadata (repo: firstmate) (kind: ship)"
+    printf '%s\n' "- [ ] orphan-$i-$large_id_suffix - Missing metadata (repo: nexus) (kind: ship)"
     i=$((i + 1))
   done
   printf '%s\n' '' '## Queued' '' '## Done'
@@ -220,13 +220,13 @@ pass "fleet snapshot transport does not require or mutate operational state"
 
 mkdir -p "$LARGE_CHILD_HOME/state" "$LARGE_CHILD_HOME/data" \
   "$LARGE_CHILD_HOME/config" "$LARGE_CHILD_HOME/projects" "$LARGE_CHILD_HOME/bin"
-printf '# Seeded Firstmate home\n' > "$LARGE_CHILD_HOME/AGENTS.md"
+printf '# Seeded Nexus home\n' > "$LARGE_CHILD_HOME/AGENTS.md"
 printf 'large-child\n' > "$LARGE_CHILD_HOME/.fm-secondmate-home"
 {
   printf '%s\n' '## In flight'
   i=1
   while [ "$i" -le 600 ]; do
-    printf '%s\n' "- [ ] orphan-$i-$large_id_suffix - Missing metadata (repo: firstmate) (kind: ship)"
+    printf '%s\n' "- [ ] orphan-$i-$large_id_suffix - Missing metadata (repo: nexus) (kind: ship)"
     i=$((i + 1))
   done
   printf '%s\n' '' '## Queued' '' '## Done'
@@ -239,12 +239,12 @@ large_child_bytes=$(wc -c < "$LARGE_CHILD_HOME/state/home-summary.json")
   || fail "large child ledger did not cross only the per-argument limit: $large_child_bytes"
 mkdir -p "$LARGE_PARENT_HOME/state" "$LARGE_PARENT_HOME/data" \
   "$LARGE_PARENT_HOME/config" "$LARGE_PARENT_HOME/projects"
-printf -- '- large-child - fixture domain (home: %s; scope: fixture work; projects: firstmate; added 2026-08-28)\n' \
+printf -- '- large-child - fixture domain (home: %s; scope: fixture work; projects: nexus; added 2026-08-28)\n' \
   "$LARGE_CHILD_HOME" > "$LARGE_PARENT_HOME/data/secondmates.md"
 printf '%s\n' '## In flight' '' '## Queued' '' '## Done' \
   > "$LARGE_PARENT_HOME/data/backlog.md"
 fm_write_secondmate_meta "$LARGE_PARENT_HOME/state/large-child.meta" \
-  "$LARGE_CHILD_HOME" "fmtest:fm-large-child" firstmate claude
+  "$LARGE_CHILD_HOME" "fmtest:fm-large-child" nexus claude
 PATH="$FAKEBIN:$PATH" FM_ROOT_OVERRIDE="$ROOT" FM_HOME="$LARGE_PARENT_HOME" \
   FM_SNAPSHOT_NOW="$NOW_ONE" FM_SNAPSHOT_NOW_EPOCH="$EPOCH_ONE" \
   "$SNAPSHOT" --json > "$TMP_ROOT/large-parent-snapshot.json" \
@@ -259,7 +259,7 @@ pass "parent snapshot consumes large child ledgers without argument transport"
 
 mkdir -p "$CADENCE_HOME/state" "$CADENCE_HOME/data" "$CADENCE_HOME/config" \
   "$CADENCE_HOME/projects"
-printf '# Seeded Firstmate home\n' > "$CADENCE_HOME/AGENTS.md"
+printf '# Seeded Nexus home\n' > "$CADENCE_HOME/AGENTS.md"
 printf 'cadence\n' > "$CADENCE_HOME/.fm-secondmate-home"
 cat > "$CADENCE_HOME/data/backlog.md" <<'EOF'
 ## In flight
@@ -292,7 +292,7 @@ from pathlib import Path
 import sys
 path = Path(sys.argv[1])
 text = path.read_text()
-path.write_text(text.replace("## Queued\n\n## Done", "## Queued\n- [ ] cadence-task - Publish without a status signal (repo: firstmate) (kind: ship)\n\n## Done"))
+path.write_text(text.replace("## Queued\n\n## Done", "## Queued\n- [ ] cadence-task - Publish without a status signal (repo: nexus) (kind: ship)\n\n## Done"))
 PY
 i=0
 while ! jq -e 'any(.queued[]; .id == "cadence-task")' \
@@ -319,7 +319,7 @@ jq '.state = "no_active_work" | .active_children = [] | .holds = []
   "$HOME_DIR/state/home-summary.json" > "$HOME_DIR/state/home-summary.poisoned"
 mv -f "$HOME_DIR/state/home-summary.poisoned" "$HOME_DIR/state/home-summary.json"
 mkdir -p "$PARENT_HOME/state" "$PARENT_HOME/data" "$PARENT_HOME/config" "$PARENT_HOME/projects"
-printf -- '- mate - fixture domain (home: %s; scope: fixture work; projects: firstmate; added 2026-08-28)\n' \
+printf -- '- mate - fixture domain (home: %s; scope: fixture work; projects: nexus; added 2026-08-28)\n' \
   "$HOME_DIR" > "$PARENT_HOME/data/secondmates.md"
 cat > "$PARENT_HOME/data/backlog.md" <<'EOF'
 ## In flight
@@ -329,7 +329,7 @@ cat > "$PARENT_HOME/data/backlog.md" <<'EOF'
 ## Done
 EOF
 fm_write_secondmate_meta "$PARENT_HOME/state/mate.meta" "$HOME_DIR" \
-  "fmtest:fm-mate" firstmate claude
+  "fmtest:fm-mate" nexus claude
 PATH="$FAKEBIN:$PATH" \
   FM_ROOT_OVERRIDE="$ROOT" FM_HOME="$PARENT_HOME" \
   FM_SNAPSHOT_NOW="$NOW_TWO" FM_SNAPSHOT_NOW_EPOCH="$EPOCH_TWO" \
@@ -621,12 +621,12 @@ pass "valid publication ignores an unavailable failure record"
 COST_HOME="$TMP_ROOT/cost-home"
 mkdir -p "$COST_HOME/state" "$COST_HOME/data" "$COST_HOME/config" \
   "$COST_HOME/projects/task"
-printf '# Seeded Firstmate home\n' > "$COST_HOME/AGENTS.md"
+printf '# Seeded Nexus home\n' > "$COST_HOME/AGENTS.md"
 printf 'cost\n' > "$COST_HOME/.fm-secondmate-home"
 fm_git_init_commit "$COST_HOME/projects/task"
 cat > "$COST_HOME/data/backlog.md" <<'EOF'
 ## In flight
-- [ ] cost-task - Publish from an accumulated home (repo: firstmate) (kind: ship) (since 2026-08-28)
+- [ ] cost-task - Publish from an accumulated home (repo: nexus) (kind: ship) (since 2026-08-28)
 
 ## Queued
 
@@ -635,7 +635,7 @@ EOF
 fm_write_meta "$COST_HOME/state/cost-task.meta" \
   "window=fmtest:fm-cost-task" \
   "worktree=$COST_HOME/projects/task" \
-  "project=firstmate" \
+  "project=nexus" \
   "harness=claude" \
   "kind=ship" \
   "mode=no-mistakes" \
@@ -675,11 +675,11 @@ pass "publication completes on a home carrying accumulated status history"
 REMOTE_HOME="$TMP_ROOT/remote-home"
 mkdir -p "$REMOTE_HOME/state" "$REMOTE_HOME/data" "$REMOTE_HOME/config" \
   "$REMOTE_HOME/projects" "$TMP_ROOT/sshbin"
-printf '# Seeded Firstmate home\n' > "$REMOTE_HOME/AGENTS.md"
+printf '# Seeded Nexus home\n' > "$REMOTE_HOME/AGENTS.md"
 printf 'remote\n' > "$REMOTE_HOME/.fm-secondmate-home"
 cat > "$REMOTE_HOME/data/backlog.md" <<'EOF'
 ## In flight
-- [ ] rsm - Read remote current state (repo: firstmate) (kind: ship) (since 2026-08-28)
+- [ ] rsm - Read remote current state (repo: nexus) (kind: ship) (since 2026-08-28)
 
 ## Queued
 
@@ -738,7 +738,7 @@ pass "producer skips remote per-task state probes"
 BEAT_HOME="$TMP_ROOT/beat-home"
 mkdir -p "$BEAT_HOME/state" "$BEAT_HOME/data" "$BEAT_HOME/config" \
   "$BEAT_HOME/projects"
-printf '# Seeded Firstmate home\n' > "$BEAT_HOME/AGENTS.md"
+printf '# Seeded Nexus home\n' > "$BEAT_HOME/AGENTS.md"
 printf 'beat\n' > "$BEAT_HOME/.fm-secondmate-home"
 cat > "$BEAT_HOME/data/backlog.md" <<'EOF'
 ## In flight
@@ -805,12 +805,12 @@ pass "a stalled publication does not delay the watcher liveness beacon"
 RESTART_HOME="$TMP_ROOT/restart-home"
 mkdir -p "$RESTART_HOME/state" "$RESTART_HOME/data" "$RESTART_HOME/config" \
   "$RESTART_HOME/projects/task"
-printf '# Seeded Firstmate home\n' > "$RESTART_HOME/AGENTS.md"
+printf '# Seeded Nexus home\n' > "$RESTART_HOME/AGENTS.md"
 printf 'restart\n' > "$RESTART_HOME/.fm-secondmate-home"
 fm_git_init_commit "$RESTART_HOME/projects/task"
 cat > "$RESTART_HOME/data/backlog.md" <<'EOF'
 ## In flight
-- [ ] restart-task - Preserve publication single flight (repo: firstmate) (kind: ship) (since 2026-08-28)
+- [ ] restart-task - Preserve publication single flight (repo: nexus) (kind: ship) (since 2026-08-28)
 
 ## Queued
 
@@ -819,7 +819,7 @@ EOF
 fm_write_meta "$RESTART_HOME/state/restart-task.meta" \
   "window=fmtest:fm-restart-task" \
   "worktree=$RESTART_HOME/projects/task" \
-  "project=firstmate" \
+  "project=nexus" \
   "harness=claude" \
   "kind=ship" \
   "mode=no-mistakes" \
@@ -923,7 +923,7 @@ pass "publication remains single-flight across watcher restart"
 REPORT_HOME="$TMP_ROOT/report-home"
 mkdir -p "$REPORT_HOME/state" "$REPORT_HOME/data" "$REPORT_HOME/config" \
   "$REPORT_HOME/projects"
-printf '# Seeded Firstmate home\n' > "$REPORT_HOME/AGENTS.md"
+printf '# Seeded Nexus home\n' > "$REPORT_HOME/AGENTS.md"
 printf 'report\n' > "$REPORT_HOME/.fm-secondmate-home"
 cat > "$REPORT_HOME/data/backlog.md" <<'EOF'
 ## In flight
@@ -947,7 +947,7 @@ run_bootstrap_detect() {
 COMPAT_HOME="$TMP_ROOT/compat-home"
 mkdir -p "$COMPAT_HOME/state" "$COMPAT_HOME/data" "$COMPAT_HOME/config" \
   "$COMPAT_HOME/projects"
-printf '# Seeded Firstmate home\n' > "$COMPAT_HOME/AGENTS.md"
+printf '# Seeded Nexus home\n' > "$COMPAT_HOME/AGENTS.md"
 printf 'compat\n' > "$COMPAT_HOME/.fm-secondmate-home"
 cat > "$COMPAT_HOME/data/backlog.md" <<'EOF'
 ## In flight
@@ -993,7 +993,7 @@ ORDER_HOME="$TMP_ROOT/order-home"
 ORDER_DATE_BIN="$TMP_ROOT/order-date-bin"
 mkdir -p "$ORDER_HOME/state" "$ORDER_HOME/data" "$ORDER_HOME/config" \
   "$ORDER_HOME/projects" "$ORDER_DATE_BIN"
-printf '# Seeded Firstmate home\n' > "$ORDER_HOME/AGENTS.md"
+printf '# Seeded Nexus home\n' > "$ORDER_HOME/AGENTS.md"
 printf 'order\n' > "$ORDER_HOME/.fm-secondmate-home"
 cat > "$ORDER_HOME/data/backlog.md" <<'EOF'
 ## In flight

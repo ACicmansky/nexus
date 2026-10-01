@@ -324,7 +324,7 @@ Captain: Nor this tilde-fenced one.
 
     Captain: An indented example is not the ask either.
 	[captain] Nor a tab-indented one.
-Keep this Firstmate constraint out of captain intent.')
+Keep this Nexus constraint out of captain intent.')
   assert_equals "" "$words" "fenced or indented Captain lines were extracted as authorized intent"
 
   words=$(fm_brief_marked_captain_words '```

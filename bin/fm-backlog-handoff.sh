@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Hand already-identified, in-scope backlog items off from the main firstmate
+# Hand already-identified, in-scope backlog items off from the main nexus
 # backlog to a secondmate's own home backlog. Use this when a secondmate is
 # created (or whenever an existing queued item should become its domain's work)
 # so the secondmate owns its queue from day one instead of the item staying
 # stranded in the main backlog.
 #
-# Scope-matching is firstmate's JUDGMENT: you pass the task-id keys you have
+# Scope-matching is nexus's JUDGMENT: you pass the task-id keys you have
 # already judged in-scope for the secondmate. This script performs only the
 # fleet-level validation that the backlog backend cannot know, then DELEGATES
 # the actual item move to `tasks-axi mv`, the single owner of the backlog
@@ -18,7 +18,7 @@
 #   - resolving the secondmate home from data/secondmates.md;
 #   - proving the destination is a genuine seeded secondmate home
 #     (.fm-secondmate-home marker, AGENTS.md + bin/), never a project clone, the
-#     active home, or the firstmate repo;
+#     active home, or the nexus repo;
 #   - moving only `## Queued` items, refusing `## In flight` and historical
 #     `## Done` records, which must stay with their home for pruning or
 #     archiving;
@@ -43,7 +43,7 @@
 # it orphaned, because tasks-axi treats only two-or-more-space lines as body.
 # The move needs compatible `tasks-axi` on PATH, including atomic multi-ID `mv`
 # support. Bootstrap requires a compatible build fleet-wide, so this works
-# everywhere; the `config/backlog-backend=manual` knob only governs firstmate's
+# everywhere; the `config/backlog-backend=manual` knob only governs nexus's
 # own hand-editing of its own backlog, not this validated helper. Idempotent:
 # re-running converges. Atomic: on any move failure nothing moves.
 # See AGENTS.md project management and task lifecycle.
@@ -168,7 +168,7 @@ path_is_ancestor_of() {
 resolved_existing_dir() {
   local path=$1
   [ -d "$path" ] || {
-    echo "error: firstmate home does not exist or is not a directory: $path" >&2
+    echo "error: nexus home does not exist or is not a directory: $path" >&2
     return 1
   }
   cd "$path" && pwd -P
@@ -195,11 +195,11 @@ validate_operational_dirs() {
       return 1
     fi
     if [ "$abs_dir" = "$abs_active_home" ] || path_is_ancestor_of "$abs_active_home" "$abs_dir"; then
-      echo "error: secondmate $name directory cannot be inside the active firstmate home: $dir" >&2
+      echo "error: secondmate $name directory cannot be inside the active nexus home: $dir" >&2
       return 1
     fi
     if [ "$abs_dir" = "$abs_root" ] || path_is_ancestor_of "$abs_root" "$abs_dir"; then
-      echo "error: secondmate $name directory cannot be inside the firstmate repo: $dir" >&2
+      echo "error: secondmate $name directory cannot be inside the nexus repo: $dir" >&2
       return 1
     fi
   done
@@ -215,45 +215,45 @@ validate_secondmate_home() {
     return 1
   fi
   if [ "$abs_home" = "$abs_active_home" ]; then
-    echo "error: secondmate home cannot be the active firstmate home: $home" >&2
+    echo "error: secondmate home cannot be the active nexus home: $home" >&2
     return 1
   fi
   if [ "$abs_home" = "$abs_root" ]; then
-    echo "error: secondmate home cannot be the firstmate repo: $home" >&2
+    echo "error: secondmate home cannot be the nexus repo: $home" >&2
     return 1
   fi
   if path_is_ancestor_of "$abs_active_home" "$abs_home"; then
-    echo "error: secondmate home cannot be inside the active firstmate home: $home" >&2
+    echo "error: secondmate home cannot be inside the active nexus home: $home" >&2
     return 1
   fi
   if path_is_ancestor_of "$abs_root" "$abs_home"; then
-    echo "error: secondmate home cannot be inside the firstmate repo: $home" >&2
+    echo "error: secondmate home cannot be inside the nexus repo: $home" >&2
     return 1
   fi
   if path_is_ancestor_of "$abs_home" "$abs_active_home"; then
-    echo "error: secondmate home cannot be an ancestor of the active firstmate home: $home" >&2
+    echo "error: secondmate home cannot be an ancestor of the active nexus home: $home" >&2
     return 1
   fi
   if path_is_ancestor_of "$abs_home" "$abs_root"; then
-    echo "error: secondmate home cannot be an ancestor of the firstmate repo: $home" >&2
+    echo "error: secondmate home cannot be an ancestor of the nexus repo: $home" >&2
     return 1
   fi
   validate_operational_dirs "$abs_home" "$abs_active_home" "$abs_root" || return 1
   if [ ! -f "$abs_home/.fm-secondmate-home" ]; then
-    echo "error: firstmate home $home is not a seeded secondmate home" >&2
+    echo "error: nexus home $home is not a seeded secondmate home" >&2
     return 1
   fi
   marker_id=$(cat "$abs_home/.fm-secondmate-home" 2>/dev/null || true)
   if [ "$marker_id" != "$id" ]; then
-    echo "error: firstmate home $home is marked for secondmate ${marker_id:-unknown}, expected $id" >&2
+    echo "error: nexus home $home is marked for secondmate ${marker_id:-unknown}, expected $id" >&2
     return 1
   fi
   if [ ! -f "$abs_home/AGENTS.md" ]; then
-    echo "error: $home is not a firstmate home (missing AGENTS.md)" >&2
+    echo "error: $home is not a nexus home (missing AGENTS.md)" >&2
     return 1
   fi
   if [ ! -d "$abs_home/bin" ]; then
-    echo "error: $home is not a firstmate home (missing bin/)" >&2
+    echo "error: $home is not a nexus home (missing bin/)" >&2
     return 1
   fi
   printf '%s\n' "$abs_home"
@@ -1053,10 +1053,10 @@ receiver_wake_mark_prepared "$ID" "$REQUESTED_BATCH" || {
   exit 1
 }
 
-# Seed the destination with firstmate's standard three-section scaffold when it
+# Seed the destination with nexus's standard three-section scaffold when it
 # does not exist yet, so the moved item lands under the right section. (Left to
 # create the file itself, tasks-axi mv writes its own `# Backlog` title format,
-# which is not firstmate's home-backlog convention.)
+# which is not nexus's home-backlog convention.)
 mkdir -p "$SUB_HOME/data"
 SUB_CREATED=0
 if [ ! -f "$SUB_BACKLOG" ]; then

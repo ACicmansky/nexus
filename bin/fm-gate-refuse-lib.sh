@@ -3,15 +3,15 @@
 # real fleet while allowing marked disposable lab homes.
 #
 # The hazard (data/nm-gate-ambient-authority-containment-c3/report.md): a
-# no-mistakes gate agent runs inside a firstmate checkout with a free shell, so
-# it auto-loads firstmate's AGENTS.md, adopts the captain identity, and - seeing
+# no-mistakes gate agent runs inside a nexus checkout with a free shell, so
+# it auto-loads nexus's AGENTS.md, adopts the captain identity, and - seeing
 # crew "in flight" - reaches for fm-spawn.sh/fm-send.sh/fm-teardown.sh to
 # "delegate" and "reconcile" the shared worktree. It has real capability because
 # those entrypoints self-locate their home and never knew a gate context existed.
 #
 # no-mistakes owns the authority-removal half (it neutralizes the project
 # instructions and stamps NO_MISTAKES_GATE into the gate agent's environment).
-# THIS is the firstmate capability boundary: an enforceable script check,
+# THIS is the nexus capability boundary: an enforceable script check,
 # not a prose rule the neutralized agent would never read. It is sourced by the
 # four fleet-lifecycle entrypoints and called before their fleet mutation, so
 # a gate agent that reaches for the real fleet is stopped cold.
@@ -28,7 +28,7 @@
 #      literal-path match only fires for the default NM_HOME (~/.no-mistakes); a
 #      relocated NM_HOME is covered by signal 1.
 #
-# A NORMAL firstmate session - a real primary checkout, a real treehouse/Orca
+# A NORMAL nexus session - a real primary checkout, a real treehouse/Orca
 # crew worktree - has NEITHER signal and is COMPLETELY unaffected: the function
 # returns 0 and the lifecycle proceeds exactly as before.
 #
@@ -51,18 +51,18 @@
 # This boundary layers above no-mistakes' separately-shipping HEAD-continuity
 # guard, which remains the adversarial/residual backstop.
 #
-# TEST-HARNESS ESCAPE HATCH (FM_GATE_REFUSE_BYPASS=1): firstmate's own test suite
+# TEST-HARNESS ESCAPE HATCH (FM_GATE_REFUSE_BYPASS=1): nexus's own test suite
 # must exercise the real fleet entrypoints, but the no-mistakes gate
 # runs that suite FROM a gate worktree (cwd git-common-dir under
 # .no-mistakes/repos/*.git, and possibly NO_MISTAKES_GATE set) - the exact
-# environment this guard refuses. So both signals would fire during firstmate's
+# environment this guard refuses. So both signals would fire during nexus's
 # own validation and break unrelated tests. FM_GATE_REFUSE_BYPASS=1 makes the
-# guard a no-op; firstmate's shared test helpers (tests/lib.sh and the backend
+# guard a no-op; nexus's shared test helpers (tests/lib.sh and the backend
 # safety helpers) export it for temp-sandbox fleet tests. The disposable lab
 # primary recipe in .no-mistakes.yaml uses the marked-home allowance instead.
 # This does NOT weaken the boundary against the real hazard: the threat is a
 # CONFUSED-not-adversarial gate agent that runs bin/fm-spawn.sh directly after
-# adopting firstmate's identity outside a lab - it never sources firstmate's
+# adopting nexus's identity outside a lab - it never sources nexus's
 # test helpers or sets the bypass; and the adversarial
 # case (an agent that would deliberately set it) is covered by no-mistakes'
 # neutral-execution-context and the HEAD-continuity guard. The dedicated
@@ -140,8 +140,8 @@ fm_is_gate_agent() {
 
 # fm_refuse_if_gate_agent: exit FM_GATE_REFUSE_EXIT with a clear stderr message if
 # this process looks like a no-mistakes gate agent without a permitted lab home.
-# Call before any fleet mutation. No-ops (returns 0) for a normal firstmate
-# session, a permitted lab home, or when firstmate's own test harness sets
+# Call before any fleet mutation. No-ops (returns 0) for a normal nexus
+# session, a permitted lab home, or when nexus's own test harness sets
 # FM_GATE_REFUSE_BYPASS=1 (see the header).
 fm_refuse_if_gate_agent() {
   fm_is_gate_agent "${1:-.}" || return 0

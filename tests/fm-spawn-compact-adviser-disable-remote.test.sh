@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # tests/fm-spawn-compact-adviser-disable-remote.test.sh - the compact-adviser
-# kill switch must reach a second mate that Firstmate launches on another host.
+# kill switch must reach a second mate that Nexus launches on another host.
 #
 # A remote second mate never reaches the local spawn path covered by
 # tests/fm-spawn-compact-adviser-disable.test.sh: bin/fm-spawn.sh routes it

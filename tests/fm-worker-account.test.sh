@@ -367,7 +367,7 @@ test_local_secondmate_reads_the_launching_home_pin() {
   sm="$CASE/secondmate-home"
   mkdir -p "$sm/bin" "$sm/data" "$sm/config" "$CASE/sm-own"
   git init -q -b main "$sm"
-  printf '# Firstmate\n' > "$sm/AGENTS.md"
+  printf '# Nexus\n' > "$sm/AGENTS.md"
   printf '%s\n' "$id" > "$sm/.fm-secondmate-home"
   printf 'charter for %s\n' "$id" > "$sm/data/charter.md"
   printf '%s\n' "$CASE/sm-own" > "$sm/config/claude-account"

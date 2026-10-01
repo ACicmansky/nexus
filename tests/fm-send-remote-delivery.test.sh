@@ -149,7 +149,7 @@ setup_home() {  # <name> -> echoes a fresh home dir with an empty state/
 }
 
 # A seeded remote secondmate home the executed host-local leg validates and
-# writes into: identity marker, Firstmate-checkout shape, and a parent-route
+# writes into: identity marker, Nexus-checkout shape, and a parent-route
 # endpoint record on Herdr in the dedicated fm-remote session.
 setup_remote_secondmate_home() {  # <name> -> echoes remote home dir
   local rh="$TMP_ROOT/$1-rhome"
@@ -242,7 +242,7 @@ test_remote_steer_lands_in_remote_inbox() {
     || fail "the remote record must carry the marked request's corr token: $body"
   case "$body" in
     *"$FM_FROMFIRST_MARK"*) : ;;
-    *) fail "the remote record must carry the from-firstmate marker: $body" ;;
+    *) fail "the remote record must carry the from-nexus marker: $body" ;;
   esac
   # The doorbell could not reach the fixture pane (no herdr CLI here); that
   # never fails the send, and the notice still names the durable record.

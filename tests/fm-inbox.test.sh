@@ -64,7 +64,7 @@ home=$(make_home human)
 out=$(run_inbox "$home" note "hello from the terminal") \
   || fail "plain note should succeed"
 assert_contains "$out" "queued " "plain note should print queued <id>"
-assert_contains "$out" "firstmate will pick this up at its next check." \
+assert_contains "$out" "nexus will pick this up at its next check." \
   "plain note should keep its human announcement line"
 assert_equals "1" "$(count_notes "$home")" "plain note should write one record"
 assert_equals "1" "$(count_wakes "$home")" "plain note should append one wake"
@@ -207,7 +207,7 @@ assert_contains "$repaired" "announced $unannounced_id" "the repair reports the 
 assert_equals "1" "$(count_wakes "$home")" "repairing appends exactly one wake"
 pass "saved-but-unannounced notes are repairable without creating a second note"
 
-# A note firstmate already acknowledged needs no wake, so neither the repair
+# A note nexus already acknowledged needs no wake, so neither the repair
 # path nor a request-id replay appends one.
 home=$(make_home announce-acked)
 set +e
@@ -234,7 +234,7 @@ assert_equals "True" "$(printf '%s' "$acked_replay" | json_get acknowledged)" \
   "replay reports the note as already acknowledged"
 assert_equals "0" "$(count_wakes "$home")" \
   "an acknowledged note never gets a repair wake"
-pass "repair and replay do not wake firstmate for an already-acknowledged note"
+pass "repair and replay do not wake nexus for an already-acknowledged note"
 
 # --- bounded receipts JSON, omission disclosure, reply cursor ---------------
 

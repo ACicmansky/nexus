@@ -16,7 +16,7 @@ command -v tasks-axi >/dev/null 2>&1 || { echo "skip: tasks-axi not found (requi
 TMP_ROOT=$(fm_test_tmproot fm-backlog-handoff)
 HANDOFF_FAKEBIN=$(make_fake_tmux "$TMP_ROOT/default-fake")
 export PATH="$HANDOFF_FAKEBIN:$PATH"
-export FM_FAKE_TMUX_WINDOW='firstmate:fm-design'
+export FM_FAKE_TMUX_WINDOW='nexus:fm-design'
 export FM_FAKE_TMUX_LOG="$TMP_ROOT/default-tmux.log"
 export FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/default-fake/pane.txt"
 export FM_SEND_SETTLE=0 FM_SEND_SLEEP=0 FM_SEND_RETRIES=1
@@ -30,7 +30,7 @@ setup_homes() {
   printf -- '- %s - feature work (home: %s; scope: feature work; projects: alpha; added 2026-07-09)\n' \
     "$id" "$sub_abs" > "$home/data/secondmates.md"
   cat > "$home/state/$id.meta" <<EOF
-window=firstmate:fm-$id
+window=nexus:fm-$id
 kind=secondmate
 harness=claude
 backend=tmux
@@ -53,7 +53,7 @@ inbox_record_count() { # <state-dir> <task-id>
 }
 
 doorbell_count() { # <backend-log>
-  grep -cF 'Firstmate instruction waiting:' "$1" 2>/dev/null || true
+  grep -cF 'Nexus instruction waiting:' "$1" 2>/dev/null || true
 }
 
 # A live local receiver gets the routed-work instruction through its durable
@@ -63,7 +63,7 @@ test_handoff_wakes_live_local_receiver() {
   setup_homes "$home" "$sub"
   mkdir -p "$sub/state" "$sub/data"
   cat > "$home/state/design.meta" <<EOF
-window=firstmate:fm-design
+window=nexus:fm-design
 kind=secondmate
 harness=claude
 backend=tmux
@@ -80,7 +80,7 @@ EOF
   fakebin=$(make_fake_tmux "$TMP_ROOT/live-wake-fake")
   out="$TMP_ROOT/live-wake.out"
   FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" PATH="$fakebin:$PATH" \
-    FM_FAKE_TMUX_WINDOW='firstmate:fm-design' \
+    FM_FAKE_TMUX_WINDOW='nexus:fm-design' \
     FM_FAKE_TMUX_LOG="$TMP_ROOT/live-wake-tmux.log" \
     FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/live-wake-fake/pane.txt" \
     FM_SEND_SETTLE=0 FM_SEND_SLEEP=0 FM_SEND_RETRIES=1 \
@@ -97,7 +97,7 @@ EOF
   [ "$(doorbell_count "$TMP_ROOT/live-wake-tmux.log")" -eq 1 ] \
     || fail "handoff did not ring exactly one constant receiver doorbell"
   FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" PATH="$fakebin:$PATH" \
-    FM_FAKE_TMUX_WINDOW='firstmate:fm-design' \
+    FM_FAKE_TMUX_WINDOW='nexus:fm-design' \
     FM_FAKE_TMUX_LOG="$TMP_ROOT/live-wake-tmux.log" \
     FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/live-wake-fake/pane.txt" \
     FM_SEND_SETTLE=0 FM_SEND_SLEEP=0 FM_SEND_RETRIES=1 \
@@ -132,7 +132,7 @@ EOF
     "missing endpoint was recorded as an attempted delivery"
 
   cat > "$home/state/design.meta" <<EOF
-window=firstmate:fm-design
+window=nexus:fm-design
 kind=secondmate
 harness=claude
 backend=tmux
@@ -171,7 +171,7 @@ SH
   chmod +x "$rejectbin/tmux"
 
   out=$(PATH="$rejectbin:$basebin:$PATH" FM_BASE_TMUX="$basebin/tmux" \
-    FM_HOME="$home" FM_FAKE_TMUX_WINDOW='firstmate:fm-design' \
+    FM_HOME="$home" FM_FAKE_TMUX_WINDOW='nexus:fm-design' \
     FM_FAKE_TMUX_LOG="$TMP_ROOT/known-fail-tmux.log" \
     FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/known-fail-fake/pane.txt" \
     "$ROOT/bin/fm-backlog-handoff.sh" design known-fail 2>&1) || rc=$?
@@ -223,7 +223,7 @@ SH
   PATH="$blockbin:$basebin:$PATH" FM_BASE_TMUX="$basebin/tmux" FM_HOME="$home" \
     FM_RECONCILE_RACE_ENTERED="$TMP_ROOT/reconcile-race.entered" \
     FM_RECONCILE_RACE_RELEASE="$TMP_ROOT/reconcile-race.release" \
-    FM_FAKE_TMUX_WINDOW='firstmate:fm-design' \
+    FM_FAKE_TMUX_WINDOW='nexus:fm-design' \
     FM_FAKE_TMUX_LOG="$TMP_ROOT/reconcile-race-tmux.log" \
     FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/reconcile-race-fake/pane.txt" \
     "$ROOT/bin/fm-backlog-handoff.sh" design reconcile-race \
@@ -559,7 +559,7 @@ EOF
   cat > "$blockbin/tmux" <<'SH'
 #!/usr/bin/env bash
 case "$*" in
-  *"Firstmate instruction waiting:"*)
+  *"Nexus instruction waiting:"*)
     if mkdir "$FM_BLOCK_WAKE_ONCE" 2>/dev/null; then
       touch "$FM_BLOCK_WAKE_ENTERED"
       while [ ! -f "$FM_BLOCK_WAKE_RELEASE" ]; do sleep 0.02; done
@@ -574,7 +574,7 @@ SH
     FM_BLOCK_WAKE_ONCE="$TMP_ROOT/concurrent.once" \
     FM_BLOCK_WAKE_ENTERED="$TMP_ROOT/concurrent.entered" \
     FM_BLOCK_WAKE_RELEASE="$TMP_ROOT/concurrent.release" \
-    FM_FAKE_TMUX_WINDOW='firstmate:fm-design' \
+    FM_FAKE_TMUX_WINDOW='nexus:fm-design' \
     FM_FAKE_TMUX_LOG="$TMP_ROOT/concurrent-tmux.log" \
     FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/concurrent-fake/pane.txt" \
     "$ROOT/bin/fm-backlog-handoff.sh" design concurrent-a > "$TMP_ROOT/concurrent-a.out" 2>&1 &
@@ -596,7 +596,7 @@ EOF
     FM_BLOCK_WAKE_ONCE="$TMP_ROOT/concurrent.once" \
     FM_BLOCK_WAKE_ENTERED="$TMP_ROOT/concurrent.entered" \
     FM_BLOCK_WAKE_RELEASE="$TMP_ROOT/concurrent.release" \
-    FM_FAKE_TMUX_WINDOW='firstmate:fm-design' \
+    FM_FAKE_TMUX_WINDOW='nexus:fm-design' \
     FM_FAKE_TMUX_LOG="$TMP_ROOT/concurrent-tmux.log" \
     FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/concurrent-fake/pane.txt" \
     "$ROOT/bin/fm-backlog-handoff.sh" design concurrent-b > "$TMP_ROOT/concurrent-b.out" 2>&1 &
@@ -633,7 +633,7 @@ EOF
   cat > "$blockbin/tmux" <<'SH'
 #!/usr/bin/env bash
 case "$*" in
-  *"Firstmate instruction waiting:"*)
+  *"Nexus instruction waiting:"*)
     touch "$FM_BLOCK_WAKE_ENTERED"
     while [ ! -f "$FM_BLOCK_WAKE_RELEASE" ]; do sleep 0.02; done
     ;;
@@ -644,7 +644,7 @@ SH
   PATH="$blockbin:$basebin:$PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" \
     FM_BASE_TMUX="$basebin/tmux" FM_BLOCK_WAKE_ENTERED="$TMP_ROOT/teardown-race.entered" \
     FM_BLOCK_WAKE_RELEASE="$TMP_ROOT/teardown-race.release" \
-    FM_FAKE_TMUX_WINDOW='firstmate:fm-design' \
+    FM_FAKE_TMUX_WINDOW='nexus:fm-design' \
     FM_FAKE_TMUX_LOG="$TMP_ROOT/teardown-race-tmux.log" \
     FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/teardown-race-fake/pane.txt" \
     "$ROOT/bin/fm-backlog-handoff.sh" design teardown-race > "$TMP_ROOT/teardown-race-handoff.out" 2>&1 &
@@ -657,7 +657,7 @@ SH
     sleep 0.02
   done
   PATH="$basebin:$PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" \
-    FM_FAKE_TMUX_WINDOW='firstmate:fm-design' \
+    FM_FAKE_TMUX_WINDOW='nexus:fm-design' \
     FM_FAKE_TMUX_LOG="$TMP_ROOT/teardown-race-tmux.log" \
     FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/teardown-race-fake/pane.txt" \
     "$ROOT/bin/fm-teardown.sh" design --force > "$TMP_ROOT/teardown-race-teardown.out" 2>&1 &
@@ -708,7 +708,7 @@ SH
   set +e
   PATH="$rm_bin:$fakebin:$PATH" FM_REAL_RM="$real_rm" FM_FAIL_HOME="$fail_home" \
     FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" \
-    FM_FAKE_TMUX_WINDOW='firstmate:fm-design' \
+    FM_FAKE_TMUX_WINDOW='nexus:fm-design' \
     FM_FAKE_TMUX_LOG="$TMP_ROOT/teardown-home-fail-tmux.log" \
     FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/teardown-home-fail-fake/pane.txt" \
     "$ROOT/bin/fm-teardown.sh" design --force > "$TMP_ROOT/teardown-home-fail.out" 2>&1
@@ -725,7 +725,7 @@ SH
   assert_grep '- design ' "$home/data/secondmates.md" "failed teardown removed the registry route"
 
   PATH="$fakebin:$PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" \
-    FM_FAKE_TMUX_WINDOW='firstmate:fm-design' \
+    FM_FAKE_TMUX_WINDOW='nexus:fm-design' \
     FM_FAKE_TMUX_LOG="$TMP_ROOT/teardown-home-fail-tmux.log" \
     FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/teardown-home-fail-fake/pane.txt" \
     "$ROOT/bin/fm-teardown.sh" design --force > "$TMP_ROOT/teardown-home-retry.out" 2>&1 \
@@ -1163,14 +1163,14 @@ test_indented_heading_is_not_section_boundary() {
 
   cat > "$home/data/backlog.md" <<'EOF'
 ## Queued
-- [ ] ha-codex-fast-default-4e - harness default work (repo: firstmate)
+- [ ] ha-codex-fast-default-4e - harness default work (repo: nexus)
   Context for the secondmate.
   ## Intent
   Deliver the full spec, not the title alone.
   ## Acceptance
   - body survives handoff
   - ## headings inside body stay body
-- [ ] next-item - after the trap (repo: firstmate)
+- [ ] next-item - after the trap (repo: nexus)
 EOF
 
   local expected_block

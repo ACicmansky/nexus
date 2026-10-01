@@ -29,7 +29,7 @@ make_main_home() {  # <name> <mate-id>
   printf -- '- %s - fixture domain (home: %s; scope: fixture; projects: sample; added 2026-08-26)\n' \
     "$id" "$abs" > "$home/data/secondmates.md"
   cat > "$home/state/$id.meta" <<META
-window=firstmate:fm-$id
+window=nexus:fm-$id
 kind=secondmate
 harness=claude
 backend=tmux
@@ -99,7 +99,7 @@ SH
 }
 
 # A seeded remote secondmate home the real host-local leg validates and writes
-# into (identity marker, Firstmate-checkout shape, parent-route endpoint meta).
+# into (identity marker, Nexus-checkout shape, parent-route endpoint meta).
 make_remote_secondmate_home() {  # <name> -> echoes remote home dir
   local rh="$TMP_ROOT/$1-rhome"
   mkdir -p "$rh/state/parent-route" "$rh/bin"
@@ -170,7 +170,7 @@ run_notify() {  # <home> <fakebin> <name> <snapshot> [extra args...]
   shift 4
   PATH="$fakebin:$PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" \
     FM_STATE_OVERRIDE="$home/state" \
-    FM_FAKE_TMUX_WINDOW="firstmate:fm-mate" \
+    FM_FAKE_TMUX_WINDOW="nexus:fm-mate" \
     FM_FAKE_TMUX_LOG="$TMP_ROOT/$name-tmux.log" \
     FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/$name-fake/pane.txt" \
     "$RECONCILE" notify --snapshot "$snap" "$@"
@@ -360,7 +360,7 @@ test_the_ask_never_arms_a_reply_expectation_or_a_re_ring() {
   # the same inbox, same grace, with an ordinary unhandled steer added.
   PATH="$fakebin:$PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" \
     FM_STATE_OVERRIDE="$home/state" \
-    FM_FAKE_TMUX_WINDOW="firstmate:fm-mate" \
+    FM_FAKE_TMUX_WINDOW="nexus:fm-mate" \
     FM_FAKE_TMUX_LOG="$TMP_ROOT/fireforget-tmux.log" \
     FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/fireforget-fake/pane.txt" \
     "$ROOT/bin/fm-send.sh" mate "an ordinary steer that does expect handling" >/dev/null 2>&1 \
@@ -552,7 +552,7 @@ SH
     rm -rf "$home/state/mate.inbox"
     rm -f "$home/state/mate.meta" "$home/state/mate.reconcile-nudged"
     cat > "$home/state/mate.meta" <<META
-window=firstmate:fm-mate
+window=nexus:fm-mate
 kind=secondmate
 harness=claude
 backend=tmux
@@ -766,7 +766,7 @@ test_reconcile_requests_coalesce_per_target_until_delivery() {
   printf -- '- coalesce-b - fixture domain (home: %s; scope: fixture; projects: sample; added 2026-08-26)\n' \
     "$second_abs" >> "$home/data/secondmates.md"
   cat > "$home/state/coalesce-b.meta" <<META
-window=firstmate:fm-coalesce-b
+window=nexus:fm-coalesce-b
 kind=secondmate
 harness=claude
 backend=tmux
@@ -854,7 +854,7 @@ META
   holder_b2=$!
   while [ ! -f "$ready_b2" ]; do sleep 0.01; done
   PATH="$fakebin:$PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" FM_STATE_OVERRIDE="$home/state" \
-    FM_FAKE_TMUX_WINDOW='firstmate:fm-coalesce-a' FM_FAKE_TMUX_LOG="$home/tmux.log" \
+    FM_FAKE_TMUX_WINDOW='nexus:fm-coalesce-a' FM_FAKE_TMUX_LOG="$home/tmux.log" \
     FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/coalesced-requests-fake/pane.txt" \
     "$RECONCILE" process-requests > "$out" 2>&1 || true
   : > "$release_b2"
@@ -868,7 +868,7 @@ META
     || fail "delivery of one target did not preserve the other target independently"
 
   PATH="$fakebin:$PATH" FM_HOME="$home" FM_ROOT_OVERRIDE="$ROOT" FM_STATE_OVERRIDE="$home/state" \
-    FM_FAKE_TMUX_WINDOW='firstmate:fm-coalesce-b' FM_FAKE_TMUX_LOG="$home/tmux.log" \
+    FM_FAKE_TMUX_WINDOW='nexus:fm-coalesce-b' FM_FAKE_TMUX_LOG="$home/tmux.log" \
     FM_FAKE_TMUX_CAPTURE="$TMP_ROOT/coalesced-requests-fake/pane.txt" \
     "$RECONCILE" process-requests > "$out" 2>&1 \
     || fail "the remaining target request could not be delivered"

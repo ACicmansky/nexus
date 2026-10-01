@@ -8,10 +8,10 @@
 # fixed fm-remote-entrypoint.sh from <remote-root>. The command records the
 # remote host dimension in data/secondmates.md, gates the host on
 # fm-remote-doctor.sh readiness before touching it, sends a bounded provisioning
-# manifest through fm-on.sh, and lets the remote host clone its own Firstmate
+# manifest through fm-on.sh, and lets the remote host clone its own Nexus
 # home and project origins. No project tree or secret environment is copied.
 #
-# Each project needs an origin the remote account can clone. Firstmate resolves
+# Each project needs an origin the remote account can clone. Nexus resolves
 # that origin and names it as <project>=<origin-url>, so seeding never requires
 # a clone of that project in this home; a bare <project> is accepted only when
 # this home already has projects/<project>, whose origin is then read instead.

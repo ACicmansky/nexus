@@ -22,7 +22,7 @@ write_spawn_brief() {  # <data-dir> <id>
 ## Captain's intent
 Exercise Orca dispatch.
 
-## Firstmate spec
+## Nexus spec
 Verify the Orca lifecycle behavior under test.
 EOF
 }
@@ -241,7 +241,7 @@ test_composer_state_popup_placeholder_fill_is_pending() {
 test_composer_state_bare_shell_prompt_is_unknown() {
   local out
   orca_case composer-bare-shell
-  printf '{"ok":true,"result":{"terminal":{"tail":["some earlier output","kunchen@mac firstmate $ "]}}}\n' > "$RESP/1.out"
+  printf '{"ok":true,"result":{"terminal":{"tail":["some earlier output","kunchen@mac nexus $ "]}}}\n' > "$RESP/1.out"
   out=$( PATH="$FB:$PATH" FM_ORCA_LOG="$LOG" FM_ORCA_RESPONSES="$RESP" \
     bash -c '. "$0/bin/backends/orca.sh"; fm_backend_orca_composer_state term-123' "$ROOT" )
   [ "$out" = unknown ] || fail "a bare dead-shell prompt (no bordered composer row) must read unknown, got '$out'"
@@ -581,7 +581,7 @@ test_spawn_refuses_orca_secondmate_before_home_mutation() {
   config="$home/config"
   mkdir -p "$data" "$state" "$config" "$subhome/bin" "$subhome/data" "$subhome/state" "$subhome/projects"
   printf '%s\n' "$id" > "$subhome/.fm-secondmate-home"
-  printf 'firstmate\n' > "$subhome/AGENTS.md"
+  printf 'nexus\n' > "$subhome/AGENTS.md"
   printf 'claude\n' > "$config/crew-harness"
   touch "$state/.last-watcher-beat"
   set +e
@@ -795,7 +795,7 @@ test_peek_send_and_crew_state_route_through_orca_meta() {
   [ "$body" = "hello orca" ] || fail "Orca task inbox did not preserve the send body, got '$body'"
   assert_not_contains "$(cat "$LOG")" $'--text\x1fhello orca\x1f' \
     "send typed the payload instead of recording it"
-  assert_contains "$(cat "$LOG")" $'orca\x1f''terminal'$'\x1f''send'$'\x1f''--terminal'$'\x1f''term-io'$'\x1f''--text'$'\x1f'': Firstmate instruction waiting:' \
+  assert_contains "$(cat "$LOG")" $'orca\x1f''terminal'$'\x1f''send'$'\x1f''--terminal'$'\x1f''term-io'$'\x1f''--text'$'\x1f'': Nexus instruction waiting:' \
     "send did not ring the inbox doorbell through the recorded Orca terminal"
   assert_contains "$(cat "$LOG")" $'orca\x1f''terminal'$'\x1f''send'$'\x1f''--terminal'$'\x1f''term-io'$'\x1f''--text'$'\x1f\x1f''--enter'$'\x1f''--json' \
     "send did not submit the doorbell through the recorded Orca terminal"
@@ -1226,7 +1226,7 @@ test_secondmate_force_teardown_removes_orca_child_via_orca() {
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   fm_git_worktree "$childproj" "$childwt" "fm/$child_id"
   fm_write_meta "$home/state/domain.meta" \
-    "window=firstmate:fm-domain" "worktree=$subhome" "project=$subhome" \
+    "window=nexus:fm-domain" "worktree=$subhome" "project=$subhome" \
     "harness=echo" "kind=secondmate" "mode=secondmate" "yolo=off" \
     "home=$subhome" "projects=alpha"
   printf '%s\n' "- domain - Orca child cleanup (home: $subhome; scope: orca cleanup; projects: alpha; added 2026-07-03)" \
@@ -1272,7 +1272,7 @@ test_secondmate_force_teardown_refuses_orca_child_id_path_mismatch() {
   fm_git_worktree "$childproj" "$childwt" "fm/$child_id"
   git -C "$childproj" worktree add --quiet -b "fm/$child_id-other" "$other_wt"
   fm_write_meta "$home/state/domain.meta" \
-    "window=firstmate:fm-domain" "worktree=$subhome" "project=$subhome" \
+    "window=nexus:fm-domain" "worktree=$subhome" "project=$subhome" \
     "harness=echo" "kind=secondmate" "mode=secondmate" "yolo=off" \
     "home=$subhome" "projects=alpha"
   printf '%s\n' "- domain - Orca child cleanup (home: $subhome; scope: orca cleanup; projects: alpha; added 2026-07-03)" \
@@ -1313,7 +1313,7 @@ test_secondmate_force_teardown_refuses_partial_orca_child() {
   printf 'domain\n' > "$subhome/.fm-secondmate-home"
   fm_git_worktree "$childproj" "$childwt" "fm/$child_id"
   fm_write_meta "$home/state/domain.meta" \
-    "window=firstmate:fm-domain" "worktree=$subhome" "project=$subhome" \
+    "window=nexus:fm-domain" "worktree=$subhome" "project=$subhome" \
     "harness=echo" "kind=secondmate" "mode=secondmate" "yolo=off" \
     "home=$subhome" "projects=alpha"
   printf '%s\n' "- domain - Orca partial child cleanup (home: $subhome; scope: orca cleanup; projects: alpha; added 2026-07-03)" \

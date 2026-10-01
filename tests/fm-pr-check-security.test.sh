@@ -279,7 +279,7 @@ SH
 write_task_meta() {
   local dir=$1 id=${2:-task-a}
   fm_write_meta "$dir/home/state/$id.meta" \
-    "window=firstmate:fm-$id" \
+    "window=nexus:fm-$id" \
     "endpoint_task_id=$id" \
     "worktree=$dir/wt" \
     "project=$dir/project" \
@@ -722,7 +722,7 @@ test_direct_pr_unpushed_commit_refuses_registration() {
   local dir pushed later
   dir=$(make_case direct-pr-unpushed)
   fm_write_meta "$dir/home/state/task-a.meta" \
-    "window=firstmate:fm-task-a" "endpoint_task_id=task-a" "worktree=$dir/wt" \
+    "window=nexus:fm-task-a" "endpoint_task_id=task-a" "worktree=$dir/wt" \
     "project=$dir/project" "kind=ship" "mode=direct-PR"
   pushed=$(git -C "$dir/wt" rev-parse HEAD)
   git -C "$dir/wt" commit -q --allow-empty -m 'fix only in the copy'
@@ -826,7 +826,7 @@ SH
   for id in _noncanonical aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa; do
     dir=$(make_case "legacy-teardown-${id:0:12}")
     fm_write_meta "$dir/home/state/$id.meta" \
-      "window=firstmate:fm-$id" \
+      "window=nexus:fm-$id" \
       "endpoint_task_id=$id" \
       "worktree=$dir/wt" \
       "project=$dir/project" \
@@ -1449,7 +1449,7 @@ test_teardown_removes_poll_artifacts() {
   dir=$(make_case teardown-cleanup)
   fakebin="$dir/fakebin"
   fm_write_meta "$dir/home/state/task-a.meta" \
-    'window=firstmate:fm-task-a' \
+    'window=nexus:fm-task-a' \
     'endpoint_task_id=task-a' \
     "worktree=$dir/missing-worktree" \
     "project=$dir/project" \
@@ -1477,7 +1477,7 @@ SH
   dir=$(make_case teardown-retirement-receipt)
   fakebin="$dir/fakebin"
   fm_write_meta "$dir/home/state/task-a.meta" \
-    'window=firstmate:fm-task-a' \
+    'window=nexus:fm-task-a' \
     'endpoint_task_id=task-a' \
     "worktree=$dir/missing-worktree" \
     "project=$dir/project" \
@@ -1506,7 +1506,7 @@ SH
     dir=$(make_case "teardown-final-directory-${artifact//./-}")
     fakebin="$dir/fakebin"
     fm_write_meta "$dir/home/state/task-a.meta" \
-      'window=firstmate:fm-task-a' \
+      'window=nexus:fm-task-a' \
       'endpoint_task_id=task-a' \
       "worktree=$dir/missing-worktree" \
       "project=$dir/project" \
@@ -1572,7 +1572,7 @@ gerrit.example
 group/apps/console
 4201" ] || fail "published Gerrit sidecar bytes were not exact"
 
-  # Only an exact MERGED status wakes firstmate. Every other reading, including
+  # Only an exact MERGED status wakes nexus. Every other reading, including
   # an abandoned change, a lowercase spelling, and a changed format, stays
   # silent rather than reporting a merge.
   for value in NEW ABANDONED merged Merged MERGED_LATER '' not-a-status; do
@@ -1728,7 +1728,7 @@ test_gerrit_arming_records_no_patch_set_revision() {
   [ "$rc" -ne 0 ] || fail "the merge path accepted a Gerrit change"
   case "$out" in
     *"does not submit a Gerrit change"*) ;;
-    *) fail "the Gerrit merge refusal did not say firstmate does not submit" ;;
+    *) fail "the Gerrit merge refusal did not say nexus does not submit" ;;
   esac
   [ ! -e "$state/task-rev.merge-authority" ] || fail "a refused Gerrit merge recorded merge authority"
 
@@ -1989,7 +1989,7 @@ gitlab.example
 group/subgroup/project
 7" ] || fail "published GitLab sidecar bytes were not exact"
 
-  # Only an exact merged state wakes firstmate. Every other reading, including
+  # Only an exact merged state wakes nexus. Every other reading, including
   # an unreadable merge request and a changed output format, stays silent.
   for value in opened closed locked '' not-a-state MERGED merged-but-not; do
     out=$(FM_TEST_GLAB_STATE="$value" run_poll "$dir")
@@ -3004,7 +3004,7 @@ test_teardown_cannot_race_authority_consumption() {
   dir=$(make_case merge-authority-teardown-race)
   state="$dir/home/state"
   fm_write_meta "$state/task-a.meta" \
-    'window=firstmate:fm-task-a' \
+    'window=nexus:fm-task-a' \
     'endpoint_task_id=task-a' \
     "worktree=$dir/wt" \
     "project=$dir/project" \
@@ -3058,7 +3058,7 @@ test_authority_retirement_preserves_replacement() {
     || fail "replacement: could not arm the original poll"
   queue_merge "$dir" "$url_a"
   # The replacement runs inside the watcher, whose environment names the real
-  # firstmate root, so restore the fixture root every other arming here uses.
+  # nexus root, so restore the fixture root every other arming here uses.
   cat > "$dir/replace-authority.sh" <<SH
 #!/usr/bin/env bash
 export FM_ROOT_OVERRIDE="$dir/root" FM_TEST_GUARD_LOG="$dir/guard.log"

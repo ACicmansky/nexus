@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Behavior tests for the worktree-tangle guards.
 #
-# Firstmate is a treehouse-pooled git repo of itself: linked worktrees and
+# Nexus is a treehouse-pooled git repo of itself: linked worktrees and
 # secondmate homes all sit at a detached HEAD on the default branch, while the
 # PRIMARY checkout (FM_ROOT) is a normal checkout on a real branch. The "tangle"
 # is a crewmate branching/committing in the primary instead of its own worktree,
@@ -218,7 +218,7 @@ test_spawn_isolation_abort() {
 #     are disabled so the fm-<id> name survives treehouse cd'ing into the worktree;
 #   - the treehouse-get send-keys and the worktree wait loop target that stable
 #     window id, never the (possibly-renamed) name - a lost name would let
-#     display-message fall back to the active client's window and misread firstmate's
+#     display-message fall back to the active client's window and misread nexus's
 #     OWN pane as the worktree, tangling a hook into the primary checkout.
 make_spawn_record_fakebin() {
   local dir=$1 fakebin
@@ -231,7 +231,7 @@ case "$*" in
   *"#{pane_current_path}"*) printf '%s\n' "${FM_FAKE_PANE_PATH:-}"; exit 0 ;;
 esac
 case "${1:-}" in
-  display-message) printf 'firstmate\n'; exit 0 ;;
+  display-message) printf 'nexus\n'; exit 0 ;;
   new-window) printf '%s\n' "@spawnwid"; exit 0 ;;
   list-windows) exit 0 ;;
   has-session|new-session|send-keys|set-window-option) exit 0 ;;
@@ -267,9 +267,9 @@ test_spawn_tmux_window_construction() {
   assert_contains "$out" "spawned rec-win-gg7" "recording spawn did not report success"
 
   # Bug 1 fix: append-form window creation (trailing colon on the session target).
-  assert_grep "new-window -dP -F #{window_id} -t firstmate: -n fm-rec-win-gg7" "$rec" \
+  assert_grep "new-window -dP -F #{window_id} -t nexus: -n fm-rec-win-gg7" "$rec" \
     "new-window must append at the session (trailing colon) and capture the window id"
-  assert_no_grep "new-window -dP -F #{window_id} -t firstmate -n" "$rec" \
+  assert_no_grep "new-window -dP -F #{window_id} -t nexus -n" "$rec" \
     "new-window must not target the bare session name (collides under base-index 1)"
 
   # Bug 2 fix (a): pin the window name against automatic-rename / allow-rename.

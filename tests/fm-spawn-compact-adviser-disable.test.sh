@@ -121,7 +121,7 @@ test_ship_allowlist_enabled() {
   local rec out status seen launch
   rec=$(make_case ship-filtered codex ship-filtered-a1)
   read_case "$rec"
-  # An empty file is the strictest opt-in: the launch keeps Firstmate's own
+  # An empty file is the strictest opt-in: the launch keeps Nexus's own
   # operational floor and nothing else, so it is where a floor either holds or
   # is lost.
   : > "$HOME_DIR/config/launch-env-allowlist"
@@ -172,7 +172,7 @@ test_secondmate_launch() {
     [ "$setting" = absent ] || : > "$HOME_DIR/config/launch-env-allowlist"
     sm="$CASE_DIR/secondmate-home"
     mkdir -p "$sm/bin" "$sm/data"
-    printf '# Firstmate\n' > "$sm/AGENTS.md"
+    printf '# Nexus\n' > "$sm/AGENTS.md"
     printf '%s\n' "sm-$setting" > "$sm/.fm-secondmate-home"
     printf 'charter for sm-%s\n' "$setting" > "$sm/data/charter.md"
     printf '%s\n' 'projects/' 'state/' 'data/' 'config/' '.no-mistakes/' > "$sm/.gitignore"
@@ -206,7 +206,7 @@ test_launch_exports_task_inbox() {
     else
       sm="$CASE_DIR/secondmate-home"
       mkdir -p "$sm/bin" "$sm/data"
-      printf '# Firstmate\n' > "$sm/AGENTS.md"
+      printf '# Nexus\n' > "$sm/AGENTS.md"
       printf '%s\n' "$id" > "$sm/.fm-secondmate-home"
       printf 'charter for %s\n' "$id" > "$sm/data/charter.md"
       printf '%s\n' 'projects/' 'state/' 'data/' 'config/' '.no-mistakes/' > "$sm/.gitignore"

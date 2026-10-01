@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 # Tests for bin/fm-update.sh: fast-forward-only self-update of a running
-# firstmate repo and every registered secondmate home.
+# nexus repo and every registered secondmate home.
 #
 # The guarantees under test mirror fm-fleet-sync.sh and prime directive #3:
-#   - The running firstmate repo (on its default branch) fast-forwards from
+#   - The running nexus repo (on its default branch) fast-forwards from
 #     origin; a leased secondmate home (detached HEAD on the default branch)
 #     fast-forwards the same way.
 #   - A dirty, offline, wrong-branch, or genuinely unique diverged target is
@@ -13,7 +13,7 @@
 #   - The update is a single-parent fast-forward (never a merge commit) and a
 #     fast-forward of one worktree never disturbs another worktree's checkout
 #     or the shared default branch.
-#   - The caller-action summary is correct: reread-firstmate flips to yes only
+#   - The caller-action summary is correct: reread-nexus flips to yes only
 #     when the instruction surface (AGENTS.md / bin / .agents/skills) changed, and
 #     the two secondmate action sets are disjoint and correctly gated -
 #     restart-secondmates carries EVERY live mate this pass left on origin's tip
@@ -23,7 +23,7 @@
 #     whose runtime cannot prove a restart falls to nudge-secondmates; and a mate
 #     whose home was skipped or whose endpoint is stopped gets no action at all.
 #   - Secondmate homes resolve from both state/<id>.meta and the
-#     data/secondmates.md registry, deduped, and the firstmate repo is never
+#     data/secondmates.md registry, deduped, and the nexus repo is never
 #     re-processed as one of its own secondmates.
 set -u
 
@@ -37,7 +37,7 @@ fm_git_identity fmtest fmtest@example.com
 
 TMP_ROOT=$(fm_test_tmproot fm-update-tests)
 
-# Build a fresh world: a bare origin seeded with one commit, a firstmate repo
+# Build a fresh world: a bare origin seeded with one commit, a nexus repo
 # clone checked out on main, and a home dir with state/ and data/. Echoes the
 # world dir. Files seeded: AGENTS.md, README.md, bin/tool.sh, and an internal skill note.
 new_world() {
@@ -90,7 +90,7 @@ SH
   printf '%s\n' "$w"
 }
 
-# Add a secondmate home as a DETACHED worktree of the firstmate repo (matching
+# Add a secondmate home as a DETACHED worktree of the nexus repo (matching
 # how treehouse leases a secondmate home), plus its state meta. Args: world id.
 # The recorded runtime matters to the action split, so it is part of the fixture:
 # harness defaults to a control-verified adapter on the default (tmux) backend,
@@ -152,25 +152,25 @@ test_updates_main_and_secondmate() {
 
   out=$(run_update "$w")
 
-  assert_contains "$out" "firstmate: updated " "firstmate fast-forwarded"
+  assert_contains "$out" "nexus: updated " "nexus fast-forwarded"
   assert_contains "$out" "secondmate sm1: updated " "secondmate fast-forwarded"
-  assert_contains "$out" "reread-firstmate: yes" "instruction change triggers reread"
+  assert_contains "$out" "reread-nexus: yes" "instruction change triggers reread"
   assert_contains "$out" "restart-secondmates: fm-sm1" "a changed AGENTS.md must move the secondmate into the restart set"
   assert_contains "$out" "nudge-secondmates: none" "a restarted secondmate must not also be nudged"
 
   # Fast-forward landed: HEAD == origin/main on both targets.
   [ "$(git -C "$w/main" rev-parse HEAD)" = "$(git -C "$w/main" rev-parse origin/main)" ] \
-    || fail "firstmate HEAD not at origin/main"
+    || fail "nexus HEAD not at origin/main"
   [ "$(git -C "$w/sm1" rev-parse HEAD)" = "$(git -C "$w/sm1" rev-parse origin/main)" ] \
     || fail "secondmate HEAD not at origin/main"
-  # Firstmate stays on its default branch; secondmate stays detached.
+  # Nexus stays on its default branch; secondmate stays detached.
   [ "$(git -C "$w/main" symbolic-ref --short HEAD 2>/dev/null)" = "main" ] \
-    || fail "firstmate left its default branch"
+    || fail "nexus left its default branch"
   git -C "$w/sm1" symbolic-ref -q HEAD >/dev/null \
     && fail "secondmate worktree is no longer detached"
   # A fast-forwarded tip has exactly one parent; a merge commit would have two.
   [ "$(git -C "$w/main" rev-list --parents -n1 HEAD | wc -w | tr -d ' ')" -eq 2 ] \
-    || fail "firstmate tip is not a single-parent fast-forward"
+    || fail "nexus tip is not a single-parent fast-forward"
   [ "$(git -C "$w/sm1" rev-list --parents -n1 HEAD | wc -w | tr -d ' ')" -eq 2 ] \
     || fail "secondmate tip is not a single-parent fast-forward"
   pass "T1 main + secondmate fast-forward (single-parent), reread + restart signalled"
@@ -185,9 +185,9 @@ test_reread_gate_is_instruction_only() {
 
   out=$(run_update "$w")
 
-  assert_contains "$out" "firstmate: updated " "firstmate still advanced"
-  assert_contains "$out" "reread-firstmate: no" "non-instruction change skips reread"
-  # The running firstmate reads nothing new, but the mate's agent still holds its
+  assert_contains "$out" "nexus: updated " "nexus still advanced"
+  assert_contains "$out" "reread-nexus: no" "non-instruction change skips reread"
+  # The running nexus reads nothing new, but the mate's agent still holds its
   # launch-time wiring from before the pass, which only a restart re-resolves.
   assert_contains "$out" "restart-secondmates: fm-sm1" \
     "a live mate on the new tip must restart even when no instruction file moved"
@@ -207,7 +207,7 @@ test_bin_only_advance_restarts() {
 
   out=$(run_update "$w")
 
-  assert_contains "$out" "reread-firstmate: yes" "a bin/ change is still an instruction-surface advance"
+  assert_contains "$out" "reread-nexus: yes" "a bin/ change is still an instruction-surface advance"
   assert_contains "$out" "restart-secondmates: fm-sm1" "a bin/-only advance must still restart the live mate"
   assert_contains "$out" "nudge-secondmates: none" "a restarted secondmate must not also be nudged"
   pass "T3b a bin/-only advance restarts the secondmate"
@@ -394,9 +394,9 @@ test_already_current_secondmate_still_restarts() {
 
   out=$(run_update "$w")       # second run: nothing left to fast-forward
 
-  assert_contains "$out" "firstmate: already current" "firstmate already current"
+  assert_contains "$out" "nexus: already current" "nexus already current"
   assert_contains "$out" "secondmate sm1: already current" "secondmate already current"
-  assert_contains "$out" "reread-firstmate: no" "no reread when nothing changed"
+  assert_contains "$out" "reread-nexus: no" "no reread when nothing changed"
   restart_line=$(printf '%s\n' "$out" | grep '^restart-secondmates:')
   assert_contains "$restart_line" "fm-sm1" \
     "an already-current live secondmate must still be in the restart set"
@@ -427,9 +427,9 @@ test_already_current_unprovable_mate_is_nudged() {
 # One world carries every secondmate-resolution edge at once:
 #   reg1 - registered in secondmates.md only, NO live meta (registry backstop);
 #   sm1  - present in BOTH meta and the registry (must be processed exactly once);
-#   selfish - a bogus registry line pointing the firstmate repo at itself.
+#   selfish - a bogus registry line pointing the nexus repo at itself.
 # Asserts: reg1 advances but is NOT nudged (no live metadata); sm1 advances,
-# is processed once, and IS nudged; the firstmate repo is never re-processed.
+# is processed once, and IS nudged; the nexus repo is never re-processed.
 test_registry_backstop_dedup_and_self_exclusion() {
   local w out count
   w=$(new_world t7)
@@ -449,7 +449,7 @@ test_registry_backstop_dedup_and_self_exclusion() {
   assert_contains "$out" "secondmate sm1: updated " "meta+registry secondmate fast-forwarded"
   count=$(printf '%s\n' "$out" | grep -c '^secondmate sm1:' || true)
   [ "$count" -eq 1 ] || fail "secondmate sm1 processed $count times, expected 1 (dedup across meta+registry)"
-  assert_not_contains "$out" "secondmate selfish" "firstmate repo re-processed as its own secondmate"
+  assert_not_contains "$out" "secondmate selfish" "nexus repo re-processed as its own secondmate"
   # sm1 has live metadata, so it is nudged; reg1 has none, so it is not. Pin the
   # nudge line exactly and confirm reg1 is absent from it (not from the whole
   # output, where 'secondmate reg1: updated' legitimately appears).
@@ -461,28 +461,28 @@ test_registry_backstop_dedup_and_self_exclusion() {
   assert_not_contains "$restart_line" "reg1" "registry-only secondmate without live metadata gets no action"
   assert_not_contains "$nudge_line" "sm1" "a restarted secondmate must not also be nudged"
   assert_not_contains "$nudge_line" "reg1" "registry-only secondmate without live metadata is not nudged"
-  pass "T7 registry backstop resolves, dedups meta+registry, excludes the firstmate repo"
+  pass "T7 registry backstop resolves, dedups meta+registry, excludes the nexus repo"
 }
 
-# --- T9: firstmate repo on a feature branch is skipped ---------------------
-test_firstmate_wrong_branch_skipped() {
+# --- T9: nexus repo on a feature branch is skipped ---------------------
+test_nexus_wrong_branch_skipped() {
   local w out before
   w=$(new_world t9)
   bump_origin "$w" instr
-  # Simulate firstmate mid-shipping its own change: not on the default branch.
+  # Simulate nexus mid-shipping its own change: not on the default branch.
   git -C "$w/main" checkout -q -b feature/wip
   before=$(git -C "$w/main" rev-parse HEAD)
 
   out=$(run_update "$w")
 
-  assert_contains "$out" "firstmate: skipped: on feature/wip, expected main" "off-default firstmate skipped"
-  assert_contains "$out" "reread-firstmate: no" "no reread when firstmate was skipped"
+  assert_contains "$out" "nexus: skipped: on feature/wip, expected main" "off-default nexus skipped"
+  assert_contains "$out" "reread-nexus: no" "no reread when nexus was skipped"
   [ "$(git -C "$w/main" rev-parse HEAD)" = "$before" ] \
-    || fail "skipped firstmate HEAD moved"
-  pass "T9 firstmate off its default branch is skipped, not forced"
+    || fail "skipped nexus HEAD moved"
+  pass "T9 nexus off its default branch is skipped, not forced"
 }
 
-test_firstmate_detached_head_skipped() {
+test_nexus_detached_head_skipped() {
   local w out before
   w=$(new_world t10)
   bump_origin "$w" instr
@@ -491,11 +491,11 @@ test_firstmate_detached_head_skipped() {
 
   out=$(run_update "$w")
 
-  assert_contains "$out" "firstmate: skipped: detached HEAD, expected main" "detached firstmate skipped"
-  assert_contains "$out" "reread-firstmate: no" "no reread when detached firstmate was skipped"
+  assert_contains "$out" "nexus: skipped: detached HEAD, expected main" "detached nexus skipped"
+  assert_contains "$out" "reread-nexus: no" "no reread when detached nexus was skipped"
   [ "$(git -C "$w/main" rev-parse HEAD)" = "$before" ] \
-    || fail "detached firstmate HEAD moved"
-  pass "T10 firstmate detached HEAD is skipped"
+    || fail "detached nexus HEAD moved"
+  pass "T10 nexus detached HEAD is skipped"
 }
 
 test_unsafe_secondmate_home_skipped_before_git_update() {
@@ -512,7 +512,7 @@ test_unsafe_secondmate_home_skipped_before_git_update() {
 
   out=$(run_update "$w")
 
-  assert_contains "$out" "secondmate bad: skipped: unsafe home: secondmate home cannot be inside the active firstmate home" \
+  assert_contains "$out" "secondmate bad: skipped: unsafe home: secondmate home cannot be inside the active nexus home" \
     "unsafe project-like home skipped"
   assert_contains "$out" "nudge-secondmates: none" "unsafe home is not nudged"
   [ "$(git -C "$bad" rev-parse HEAD)" = "$before" ] \
@@ -548,7 +548,7 @@ test_primary_update_rebinds_local_watch() {
 
   out=$(run_update "$w")
 
-  assert_contains "$out" "firstmate: updated " "the primary still advanced"
+  assert_contains "$out" "nexus: updated " "the primary still advanced"
   assert_contains "$out" "rebound: when-rebind-primary" "the primary self-update rebound its own locally armed watch"
   after_hash=$(grep '^action_sha256=' "$spec")
   [ "$before_hash" != "$after_hash" ] \
@@ -568,8 +568,8 @@ test_squash_merged_divergence_reconciles
 test_already_current_secondmate_still_restarts
 test_already_current_unprovable_mate_is_nudged
 test_registry_backstop_dedup_and_self_exclusion
-test_firstmate_wrong_branch_skipped
-test_firstmate_detached_head_skipped
+test_nexus_wrong_branch_skipped
+test_nexus_detached_head_skipped
 test_unsafe_secondmate_home_skipped_before_git_update
 test_primary_update_rebinds_local_watch
 

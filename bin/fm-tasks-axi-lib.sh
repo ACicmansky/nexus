@@ -11,7 +11,7 @@
 # constants in bin/fm-bootstrap.sh.
 # The feature probes are a separate concern and stay as defense in depth for
 # stripped or forked builds that advertise a current version without those flags.
-# `config/backlog-backend=manual` opts out of tasks-axi for routine firstmate
+# `config/backlog-backend=manual` opts out of tasks-axi for routine nexus
 # backlog mutations, but validated secondmate handoffs always use `tasks-axi mv`.
 # Absent or any other value keeps the default tasks-axi backend path, falling
 # back to manual mutation when the tool is not compatible.

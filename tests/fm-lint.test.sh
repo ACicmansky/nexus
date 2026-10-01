@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Parity guard for firstmate's shell-lint definition.
+# Parity guard for nexus's shell-lint definition.
 #
 # bin/fm-lint.sh is the single owner invoked by CI
 # (.github/workflows/ci.yml) and by the pre-push gate (.no-mistakes.yaml
@@ -1172,9 +1172,9 @@ SH
 
   for invocation in \
     'bd update fm-example --status in_progress' \
-    'BD_ACTOR=firstmate bd update fm-example --status closed' \
+    'BD_ACTOR=nexus bd update fm-example --status closed' \
     'env bd close fm-example' \
-    'env -i BD_ACTOR=firstmate bd close fm-example' \
+    'env -i BD_ACTOR=nexus bd close fm-example' \
     'env -u BD_ACTOR bd close fm-example' \
     'env -- bd close fm-example' \
     '/usr/local/bin/bd close fm-example' \
@@ -1195,7 +1195,7 @@ SH
     assert_contains "$out" "direct Beads CLI invocation bypasses tasks-axi" \
       "lint did not identify the backend-boundary violation: $invocation"
   done
-  pass "fm-lint.sh rejects direct Beads CLI invocations in firstmate core"
+  pass "fm-lint.sh rejects direct Beads CLI invocations in nexus core"
 }
 
 test_rejects_direct_beads_cli_in_explicit_core_path() {

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # tests/fm-backend-herdr-respawn-idem-e2e.test.sh - isolated real-herdr
-# regression test for firstmate-restart idempotency against herdr's
+# regression test for nexus-restart idempotency against herdr's
 # restored-layout husks (docs/herdr-backend.md "Known gaps" / "ID stability
 # across a server restart").
 #

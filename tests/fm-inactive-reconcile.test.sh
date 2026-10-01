@@ -89,7 +89,7 @@ write_child() { # <home> <id> <status> [spawn-gen]
   sha=$(git -C "$home/projects/$id" rev-parse HEAD)
   git -C "$home/projects/$id" update-ref refs/remotes/origin/main "$sha"
   fm_write_meta "$home/state/$id.meta" \
-    "window=firstmate:fm-$id" "worktree=$home/projects/$id" "project=$home/projects/$id" \
+    "window=nexus:fm-$id" "worktree=$home/projects/$id" "project=$home/projects/$id" \
     'harness=codex' 'kind=ship' 'mode=no-mistakes' 'yolo=off' \
     "spawn_gen=$spawn_gen" 'pr=https://example.test/owner/repo/pull/1' \
     "pr_head=$sha"

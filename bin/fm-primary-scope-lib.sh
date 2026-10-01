@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Shared marker-or-plain-checkout predicate for tracked hooks that must act only
-# in a genuine firstmate primary home.
+# in a genuine nexus primary home.
 # This file is sourced by hook entrypoints and has no side effects on source.
 # fm_primary_root_matches is split out so a caller can confirm primary-home
 # identity before its gitignored state dir exists, such as to create it.

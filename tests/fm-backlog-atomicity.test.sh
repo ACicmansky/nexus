@@ -82,7 +82,7 @@ EOF
 ## Captain's intent
 Exercise backlog dispatch for $id.
 
-## Firstmate spec
+## Nexus spec
 Verify the atomic backlog transition.
 
 # Definition of done
@@ -93,7 +93,7 @@ EOF
   cat > "$fakebin/tmux" <<'SH'
 #!/usr/bin/env bash
 case "$*" in *"#{pane_current_path}"*) printf '%s\n' "${FM_FAKE_PANE_PATH:-}"; exit 0 ;; esac
-case "${1:-}" in display-message) printf 'firstmate\n'; exit 0 ;; esac
+case "${1:-}" in display-message) printf 'nexus\n'; exit 0 ;; esac
 exit 0
 SH
   chmod +x "$fakebin/tmux"
@@ -444,7 +444,7 @@ break_launch_delivery() {  # <case-dir>
 #!/usr/bin/env bash
 case "$*" in *"#{pane_current_path}"*) printf '%s\n' "${FM_FAKE_PANE_PATH:-}"; exit 0 ;; esac
 case "${1:-}" in
-  display-message) printf 'firstmate\n'; exit 0 ;;
+  display-message) printf 'nexus\n'; exit 0 ;;
   send-keys) exit 1 ;;
 esac
 exit 0
@@ -496,7 +496,7 @@ case "\$*" in
   *"#{cursor_y}"*) printf '1\\n'; exit 0 ;;
 esac
 case "\${1:-}" in
-  display-message) printf 'firstmate\\n'; exit 0 ;;
+  display-message) printf 'nexus\\n'; exit 0 ;;
   capture-pane)
     if [ ! -f "$case_dir/kimi-interrupted" ]; then
       : > "$case_dir/kimi-interrupted"
@@ -579,7 +579,7 @@ write_task_meta() {  # <case-dir> <id> <kind> <mode> [extra-line...]
   local case_dir=$1 id=$2 kind=$3 mode=$4
   shift 4
   fm_write_meta "$(home_of "$case_dir")/state/$id.meta" \
-    "window=firstmate:fm-$id" \
+    "window=nexus:fm-$id" \
     "endpoint_task_id=$id" \
     "worktree=$case_dir/absent-worktree" \
     "project=$case_dir/absent-project" \
@@ -913,7 +913,7 @@ case "\$*" in
   *treehouse\\ get*) : > "$case_dir/local-copy-requested" ;;
   *"#{pane_current_path}"*) printf '%s\n' "\${FM_FAKE_PANE_PATH:-}"; exit 0 ;;
 esac
-case "\${1:-}" in display-message) printf 'firstmate\n'; exit 0 ;; esac
+case "\${1:-}" in display-message) printf 'nexus\n'; exit 0 ;; esac
 exit 0
 SH
   chmod +x "$case_dir/fakebin/tmux"
@@ -948,7 +948,7 @@ case "\$*" in
   *treehouse\\ get*) : > "$case_dir/local-copy-requested" ;;
   *"#{pane_current_path}"*) printf '%s\n' "\${FM_FAKE_PANE_PATH:-}"; exit 0 ;;
 esac
-case "\${1:-}" in display-message) printf 'firstmate\n'; exit 0 ;; esac
+case "\${1:-}" in display-message) printf 'nexus\n'; exit 0 ;; esac
 exit 0
 SH
   chmod +x "$case_dir/fakebin/tmux"
@@ -983,7 +983,7 @@ case "\$*" in
   *treehouse\\ get*) : > "$case_dir/local-copy-requested" ;;
   *"#{pane_current_path}"*) printf '%s\n' "\${FM_FAKE_PANE_PATH:-}"; exit 0 ;;
 esac
-case "\${1:-}" in display-message) printf 'firstmate\n'; exit 0 ;; esac
+case "\${1:-}" in display-message) printf 'nexus\n'; exit 0 ;; esac
 exit 0
 SH
   chmod +x "$case_dir/fakebin/tmux"
@@ -1018,7 +1018,7 @@ case "\$*" in
   *treehouse\\ get*) : > "$case_dir/local-copy-requested" ;;
   *"#{pane_current_path}"*) printf '%s\n' "\${FM_FAKE_PANE_PATH:-}"; exit 0 ;;
 esac
-case "\${1:-}" in display-message) printf 'firstmate\n'; exit 0 ;; esac
+case "\${1:-}" in display-message) printf 'nexus\n'; exit 0 ;; esac
 exit 0
 SH
   chmod +x "$case_dir/fakebin/tmux"
@@ -2692,7 +2692,7 @@ test_no_backlog_teardown_refuses_a_symlinked_task_record_at_entry() {
   target="$target_dir/$id.meta"
   mkdir -p "$target_dir"
   fm_write_meta "$target" \
-    "window=firstmate:fm-$id" "endpoint_task_id=$id" \
+    "window=nexus:fm-$id" "endpoint_task_id=$id" \
     "worktree=$foreign_worktree" "project=$case_dir/foreign-project" \
     "harness=claude" "kind=ship" "mode=local-only" "yolo=off"
   ln -s "$target" "$home/state/$id.meta"
@@ -2722,7 +2722,7 @@ test_teardown_rechecks_record_parent_after_lock_acquisition() {
   foreign_worktree="$case_dir/foreign-worktree"
   mkdir -p "$foreign_state" "$foreign_worktree"
   fm_write_meta "$foreign_state/$id.meta" \
-    "window=firstmate:fm-$id" "endpoint_task_id=$id" \
+    "window=nexus:fm-$id" "endpoint_task_id=$id" \
     "worktree=$foreign_worktree" "project=$case_dir/foreign-project" \
     "harness=claude" "kind=ship" "mode=local-only" "yolo=off"
   track_teardown_resource_actions "$case_dir"
@@ -2763,7 +2763,7 @@ test_teardown_refuses_a_symlinked_state_directory_at_entry() {
   external_state="$case_dir/external-state"
   mv "$home/state" "$external_state"
   fm_write_meta "$external_state/$id.meta" \
-    "window=firstmate:fm-$id" "endpoint_task_id=$id" \
+    "window=nexus:fm-$id" "endpoint_task_id=$id" \
     "worktree=$case_dir/foreign-worktree" "project=$case_dir/foreign-project" \
     "harness=claude" "kind=ship" "mode=local-only" "yolo=off"
   ln -s "$external_state" "$home/state"
@@ -2901,7 +2901,7 @@ test_configured_adapter_refuses_a_data_directory_outside_the_home() {
 test_dispatch_and_completion_are_structural() {
   local case_dir home id meta out pr
   id=fm-structural-b15
-  pr=https://github.com/example/firstmate/pull/15
+  pr=https://github.com/example/nexus/pull/15
   case_dir=$(make_home structural "$id")
   home=$(home_of "$case_dir")
   add_item "$case_dir" "$id"
@@ -2996,7 +2996,7 @@ test_a_secondmate_home_keeps_its_own_books() {
   local case_dir id out
   id=atomic-mate-b13
   case_dir=$(make_home mate-own-books "$id")
-  # The mate's home is a firstmate home in its own right; the invariant is
+  # The mate's home is a nexus home in its own right; the invariant is
   # single-host, so its own dispatch and completion keep its own two records
   # paired with no parent involved.
   printf '%s\n' mate-h1 > "$(home_of "$case_dir")/.fm-secondmate-home"
@@ -3020,7 +3020,7 @@ test_a_persistent_secondmate_is_never_a_backlog_item() {
   case_dir=$(make_home mate-not-an-item)
   mate="$case_dir/mate-home"
   mkdir -p "$mate/bin" "$mate/data"
-  printf '# Firstmate\n' > "$mate/AGENTS.md"
+  printf '# Nexus\n' > "$mate/AGENTS.md"
   printf '%s\n' "$id" > "$mate/.fm-secondmate-home"
   printf 'charter for %s\n' "$id" > "$mate/data/charter.md"
   printf '%s\n' 'projects/' 'state/' 'data/' 'config/' '.no-mistakes/' > "$mate/.gitignore"

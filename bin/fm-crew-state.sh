@@ -4,7 +4,7 @@
 # Why this exists: state/<id>.status is an append-only, best-effort EVENT LOG.
 # Crews append only wake-worthy transitions (done/needs-decision/blocked/paused/failed)
 # and nothing when they silently resume, so `tail -1` of that log reports the
-# last EVENT, not the current STATE. After firstmate resolves a needs-decision
+# last EVENT, not the current STATE. After nexus resolves a needs-decision
 # or blocked and the crew resumes (responds to the gate, the pipeline fixes, it
 # re-validates), the log's last line stays stale. This helper never infers the
 # current state from a tail of the log: it reads the authoritative source (a
@@ -21,7 +21,7 @@
 # FM_CREW_STATE_NO_FORGE=1 keeps the receipt read but skips the forge fallback.
 # An absent or unreadable PR identity yields an honest unknown, never an
 # optimistic merged claim.
-# Output is one stable, parseable, token-tight line firstmate can read every
+# Output is one stable, parseable, token-tight line nexus can read every
 # heartbeat:
 #
 #   state: <working|parked|done|blocked|paused|failed|unknown> · source: <run-step|pane|status-log|remote-endpoint|none> · <detail>
@@ -704,7 +704,7 @@ nm_steps_rows() {
 # fixing step. The client prefixes a step's `last_activity` with `quiet` once no
 # step log or native-agent lifecycle event has arrived for longer than its
 # configured quiet warning, so its own recency verdict is the signal here rather
-# than a second threshold invented in firstmate. Positive evidence is required:
+# than a second threshold invented in nexus. Positive evidence is required:
 # an absent table is not recency, so a run record that merely still says
 # `running` while nothing executes it never reads as alive.
 nm_run_activity_is_recent() {

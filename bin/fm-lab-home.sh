@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# fm-lab-home.sh - mint a disposable firstmate "lab" home.
+# fm-lab-home.sh - mint a disposable nexus "lab" home.
 #
 # A lab home is a throwaway FM_HOME that a no-mistakes GATE agent may drive
 # through the fleet lifecycle entrypoints: bin/fm-gate-refuse-lib.sh refuses

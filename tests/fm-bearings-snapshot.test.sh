@@ -63,7 +63,7 @@ JSON
   exit 0
 fi
 cat <<'JSON'
-[{"number":9,"title":"Ship the thing","url":"https://github.com/kunchenguid/firstmate/pull/9","headRefName":"fm/ship-task","reviewDecision":"APPROVED","mergeable":"MERGEABLE","statusCheckRollup":[{"conclusion":"SUCCESS","status":"COMPLETED"}]}]
+[{"number":9,"title":"Ship the thing","url":"https://github.com/ACicmansky/nexus/pull/9","headRefName":"fm/ship-task","reviewDecision":"APPROVED","mergeable":"MERGEABLE","statusCheckRollup":[{"conclusion":"SUCCESS","status":"COMPLETED"}]}]
 JSON
 SH
   cat > "$fb/gh-axi" <<'SH'
@@ -110,58 +110,58 @@ write_fixture() {  # <home>
   local home=$1 mate
   mate=$(fixture_mate_home "$home")
   mkdir -p "$home/projects/ship-wt" "$home/data/scout-x" "$mate/data" "$mate/state" "$mate/config" "$mate/projects" "$mate/bin"
-  printf '# Firstmate fixture\n' > "$mate/AGENTS.md"
+  printf '# Nexus fixture\n' > "$mate/AGENTS.md"
   printf 'mate\n' > "$mate/.fm-secondmate-home"
-  printf -- '- mate - fixture domain (home: %s; scope: fixture work; projects: firstmate; added 2026-07-11)\n' \
+  printf -- '- mate - fixture domain (home: %s; scope: fixture work; projects: nexus; added 2026-07-11)\n' \
     "$mate" > "$home/data/secondmates.md"
   cat > "$home/data/backlog.md" <<EOF
 ## In flight
-- [ ] ship-task - Ship the thing (repo: firstmate) (kind: ship) (since 2026-07-11)
-- [ ] scout-x - Investigate the thing data/scout-x/report.md (repo: firstmate) (kind: scout) (since 2026-07-11)
+- [ ] ship-task - Ship the thing (repo: nexus) (kind: ship) (since 2026-07-11)
+- [ ] scout-x - Investigate the thing data/scout-x/report.md (repo: nexus) (kind: scout) (since 2026-07-11)
 
 ## Queued
-- [ ] live-gate - Real queued work blocked-by: ship-task (repo: firstmate) (kind: ship)
-- [ ] dead-gate - Old conditional work (repo: firstmate) (kind: scout)
+- [ ] live-gate - Real queued work blocked-by: ship-task (repo: nexus) (kind: ship)
+- [ ] dead-gate - Old conditional work (repo: nexus) (kind: scout)
   NOT REQUIRED - superseded 2026-07-11; kept as reference only.
 
 ## Done
-- [x] done-a - Landed thing https://github.com/kunchenguid/firstmate/pull/7 (repo: firstmate) (kind: ship) (merged 2026-07-10)
+- [x] done-a - Landed thing https://github.com/ACicmansky/nexus/pull/7 (repo: nexus) (kind: ship) (merged 2026-07-10)
 EOF
   printf '# Scout X\n' > "$home/data/scout-x/report.md"
   fm_write_meta "$home/state/ship-task.meta" \
-    "window=firstmate:fm-ship-task" \
+    "window=nexus:fm-ship-task" \
     "worktree=$home/projects/ship-wt" \
-    "project=firstmate" \
+    "project=nexus" \
     "harness=claude" \
     "kind=ship" \
     "mode=no-mistakes" \
-    "pr=https://github.com/kunchenguid/firstmate/pull/9"
+    "pr=https://github.com/ACicmansky/nexus/pull/9"
   record_claude_state "$home/state" ship-task busy
   printf 'working: building the thing\n' > "$home/state/ship-task.status"
   fm_write_meta "$home/state/scout-x.meta" \
-    "window=firstmate:fm-scout-x" \
+    "window=nexus:fm-scout-x" \
     "worktree=$home/projects/ship-wt" \
-    "project=firstmate" \
+    "project=nexus" \
     "harness=claude" \
     "kind=scout" \
     "mode=scout"
   record_claude_state "$home/state" scout-x idle
   printf 'done: report ready\n' > "$home/state/scout-x.status"
   fm_write_meta "$home/state/mate.meta" \
-    "window=firstmate:fm-mate" \
+    "window=nexus:fm-mate" \
     "worktree=$mate" \
     "project=$mate" \
     "harness=codex" \
     "kind=secondmate" \
     "mode=secondmate" \
     "home=$mate" \
-    "projects=firstmate"
+    "projects=nexus"
   printf 'needs-decision [key=race]: pick subscribe order\n' > "$home/state/mate.status"
   printf 'done: an unrelated subtask finished\n' >> "$home/state/mate.status"
   fm_write_meta "$home/state/external-wait.meta" \
-    "window=firstmate:fm-external-wait" \
+    "window=nexus:fm-external-wait" \
     "worktree=$home/projects/ship-wt" \
-    "project=firstmate" \
+    "project=nexus" \
     "harness=claude" \
     "kind=ship" \
     "mode=no-mistakes"
@@ -172,17 +172,17 @@ EOF
   # bounded cross-home Done roll-up.
   cat > "$mate/data/backlog.md" <<'EOF'
 ## In flight
-- [ ] mate - Decide subscription order (repo: firstmate) (kind: ship) (since 2026-07-11)
+- [ ] mate - Decide subscription order (repo: nexus) (kind: ship) (since 2026-07-11)
 
 ## Queued
-- [ ] mate-decision-race - Choose subscription order (repo: firstmate) (kind: captain) (hold: captain choice pending) (hold-kind: captain)
+- [ ] mate-decision-race - Choose subscription order (repo: nexus) (kind: captain) (hold: captain choice pending) (hold-kind: captain)
 
 ## Done
-- [x] mate-landed - Secondmate-managed fix https://github.com/kunchenguid/firstmate/pull/50 (repo: firstmate) (kind: ship) (merged 2026-07-11)
+- [x] mate-landed - Secondmate-managed fix https://github.com/ACicmansky/nexus/pull/50 (repo: nexus) (kind: ship) (merged 2026-07-11)
 EOF
   mkdir -p "$mate/projects/mate"
   fm_write_meta "$mate/state/mate.meta" \
-    "window=firstmate:fm-mate" "worktree=$mate/projects/mate" "project=firstmate" \
+    "window=nexus:fm-mate" "worktree=$mate/projects/mate" "project=nexus" \
     "harness=claude" "kind=ship" "mode=no-mistakes"
   record_claude_state "$mate/state" mate idle
   printf 'needs-decision [key=race]: pick subscribe order\n' > "$mate/state/mate.status"
@@ -238,8 +238,8 @@ write_remote_home_summary() {  # <remote-home> <generated-epoch>
       {id:"remote-aged",key:"remote-aged",verb:"captain-hold",summary:"Remote aged hold",reason:"choose a route",hold_until:null,hold_bucket:"aged",hold_age_days:40,source:"backlog"}
     ],holds:[],
     queued:[
-      {id:"remote-parked",title:"Remote parked hold",blocked_by:null,blocked_by_ids:[],unresolved_blocker_ids:[],blocked_reason:null,hold_reason:"parked",hold_kind:"captain",hold_until:null,hold_bucket:"live",hold_age_days:null,captain_actionable:true,repo:"firstmate",kind:"captain"},
-      {id:"remote-aged",title:"Remote aged hold",blocked_by:null,blocked_by_ids:[],unresolved_blocker_ids:[],blocked_reason:null,hold_reason:"choose a route",hold_kind:"captain",hold_until:null,hold_bucket:"aged",hold_age_days:40,captain_actionable:false,repo:"firstmate",kind:"captain"}
+      {id:"remote-parked",title:"Remote parked hold",blocked_by:null,blocked_by_ids:[],unresolved_blocker_ids:[],blocked_reason:null,hold_reason:"parked",hold_kind:"captain",hold_until:null,hold_bucket:"live",hold_age_days:null,captain_actionable:true,repo:"nexus",kind:"captain"},
+      {id:"remote-aged",title:"Remote aged hold",blocked_by:null,blocked_by_ids:[],unresolved_blocker_ids:[],blocked_reason:null,hold_reason:"choose a route",hold_kind:"captain",hold_until:null,hold_bucket:"aged",hold_age_days:40,captain_actionable:false,repo:"nexus",kind:"captain"}
     ],landed:[],endpoints:[],
     counts:{active_children:0,decisions_open:2,holds:0,queued:2,landed:0,endpoints:0},omitted:[]
   }' > "$home/state/home-summary.json"
@@ -333,11 +333,11 @@ run_remote_ledger_bearings() {  # <parent-home> <fakebin> <epoch>
 write_domain_alpha_fixture() {  # <parent-home> <secondmate-home>
   local home=$1 mate=$2 i
   mkdir -p "$mate/state" "$mate/data" "$mate/config" "$mate/projects" "$mate/bin"
-  printf '# Firstmate fixture\n' > "$mate/AGENTS.md"
+  printf '# Nexus fixture\n' > "$mate/AGENTS.md"
   printf 'domain-alpha\n' > "$mate/.fm-secondmate-home"
   printf -- '- domain-alpha - sample rollout (home: %s; scope: sample rollout and legal release; projects: sample; added 2026-07-13)\n' \
     "$mate" > "$home/data/secondmates.md"
-  fm_write_secondmate_meta "$home/state/domain-alpha.meta" "$mate" "firstmate:fm-domain-alpha" sample
+  fm_write_secondmate_meta "$home/state/domain-alpha.meta" "$mate" "nexus:fm-domain-alpha" sample
   printf 'working [key=phase7]: Phase 7 started\n' > "$home/state/domain-alpha.status"
   cat > "$mate/data/backlog.md" <<'EOF'
 ## In flight
@@ -495,7 +495,7 @@ test_active_child_overrides_old_parent_event() {
 - [x] phase7 - Sample rollout Phase 7 (repo: sample) (kind: ship) (done 2026-07-12)
 EOF
   fm_write_meta "$mate/state/phase8.meta" \
-    "window=firstmate:fm-phase8" "worktree=$mate/projects/phase8" "project=sample" \
+    "window=nexus:fm-phase8" "worktree=$mate/projects/phase8" "project=sample" \
     "harness=codex" "kind=ship" "mode=no-mistakes"
   printf 'working [key=phase8]: implementing Phase 8 parity\nneeds-decision [key=release]: choose release A or B\n' \
     > "$mate/state/phase8.status"
@@ -535,7 +535,7 @@ test_structured_child_decision_reaches_captains_call() {
 - [x] phase7 - Sample rollout Phase 7 (repo: sample) (kind: ship) (done 2026-07-12)
 EOF
   fm_write_meta "$mate/state/phase8.meta" \
-    "window=firstmate:fm-phase8" "worktree=$mate/projects/phase8" "project=sample" \
+    "window=nexus:fm-phase8" "worktree=$mate/projects/phase8" "project=sample" \
     "harness=claude" "kind=ship" "mode=no-mistakes"
   record_claude_state "$mate/state" phase8 idle
   printf 'needs-decision [key=release]: choose release A or B\n' > "$mate/state/phase8.status"
@@ -553,7 +553,7 @@ EOF
 make_valid_secondmate_home() {  # <id> <home>
   local id=$1 home=$2
   mkdir -p "$home/state" "$home/data" "$home/config" "$home/projects" "$home/bin"
-  printf '# Firstmate fixture\n' > "$home/AGENTS.md"
+  printf '# Nexus fixture\n' > "$home/AGENTS.md"
   printf '%s\n' "$id" > "$home/.fm-secondmate-home"
   cat > "$home/data/backlog.md" <<'EOF'
 ## In flight
@@ -570,7 +570,7 @@ append_secondmate_registry() {  # <parent> <id> <home>
 }
 
 append_landed_row() {  # <secondmate-home> <id> <title> <date>
-  printf -- '- [x] %s - %s (repo: firstmate) (kind: ship) (merged %s)\n' \
+  printf -- '- [x] %s - %s (repo: nexus) (kind: ship) (merged %s)\n' \
     "$2" "$3" "$4" >> "$1/data/backlog.md"
 }
 
@@ -583,7 +583,7 @@ make_landed_secondmate() {  # <parent> <id>
 }
 
 write_parent_secondmate_event() {  # <parent> <id> <home> <note>
-  fm_write_secondmate_meta "$1/state/$2.meta" "$3" "firstmate:fm-$2" sample
+  fm_write_secondmate_meta "$1/state/$2.meta" "$3" "nexus:fm-$2" sample
   printf 'working [key=%s]: %s\n' "$2" "$4" > "$1/state/$2.status"
 }
 
@@ -620,7 +620,7 @@ test_bad_secondmate_homes_never_revive_parent_work() {
   git -C "$wt" checkout -q -b fm/slow
   printf '## In flight\n- [ ] slow - Slow child (repo: sample) (kind: ship) (since 2026-07-13)\n\n## Queued\n\n## Done\n' > "$unknown_child/data/backlog.md"
   fm_write_meta "$unknown_child/state/slow.meta" \
-    "window=firstmate:fm-slow" "worktree=$wt" "project=sample" \
+    "window=nexus:fm-slow" "worktree=$wt" "project=sample" \
     "harness=codex" "kind=ship" "mode=no-mistakes"
   append_secondmate_registry "$home" unknown-child "$unknown_child"
   write_parent_secondmate_event "$home" unknown-child "$unknown_child" "old unknown work"
@@ -655,7 +655,7 @@ test_oversized_secondmate_summary_stays_strict_unknown() {
   mate="$TMP_ROOT/oversized-secondmate-home"
   make_valid_secondmate_home oversized "$mate"
   append_secondmate_registry "$home" oversized "$mate"
-  fm_write_secondmate_meta "$home/state/oversized.meta" "$mate" "firstmate:fm-oversized" sample
+  fm_write_secondmate_meta "$home/state/oversized.meta" "$mate" "nexus:fm-oversized" sample
   printf 'working [key=old]: stale parent activity\n' > "$home/state/oversized.status"
   cat > "$mate/data/backlog.md" <<'EOF'
 ## In flight
@@ -701,7 +701,7 @@ test_secondmate_and_child_bounds_are_disclosed() {
     mkdir -p "$mate/projects/$child"
     printf -- '- [ ] %s - Active %s (repo: sample) (kind: ship) (since 2026-07-13)\n' "$child" "$child" >> "$mate/data/backlog.md"
     fm_write_meta "$mate/state/$child.meta" \
-      "window=firstmate:fm-$child" "worktree=$mate/projects/$child" "project=sample" \
+      "window=nexus:fm-$child" "worktree=$mate/projects/$child" "project=sample" \
       "harness=claude" "kind=ship" "mode=no-mistakes"
     record_claude_state "$mate/state" "$child" busy
     printf 'working [key=%s]: active child %s\n' "$child" "$i" > "$mate/state/$child.status"
@@ -745,7 +745,7 @@ test_parent_decision_is_untrusted_contradiction_only() {
   mate="$TMP_ROOT/parent-decision-only-home"
   make_valid_secondmate_home authority "$mate"
   append_secondmate_registry "$home" authority "$mate"
-  fm_write_secondmate_meta "$home/state/authority.meta" "$mate" "firstmate:fm-authority" sample
+  fm_write_secondmate_meta "$home/state/authority.meta" "$mate" "nexus:fm-authority" sample
   printf 'needs-decision [key=stale]: old parent question\n' > "$home/state/authority.status"
   fakebin=$(make_fakebin "$home")
   refresh_local_secondmate_ledgers "$home"
@@ -778,9 +778,9 @@ test_parent_evidence_reconciles_by_verb_and_key() {
   append_secondmate_registry "$home" hold "$hold"
   append_secondmate_registry "$home" blocked "$blocked"
   append_secondmate_registry "$home" decision "$decision"
-  fm_write_secondmate_meta "$home/state/hold.meta" "$hold" "firstmate:fm-hold" sample
-  fm_write_secondmate_meta "$home/state/blocked.meta" "$blocked" "firstmate:fm-blocked" sample
-  fm_write_secondmate_meta "$home/state/decision.meta" "$decision" "firstmate:fm-decision" sample
+  fm_write_secondmate_meta "$home/state/hold.meta" "$hold" "nexus:fm-hold" sample
+  fm_write_secondmate_meta "$home/state/blocked.meta" "$blocked" "nexus:fm-blocked" sample
+  fm_write_secondmate_meta "$home/state/decision.meta" "$decision" "nexus:fm-decision" sample
   printf 'working [key=stale-work]: old work still running\n' > "$home/state/hold.status"
   printf 'paused [key=legal-release]: waiting for legal release\n' >> "$home/state/hold.status"
   printf 'paused: legacy pause without an identity\n' >> "$home/state/hold.status"
@@ -815,7 +815,7 @@ EOF
 ## Done
 EOF
   fm_write_meta "$decision/state/$child.meta" \
-    "window=firstmate:fm-$child" "worktree=$decision/projects/$child" "project=sample" \
+    "window=nexus:fm-$child" "worktree=$decision/projects/$child" "project=sample" \
     "harness=claude" "kind=ship" "mode=no-mistakes"
   record_claude_state "$decision/state" "$child" idle
   printf 'needs-decision [key=live-route]: choose the current route\n' > "$decision/state/$child.status"
@@ -869,7 +869,7 @@ test_nonprogressing_child_states_are_explicit() {
 ## Done
 EOF
   fm_write_meta "$mate/state/parked.meta" \
-    "window=firstmate:fm-parked" "worktree=$mate/projects/parked" "project=sample" \
+    "window=nexus:fm-parked" "worktree=$mate/projects/parked" "project=sample" \
     "harness=claude" "kind=ship" "mode=no-mistakes"
   record_claude_state "$mate/state" parked idle
   printf 'needs-decision [key=parked]: choose a route\n' > "$mate/state/parked.status"
@@ -913,10 +913,10 @@ EOF
 ## Done
 EOF
   fm_write_meta "$mate/state/done.meta" \
-    "window=firstmate:fm-done" "worktree=$mate/projects/done" "project=sample" \
+    "window=nexus:fm-done" "worktree=$mate/projects/done" "project=sample" \
     "harness=claude" "kind=ship" "mode=no-mistakes"
   fm_write_meta "$mate/state/failed.meta" \
-    "window=firstmate:fm-failed" "worktree=$mate/projects/failed" "project=sample" \
+    "window=nexus:fm-failed" "worktree=$mate/projects/failed" "project=sample" \
     "harness=claude" "kind=ship" "mode=no-mistakes"
   record_claude_state "$mate/state" "done" idle
   record_claude_state "$mate/state" failed idle
@@ -945,7 +945,7 @@ test_registry_unavailability_and_bounds_are_explicit() {
   mate="$TMP_ROOT/registry-hidden"
   make_valid_secondmate_home hidden "$mate"
   printf -- '- hidden - fixture (home: %s; scope: fixture; projects: sample; added 2026-07-11)\n' "$mate" > "$home/data/secondmates.md"
-  fm_write_secondmate_meta "$home/state/hidden.meta" "$mate" "firstmate:fm-hidden" sample
+  fm_write_secondmate_meta "$home/state/hidden.meta" "$mate" "nexus:fm-hidden" sample
   chmod 000 "$home/data/secondmates.md"
   fakebin=$(make_fakebin "$home")
   canonical=$(PATH="$fakebin:$PATH" FM_HOME="$home" FM_SNAPSHOT_NOW=2026-07-11T18:00:00Z \
@@ -1011,7 +1011,7 @@ test_registry_unavailability_and_bounds_are_explicit() {
   mate="$TMP_ROOT/registry-z-hidden"
   make_valid_secondmate_home z-hidden "$mate"
   append_secondmate_registry "$home" z-hidden "$mate"
-  fm_write_secondmate_meta "$home/state/z-hidden.meta" "$mate" "firstmate:fm-z-hidden" sample
+  fm_write_secondmate_meta "$home/state/z-hidden.meta" "$mate" "nexus:fm-z-hidden" sample
   refresh_local_secondmate_ledgers "$home"
   canonical=$(PATH="$fakebin:$PATH" FM_HOME="$home" FM_SNAPSHOT_NOW=2026-07-11T18:00:00Z \
     FM_SNAPSHOT_REGISTRY_RECORDS=3 "$ROOT/bin/fm-fleet-snapshot.sh" --json)
@@ -1054,7 +1054,7 @@ test_default_is_bounded_and_local_only() {
   local home fakebin toon json backlog
   home=$(make_home bounded); write_fixture "$home"
   backlog="$home/data/backlog.md"
-  awk '{if ($0 ~ /^- \[ \] ship-task /) sub(/ \(repo: firstmate\)/, ""); print}' \
+  awk '{if ($0 ~ /^- \[ \] ship-task /) sub(/ \(repo: nexus\)/, ""); print}' \
     "$backlog" > "$backlog.tmp" && mv "$backlog.tmp" "$backlog"
   fakebin=$(make_fakebin "$home"); : > "$home/net.log"
   toon=$(run "$home" "$fakebin")
@@ -1072,7 +1072,7 @@ test_default_is_bounded_and_local_only() {
   # Valid JSON, correct schema.
   printf '%s' "$json" | jq -e '
     .schema == "fm-bearings.v1"
-      and (.in_flight | any(.id == "ship-task" and .repo == "firstmate"))
+      and (.in_flight | any(.id == "ship-task" and .repo == "nexus"))
   ' >/dev/null || fail "json schema or main Underway repository wrong: $json"
   pass "default output is bounded, local-only, and marks omitted surfaces"
 }
@@ -1161,15 +1161,15 @@ test_collapsed_captain_call_deferral_and_landed() {
 ## In flight
 
 ## Queued
-- [ ] work-gate - Captain-gated ship work (repo: firstmate) (kind: ship) (hold: captain go needed) (hold-kind: captain)
-- [ ] later-call - Deferred captain call (repo: firstmate) (kind: captain) (hold: revisit with the captain) (hold-kind: captain) (hold-until: 2026-08-01)
-- [ ] due-call - Due captain call (repo: firstmate) (kind: captain) (hold: overdue captain choice) (hold-kind: captain) (hold-until: 2026-07-11)
-- [ ] parked-call - Prose-parked captain call (repo: firstmate) (kind: ship) (hold: DEFERRED by captain revisit later) (hold-kind: captain)
-- [ ] external-gate - Externally held work (repo: firstmate) (kind: ship) (hold: upstream release pending) (hold-kind: external)
+- [ ] work-gate - Captain-gated ship work (repo: nexus) (kind: ship) (hold: captain go needed) (hold-kind: captain)
+- [ ] later-call - Deferred captain call (repo: nexus) (kind: captain) (hold: revisit with the captain) (hold-kind: captain) (hold-until: 2026-08-01)
+- [ ] due-call - Due captain call (repo: nexus) (kind: captain) (hold: overdue captain choice) (hold-kind: captain) (hold-until: 2026-07-11)
+- [ ] parked-call - Prose-parked captain call (repo: nexus) (kind: ship) (hold: DEFERRED by captain revisit later) (hold-kind: captain)
+- [ ] external-gate - Externally held work (repo: nexus) (kind: ship) (hold: upstream release pending) (hold-kind: external)
 
 ## Done
-- [x] answered-call - Answered captain question (repo: firstmate) (kind: captain) (done 2026-07-10) (hold: captain choice pending) (hold-kind: captain)
-- [x] shipped-work - Ordinary landed work (repo: firstmate) (kind: ship) (merged 2026-07-10)
+- [x] answered-call - Answered captain question (repo: nexus) (kind: captain) (done 2026-07-10) (hold: captain choice pending) (hold-kind: captain)
+- [x] shipped-work - Ordinary landed work (repo: nexus) (kind: ship) (merged 2026-07-10)
 EOF
   fakebin=$(make_fakebin "$home")
   json=$(run "$home" "$fakebin" --json)
@@ -1200,23 +1200,23 @@ test_undated_hold_phrasing_and_aging_projection() {
   home=$(make_home undated-aging-proj)
   mate=$(fixture_mate_home "$home")
   mkdir -p "$home/data" "$mate/data" "$mate/state" "$mate/config" "$mate/projects" "$mate/bin"
-  printf '# Firstmate fixture\n' > "$mate/AGENTS.md"
+  printf '# Nexus fixture\n' > "$mate/AGENTS.md"
   printf 'aging-mate\n' > "$mate/.fm-secondmate-home"
-  printf -- '- aging-mate - hold aging fixture (home: %s; scope: captain holds; projects: firstmate; added 2026-07-11)\n' \
+  printf -- '- aging-mate - hold aging fixture (home: %s; scope: captain holds; projects: nexus; added 2026-07-11)\n' \
     "$mate" > "$home/data/secondmates.md"
   fm_write_meta "$home/state/aging-mate.meta" \
-    "kind=secondmate" "mode=secondmate" "harness=pi" "home=$mate" "projects=firstmate"
+    "kind=secondmate" "mode=secondmate" "harness=pi" "home=$mate" "projects=nexus"
   cat > "$mate/data/backlog.md" <<'EOF'
 ## In flight
 
 ## Queued
-- [ ] mate-parked - Remote parked call (repo: firstmate) (kind: captain) (hold: parked) (hold-kind: captain)
-- [ ] mate-blocked-parked - Remote blocked parked call blocked-by: missing-remote-blocker (repo: firstmate) (kind: captain) (hold: parked) (hold-kind: captain)
-- [ ] mate-future-parked - Remote parked call for later (repo: firstmate) (kind: captain) (hold: parked) (hold-kind: captain) (hold-until: 2026-08-01)
-- [ ] mate-due-parked - Remote parked call now due (repo: firstmate) (kind: captain) (hold: parked) (hold-kind: captain) (hold-until: 2026-07-11)
-- [ ] mate-due-not-required - Remote moot call now due (repo: firstmate) (kind: captain) (hold: choose a remote route) (hold-kind: captain) (hold-until: 2026-07-11)
+- [ ] mate-parked - Remote parked call (repo: nexus) (kind: captain) (hold: parked) (hold-kind: captain)
+- [ ] mate-blocked-parked - Remote blocked parked call blocked-by: missing-remote-blocker (repo: nexus) (kind: captain) (hold: parked) (hold-kind: captain)
+- [ ] mate-future-parked - Remote parked call for later (repo: nexus) (kind: captain) (hold: parked) (hold-kind: captain) (hold-until: 2026-08-01)
+- [ ] mate-due-parked - Remote parked call now due (repo: nexus) (kind: captain) (hold: parked) (hold-kind: captain) (hold-until: 2026-07-11)
+- [ ] mate-due-not-required - Remote moot call now due (repo: nexus) (kind: captain) (hold: choose a remote route) (hold-kind: captain) (hold-until: 2026-07-11)
   NOT REQUIRED - the remote decision is moot.
-- [ ] mate-aged - Remote aged call (repo: firstmate) (kind: captain) (since 2026-06-01) (hold: choose a remote route) (hold-kind: captain)
+- [ ] mate-aged - Remote aged call (repo: nexus) (kind: captain) (since 2026-06-01) (hold: choose a remote route) (hold-kind: captain)
   Captain hold set: 2026-06-01T00:00:00Z
 
 ## Done
@@ -1225,29 +1225,29 @@ EOF
 ## In flight
 
 ## Queued
-- [ ] parked-hold - Parked style call (repo: firstmate) (kind: ship) (since 2026-07-10) (hold: not urgent) (hold-kind: captain)
-- [ ] blocked-parked - Blocked parked call blocked-by: missing-blocker (repo: firstmate) (kind: captain) (hold: parked) (hold-kind: captain)
-- [ ] future-parked - Parked style call for later (repo: firstmate) (kind: captain) (hold: parked) (hold-kind: captain) (hold-until: 2026-08-01)
-- [ ] due-parked - Parked style call now due (repo: firstmate) (kind: captain) (hold: parked) (hold-kind: captain) (hold-until: 2026-07-11)
-- [ ] due-superseded - Superseded call now due (repo: firstmate) (kind: captain) (hold: SUPERSEDED) (hold-kind: captain) (hold-until: 2026-07-11)
-- [ ] aged-call - Aged genuine call (repo: firstmate) (kind: captain) (since 2026-06-01) (hold: choose a sample route) (hold-kind: captain)
+- [ ] parked-hold - Parked style call (repo: nexus) (kind: ship) (since 2026-07-10) (hold: not urgent) (hold-kind: captain)
+- [ ] blocked-parked - Blocked parked call blocked-by: missing-blocker (repo: nexus) (kind: captain) (hold: parked) (hold-kind: captain)
+- [ ] future-parked - Parked style call for later (repo: nexus) (kind: captain) (hold: parked) (hold-kind: captain) (hold-until: 2026-08-01)
+- [ ] due-parked - Parked style call now due (repo: nexus) (kind: captain) (hold: parked) (hold-kind: captain) (hold-until: 2026-07-11)
+- [ ] due-superseded - Superseded call now due (repo: nexus) (kind: captain) (hold: SUPERSEDED) (hold-kind: captain) (hold-until: 2026-07-11)
+- [ ] aged-call - Aged genuine call (repo: nexus) (kind: captain) (since 2026-06-01) (hold: choose a sample route) (hold-kind: captain)
   Captain hold set: 2026-06-01T00:00:00Z
-- [ ] recent-call - Recent genuine call (repo: firstmate) (kind: captain) (since 2026-07-10) (hold: choose a sample route) (hold-kind: captain)
+- [ ] recent-call - Recent genuine call (repo: nexus) (kind: captain) (since 2026-07-10) (hold: choose a sample route) (hold-kind: captain)
   Captain hold set: 2026-07-10T00:00:00Z
-- [ ] contextual-call - Context is not a deferral (repo: firstmate) (kind: captain) (since 2026-07-10) (hold: choose whether to pursue this queued opportunity) (hold-kind: captain)
+- [ ] contextual-call - Context is not a deferral (repo: nexus) (kind: captain) (since 2026-07-10) (hold: choose whether to pursue this queued opportunity) (hold-kind: captain)
   Captain hold set: 2026-07-10T00:00:00Z
   This is not urgent context, but the captain decision is current.
-- [ ] contextual-not-urgent - Leading context is not a deferral (repo: firstmate) (kind: captain) (since 2026-07-10) (hold: not urgent but choose the route now) (hold-kind: captain)
+- [ ] contextual-not-urgent - Leading context is not a deferral (repo: nexus) (kind: captain) (since 2026-07-10) (hold: not urgent but choose the route now) (hold-kind: captain)
   Captain hold set: 2026-07-10T00:00:00Z
-- [ ] contextual-comma - Comma context is not a deferral (repo: firstmate) (kind: captain) (since 2026-07-10) (hold: not urgent, choose the launch route now) (hold-kind: captain)
+- [ ] contextual-comma - Comma context is not a deferral (repo: nexus) (kind: captain) (since 2026-07-10) (hold: not urgent, choose the launch route now) (hold-kind: captain)
   Captain hold set: 2026-07-10T00:00:00Z
-- [ ] metadata-context - Metadata-like context is not a deferral (repo: firstmate) (kind: captain) (since 2026-07-10) (hold: not urgent, priority: decide P1 or P2) (hold-kind: captain)
+- [ ] metadata-context - Metadata-like context is not a deferral (repo: nexus) (kind: captain) (since 2026-07-10) (hold: not urgent, priority: decide P1 or P2) (hold-kind: captain)
   Captain hold set: 2026-07-10T00:00:00Z
-- [ ] contextual-opportunity - Leading opportunity is not a deferral (repo: firstmate) (kind: captain) (since 2026-07-10) (hold: queued opportunity: choose whether to proceed) (hold-kind: captain)
+- [ ] contextual-opportunity - Leading opportunity is not a deferral (repo: nexus) (kind: captain) (since 2026-07-10) (hold: queued opportunity: choose whether to proceed) (hold-kind: captain)
   Captain hold set: 2026-07-10T00:00:00Z
-- [ ] contextual-gated - Leading gate is not a deferral (repo: firstmate) (kind: captain) (since 2026-07-10) (hold: captain-gated decision needs current approval) (hold-kind: captain)
+- [ ] contextual-gated - Leading gate is not a deferral (repo: nexus) (kind: captain) (since 2026-07-10) (hold: captain-gated decision needs current approval) (hold-kind: captain)
   Captain hold set: 2026-07-10T00:00:00Z
-- [ ] reheld-current-call - Re-held genuine call (repo: firstmate) (kind: captain) (since 2026-06-01) (hold: choose a current sample route) (hold-kind: captain)
+- [ ] reheld-current-call - Re-held genuine call (repo: nexus) (kind: captain) (since 2026-06-01) (hold: choose a current sample route) (hold-kind: captain)
   Captain hold set: 2026-07-10T00:00:00Z
   Current decision prose lists route north or route south.
   Resolution recorded by fm-captain-hold.
@@ -1255,7 +1255,7 @@ EOF
   Resolution mode: released
   Captain decision:
   Not urgent at the time of the previous call.
-- [ ] legacy-old-hold - Legacy unstamped hold (repo: firstmate) (kind: ship) (since 2026-06-01) (hold: choose a sample route) (hold-kind: captain)
+- [ ] legacy-old-hold - Legacy unstamped hold (repo: nexus) (kind: ship) (since 2026-06-01) (hold: choose a sample route) (hold-kind: captain)
 
 ## Done
 EOF
@@ -1347,7 +1347,7 @@ test_blocked_deferred_hold_has_concrete_disclosure() {
 ## In flight
 
 ## Queued
-- [ ] only-blocked-parked - Blocked parked call blocked-by: missing-blocker (repo: firstmate) (kind: captain) (hold: parked) (hold-kind: captain) (hold-until: 2026-07-11)
+- [ ] only-blocked-parked - Blocked parked call blocked-by: missing-blocker (repo: nexus) (kind: captain) (hold: parked) (hold-kind: captain) (hold-until: 2026-07-11)
 
 ## Done
 EOF
@@ -1373,11 +1373,11 @@ test_revealed_deferred_holds_show_their_deferral_reason() {
 ## In flight
 
 ## Queued
-- [ ] reveal-blocked - Blocked parked call blocked-by: missing-blocker-1234567890123456789012345678901234567890 (repo: firstmate) (kind: captain) (hold: parked) (hold-kind: captain)
-- [ ] reveal-future - 1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 (repo: firstmate) (kind: captain) (hold: parked) (hold-kind: captain) (hold-until: 2026-12-01)
-- [ ] reveal-aged - Aged undated call (repo: firstmate) (kind: captain) (since 2026-06-01) (hold: choose a route) (hold-kind: captain)
+- [ ] reveal-blocked - Blocked parked call blocked-by: missing-blocker-1234567890123456789012345678901234567890 (repo: nexus) (kind: captain) (hold: parked) (hold-kind: captain)
+- [ ] reveal-future - 1234567890123456789012345678901234567890123456789012345678901234567890123456789012345678901234567890 (repo: nexus) (kind: captain) (hold: parked) (hold-kind: captain) (hold-until: 2026-12-01)
+- [ ] reveal-aged - Aged undated call (repo: nexus) (kind: captain) (since 2026-06-01) (hold: choose a route) (hold-kind: captain)
   Captain hold set: 2026-06-01T00:00:00Z
-- [ ] reveal-live - 123456789012345678901234567890123456789012345678901234567890 (repo: firstmate) (kind: captain) (hold: choose A) (hold-kind: captain)
+- [ ] reveal-live - 123456789012345678901234567890123456789012345678901234567890 (repo: nexus) (kind: captain) (hold: choose A) (hold-kind: captain)
 
 ## Done
 EOF
@@ -1429,21 +1429,21 @@ test_include_prs_maps_custom_branch_prefix_to_task() {
   local home fakebin json
   home=$(make_home custom-prefix); write_fixture "$home"
   fm_write_meta "$home/state/ship-task.meta" \
-    "window=firstmate:fm-ship-task" \
+    "window=nexus:fm-ship-task" \
     "worktree=$home/projects/ship-wt" \
-    "project=firstmate" \
+    "project=nexus" \
     "harness=claude" \
     "kind=ship" \
     "mode=no-mistakes" \
     "branch=fix/ship-task" \
-    "pr=https://github.com/kunchenguid/firstmate/pull/9"
+    "pr=https://github.com/ACicmansky/nexus/pull/9"
   fakebin=$(make_fakebin "$home"); : > "$home/net.log"
   cat > "$fakebin/gh" <<'SH'
 #!/usr/bin/env bash
 echo "gh $*" >> "$NET_LOG"
 if [ "${FAKE_GH_FAIL:-0}" = 1 ]; then exit 1; fi
 cat <<'JSON'
-[{"number":9,"title":"Ship the thing","url":"https://github.com/kunchenguid/firstmate/pull/9","headRefName":"fix/ship-task","reviewDecision":"APPROVED","mergeable":"MERGEABLE","statusCheckRollup":[{"conclusion":"SUCCESS","status":"COMPLETED"}]}]
+[{"number":9,"title":"Ship the thing","url":"https://github.com/ACicmansky/nexus/pull/9","headRefName":"fix/ship-task","reviewDecision":"APPROVED","mergeable":"MERGEABLE","statusCheckRollup":[{"conclusion":"SUCCESS","status":"COMPLETED"}]}]
 JSON
 SH
   chmod +x "$fakebin/gh"
@@ -1504,7 +1504,7 @@ write_large_fixture() {  # <home> <count>
     printf -- '- [ ] gate-%s - Gate %s blocked-by: task-%s (repo: repo-%s) (kind: ship)\n' "$i" "$i" "$i" "$i" >> "$home/data/backlog.md"
     printf -- '- [ ] decision-%s - Decision %s (repo: repo-%s) (kind: captain) (hold: captain choice pending) (hold-kind: captain)\n' "$i" "$i" "$i" >> "$home/data/backlog.md"
     fm_write_meta "$home/state/$id.meta" \
-      "window=firstmate:fm-$id" \
+      "window=nexus:fm-$id" \
       "worktree=$home/projects/$id" \
       "project=repo-$i" \
       "harness=codex" \
@@ -1619,9 +1619,9 @@ test_completed_scout_report_not_pending() {
   fakebin=$(make_fakebin "$home")
   mkdir -p "$home/projects/lav-wt" "$home/data/lavish-103"
   fm_write_meta "$home/state/lavish-103.meta" \
-    "window=firstmate:fm-lavish-103" \
+    "window=nexus:fm-lavish-103" \
     "worktree=$home/projects/lav-wt" \
-    "project=firstmate" \
+    "project=nexus" \
     "harness=codex" \
     "kind=scout" \
     "mode=scout"
@@ -1670,7 +1670,7 @@ test_landed_accepts_only_kind_owned_delivery_artifacts() {
 
   "$TASKS_AXI_BIN" add answered-question \
     "Decide whether https://github.com/o/r/pull/7 may merge" --kind ship \
-    --repo firstmate --file "$main_backlog" >/dev/null \
+    --repo nexus --file "$main_backlog" >/dev/null \
     || fail "could not create the answered captain question"
   run_captain "$home" "$fakebin" hold answered-question \
     --reason "captain route choice pending" >/dev/null \
@@ -1690,7 +1690,7 @@ test_landed_accepts_only_kind_owned_delivery_artifacts() {
     || fail "could not close the local-only captain question"
 
   "$TASKS_AXI_BIN" add legacy-local-question "Choose local main" \
-    --repo firstmate --file "$main_backlog" >/dev/null \
+    --repo nexus --file "$main_backlog" >/dev/null \
     || fail "could not create the legacy kindless captain question"
   run_captain "$home" "$fakebin" hold legacy-local-question \
     --reason "captain legacy local route pending" >/dev/null \
@@ -1705,31 +1705,31 @@ test_landed_accepts_only_kind_owned_delivery_artifacts() {
   printf '# Keyword scout\n' > "$home/$keyword_report"
   printf '# Shipping scout\n' > "$home/$shipping_report"
   "$TASKS_AXI_BIN" add keyword-scout "SCOUT parser keywords" --kind scout \
-    --repo firstmate --start --file "$main_backlog" >/dev/null \
+    --repo nexus --start --file "$main_backlog" >/dev/null \
     || fail "could not create the canonical keyword scout"
   "$TASKS_AXI_BIN" 'done' keyword-scout --report "$keyword_report" \
     --file "$main_backlog" >/dev/null \
     || fail "could not complete the canonical keyword scout"
   "$TASKS_AXI_BIN" add keyword-local "SHIP keyword local main" --kind ship \
-    --repo firstmate --start --file "$main_backlog" >/dev/null \
+    --repo nexus --start --file "$main_backlog" >/dev/null \
     || fail "could not create the canonical keyword local delivery"
   "$TASKS_AXI_BIN" 'done' keyword-local --note "local main" \
     --file "$main_backlog" >/dev/null \
     || fail "could not complete the canonical keyword local delivery"
   "$TASKS_AXI_BIN" add noted-local "Land the local-only change" --kind ship \
-    --repo firstmate --start --file "$main_backlog" >/dev/null \
+    --repo nexus --start --file "$main_backlog" >/dev/null \
     || fail "could not create the recorded-note local delivery"
   "$TASKS_AXI_BIN" 'done' noted-local --note "local main" \
     --file "$main_backlog" >/dev/null \
     || fail "could not complete the recorded-note local delivery"
   "$TASKS_AXI_BIN" add legacy-noted-local "Complete the legacy work" \
-    --repo firstmate --start --file "$main_backlog" >/dev/null \
+    --repo nexus --start --file "$main_backlog" >/dev/null \
     || fail "could not create the kindless local delivery"
   "$TASKS_AXI_BIN" 'done' legacy-noted-local --note "local main" \
     --file "$main_backlog" >/dev/null \
     || fail "could not complete the kindless local delivery"
   "$TASKS_AXI_BIN" add shipping-scout "SHIPPING parser boundary" --kind scout \
-    --repo firstmate --start --file "$main_backlog" >/dev/null \
+    --repo nexus --start --file "$main_backlog" >/dev/null \
     || fail "could not create the longer-word scout"
   "$TASKS_AXI_BIN" 'done' shipping-scout --report "$shipping_report" \
     --file "$main_backlog" >/dev/null \
@@ -1740,11 +1740,11 @@ test_landed_accepts_only_kind_owned_delivery_artifacts() {
   mkdir -p "$home/data/reported-scout"
   printf '# Reported scout\n' > "$home/$report_path"
   cat >> "$main_backlog" <<EOF
-- [x] done-pr-nondelivery - Closed without merge https://github.com/o/r/pull/5 (repo: firstmate) (kind: ship) (done 2026-07-12)
-- [x] scout-pr-no-report - Scout without report https://github.com/o/r/pull/6 (repo: firstmate) (kind: scout) (merged 2026-07-12)
-- [x] ship-reported-path - Ship naming data/ship-reported-path/report.md (repo: firstmate) (kind: ship) (reported 2026-07-12)
-- [x] reported-scout - Report with $report_pr context $report_path (repo: firstmate) (kind: scout) (reported 2026-07-12)
-- [x] local-delivery - Local with https://github.com/o/r/pull/9 context local main (repo: firstmate) (kind: ship) (done 2026-07-12)
+- [x] done-pr-nondelivery - Closed without merge https://github.com/o/r/pull/5 (repo: nexus) (kind: ship) (done 2026-07-12)
+- [x] scout-pr-no-report - Scout without report https://github.com/o/r/pull/6 (repo: nexus) (kind: scout) (merged 2026-07-12)
+- [x] ship-reported-path - Ship naming data/ship-reported-path/report.md (repo: nexus) (kind: ship) (reported 2026-07-12)
+- [x] reported-scout - Report with $report_pr context $report_path (repo: nexus) (kind: scout) (reported 2026-07-12)
+- [x] local-delivery - Local with https://github.com/o/r/pull/9 context local main (repo: nexus) (kind: ship) (done 2026-07-12)
 EOF
 
   : > "$home/net.log"
@@ -2062,12 +2062,12 @@ test_landed_bounded_and_disclosed() {
   mate=$(fixture_mate_home "$home")
   {
     printf '## In flight\n'
-    printf '%s\n\n' '- [ ] mate - Decide subscription order (repo: firstmate) (kind: ship) (since 2026-07-11)'
+    printf '%s\n\n' '- [ ] mate - Decide subscription order (repo: nexus) (kind: ship) (since 2026-07-11)'
     printf '## Done\n'
   } > "$mate/data/backlog.md"
   i=1
   while [ "$i" -le 12 ]; do
-    printf -- '- [x] mate-landed-%02d - Secondmate fix %02d (repo: firstmate) (kind: ship) (merged 2026-06-%02d)\n' \
+    printf -- '- [x] mate-landed-%02d - Secondmate fix %02d (repo: nexus) (kind: ship) (merged 2026-06-%02d)\n' \
       "$i" "$i" "$((13 - i))" >> "$mate/data/backlog.md"
     i=$((i + 1))
   done
@@ -2103,7 +2103,7 @@ $(printf 'mate-landed-%02d' "$i")"
 test_live_blocker_is_not_charted_queue_work() {
   local home fakebin json
   home=$(make_home live-blocker); write_fixture "$home"
-  printf 'blocked [key=synthetic-dependency]: firstmate can refresh the synthetic token\n' > "$home/state/ship-task.status"
+  printf 'blocked [key=synthetic-dependency]: nexus can refresh the synthetic token\n' > "$home/state/ship-task.status"
   record_claude_state "$home/state" ship-task idle
   fakebin=$(make_fakebin "$home")
   json=$(run "$home" "$fakebin" --json)
@@ -2151,7 +2151,7 @@ test_main_orphan_in_flight_is_disclosed_not_invented() {
   : > "$home/data/secondmates.md"
   cat > "$home/data/backlog.md" <<'EOF'
 ## In flight
-- [ ] only-orphan - Structured in flight without meta (repo: firstmate) (kind: ship) (since 2026-07-11)
+- [ ] only-orphan - Structured in flight without meta (repo: nexus) (kind: ship) (since 2026-07-11)
 
 ## Queued
 
@@ -2187,18 +2187,18 @@ test_main_unstructured_current_is_disclosed_with_structured_sibling() {
   cat > "$home/data/backlog.md" <<'EOF'
 ## In flight
 this current row is not structured
-- [ ] structured-ship - Visible structured sibling (repo: firstmate) (kind: ship) (since 2026-07-11)
+- [ ] structured-ship - Visible structured sibling (repo: nexus) (kind: ship) (since 2026-07-11)
 
 ## Queued
 another free-form note without checkbox
-- [ ] structured-queued - Structured queued (repo: firstmate) (kind: ship)
+- [ ] structured-queued - Structured queued (repo: nexus) (kind: ship)
 
 ## Done
 EOF
   fm_write_meta "$home/state/structured-ship.meta" \
-    "window=firstmate:fm-structured-ship" \
+    "window=nexus:fm-structured-ship" \
     "worktree=$home/projects/structured-ship" \
-    "project=firstmate" \
+    "project=nexus" \
     "harness=codex" \
     "kind=ship" \
     "mode=no-mistakes"
@@ -2231,18 +2231,18 @@ test_main_orphan_counterfactual_meta_clears_inventory_warning() {
   mkdir -p "$home/projects/orphan-ship"
   cat > "$home/data/backlog.md" <<'EOF'
 ## In flight
-- [ ] orphan-ship - Gains meta in counterfactual (repo: firstmate) (kind: ship) (since 2026-07-11)
-- [ ] visible-ship - Already live (repo: firstmate) (kind: ship) (since 2026-07-11)
+- [ ] orphan-ship - Gains meta in counterfactual (repo: nexus) (kind: ship) (since 2026-07-11)
+- [ ] visible-ship - Already live (repo: nexus) (kind: ship) (since 2026-07-11)
 
 ## Queued
-- [ ] queued-ship - Ordinary queue (repo: firstmate) (kind: ship)
+- [ ] queued-ship - Ordinary queue (repo: nexus) (kind: ship)
 
 ## Done
 EOF
   fm_write_meta "$home/state/visible-ship.meta" \
-    "window=firstmate:fm-visible-ship" \
+    "window=nexus:fm-visible-ship" \
     "worktree=$home/projects/orphan-ship" \
-    "project=firstmate" \
+    "project=nexus" \
     "harness=codex" \
     "kind=ship" \
     "mode=no-mistakes"
@@ -2257,9 +2257,9 @@ EOF
       and ([.gates[].id] | index("queued-ship") != null)
   ' >/dev/null || fail "pre-meta orphan fixture failed: $json_before"
   fm_write_meta "$home/state/orphan-ship.meta" \
-    "window=firstmate:fm-orphan-ship" \
+    "window=nexus:fm-orphan-ship" \
     "worktree=$home/projects/orphan-ship" \
-    "project=firstmate" \
+    "project=nexus" \
     "harness=codex" \
     "kind=ship" \
     "mode=no-mistakes"
@@ -2281,7 +2281,7 @@ seed_working_child() {  # <mate-home> <id> <doing> [repo]
   printf -- '- [ ] %s - %s%s (kind: ship) (since 2026-07-13)\n' \
     "$id" "$doing" "$repo_field" >> "$mate/data/backlog.md"
   fm_write_meta "$mate/state/$id.meta" \
-    "window=firstmate:fm-$id" "worktree=$mate/projects/$id" "project=sample" \
+    "window=nexus:fm-$id" "worktree=$mate/projects/$id" "project=sample" \
     "harness=claude" "kind=ship" "mode=no-mistakes"
   record_claude_state "$mate/state" "$id" busy
   printf 'working: %s\n' "$doing" > "$mate/state/$id.status"
@@ -2316,7 +2316,7 @@ EOF
     for id in working-live working-live-two working-blocked working-dated working-aged; do
       mkdir -p "$home/projects/$id"
       fm_write_meta "$home/state/$id.meta" \
-        "window=firstmate:fm-$id" "worktree=$home/projects/$id" "project=sample" \
+        "window=nexus:fm-$id" "worktree=$home/projects/$id" "project=sample" \
         "harness=claude" "kind=ship" "mode=no-mistakes"
       record_claude_state "$home/state" "$id" busy
       printf 'working: active held work\n' > "$home/state/$id.status"
@@ -2537,17 +2537,17 @@ test_underway_and_gate_rows_carry_the_durable_name_and_filed_date() {
   mkdir -p "$home/projects/main-wt"
   cat > "$home/data/backlog.md" <<'EOF'
 ## In flight
-- [ ] main-ship - Rename the fleet board rows (repo: firstmate) (kind: ship) (since 2026-07-09)
+- [ ] main-ship - Rename the fleet board rows (repo: nexus) (kind: ship) (since 2026-07-09)
 
 ## Queued
-- [ ] newer-gate - Filed later (repo: firstmate) (kind: ship) (since 2026-07-10)
-- [ ] older-gate - Filed earlier (repo: firstmate) (kind: ship) (since 2026-07-01)
-- [ ] undated-gate - Filed before dates were recorded (repo: firstmate) (kind: ship)
+- [ ] newer-gate - Filed later (repo: nexus) (kind: ship) (since 2026-07-10)
+- [ ] older-gate - Filed earlier (repo: nexus) (kind: ship) (since 2026-07-01)
+- [ ] undated-gate - Filed before dates were recorded (repo: nexus) (kind: ship)
 
 ## Done
 EOF
   fm_write_meta "$home/state/main-ship.meta" \
-    "window=firstmate:fm-main-ship" "worktree=$home/projects/main-wt" "project=firstmate" \
+    "window=nexus:fm-main-ship" "worktree=$home/projects/main-wt" "project=nexus" \
     "harness=claude" "kind=ship" "mode=no-mistakes"
   record_claude_state "$home/state" main-ship busy
   printf 'working: no-mistakes review round 2\n' > "$home/state/main-ship.status"
@@ -2558,7 +2558,7 @@ EOF
   printf '\n## Queued\n\n## Done\n' >> "$mate/data/backlog.md"
   mkdir -p "$mate/projects/mate-child"
   fm_write_meta "$mate/state/mate-child.meta" \
-    "window=firstmate:fm-mate-child" "worktree=$mate/projects/mate-child" "project=sample" \
+    "window=nexus:fm-mate-child" "worktree=$mate/projects/mate-child" "project=sample" \
     "harness=claude" "kind=ship" "mode=no-mistakes"
   record_claude_state "$mate/state" mate-child busy
   printf 'working: waiting on the pipeline\n' > "$mate/state/mate-child.status"
@@ -2609,7 +2609,7 @@ test_mixed_secondmate_roles_partial_state_and_captain_readiness() {
 ## Done
 EOF
   fm_write_meta "$hibit/state/hibit-worker.meta" \
-    "window=firstmate:fm-hibit-worker" "worktree=$hibit/projects/worker" "project=hibit" \
+    "window=nexus:fm-hibit-worker" "worktree=$hibit/projects/worker" "project=hibit" \
     "harness=claude" "kind=ship" "mode=no-mistakes"
   record_claude_state "$hibit/state" hibit-worker busy
   printf 'working: finalizing progress\n' > "$hibit/state/hibit-worker.status"
@@ -2624,7 +2624,7 @@ EOF
 ## Done
 EOF
   fm_write_meta "$wheel/state/wheel-worker.meta" \
-    "window=firstmate:fm-wheel-worker" "worktree=$wheel/projects/worker" "project=wheelhouse" \
+    "window=nexus:fm-wheel-worker" "worktree=$wheel/projects/worker" "project=wheelhouse" \
     "harness=claude" "kind=ship" "mode=no-mistakes"
   record_claude_state "$wheel/state" wheel-worker busy
   printf 'working: active validation\n' > "$wheel/state/wheel-worker.status"
@@ -2640,7 +2640,7 @@ EOF
 - [x] prior-release - Prior release (repo: sshhip) (kind: ship) (done 2026-07-21)
 EOF
   fm_write_meta "$sshhip/state/unreadable-child.meta" \
-    "window=firstmate:dead-sshhip-child" "worktree=$sshhip/projects/child" "project=sshhip" \
+    "window=nexus:dead-sshhip-child" "worktree=$sshhip/projects/child" "project=sshhip" \
     "harness=codex" "kind=ship" "mode=no-mistakes"
 
   cat > "$ha/data/backlog.md" <<'EOF'
@@ -2654,7 +2654,7 @@ EOF
 ## Done
 EOF
   fm_write_meta "$ha/state/prep.meta" \
-    "window=firstmate:fm-prep" "worktree=$ha/projects/prep" "project=home-assistant" \
+    "window=nexus:fm-prep" "worktree=$ha/projects/prep" "project=home-assistant" \
     "harness=claude" "kind=ship" "mode=no-mistakes"
   record_claude_state "$ha/state" prep busy
   printf 'working: preparing canary\n' > "$ha/state/prep.status"
@@ -2761,7 +2761,7 @@ EOF
   mv "$sshhip/data/backlog.next" "$sshhip/data/backlog.md"
 
   fm_write_meta "$wheel/state/production-observation.meta" \
-    "window=firstmate:fm-production-observation" "worktree=$wheel/projects/worker" "project=wheelhouse" \
+    "window=nexus:fm-production-observation" "worktree=$wheel/projects/worker" "project=wheelhouse" \
     "harness=claude" "kind=scout" "mode=scout"
   record_claude_state "$wheel/state" production-observation idle
   printf 'paused: observation is deliberately held\n' > "$wheel/state/production-observation.status"
@@ -2776,7 +2776,7 @@ EOF
   ' >/dev/null || fail "held metadata plus a real child duplicated or discarded the record: $canonical"
 
   fm_write_meta "$sshhip/state/unreadable-child.meta" \
-    "window=firstmate:fm-unreadable-child" "worktree=$sshhip/projects/child" "project=sshhip" \
+    "window=nexus:fm-unreadable-child" "worktree=$sshhip/projects/child" "project=sshhip" \
     "harness=claude" "kind=ship" "mode=no-mistakes"
   record_claude_state "$sshhip/state" unreadable-child busy
   printf 'working: app store submission restored\n' > "$sshhip/state/unreadable-child.status"
@@ -2852,21 +2852,21 @@ test_main_captain_readiness_matches_secondmate_projection() {
   mkdir -p "$home/projects/prep" "$home/projects/observation"
   cat > "$home/data/backlog.md" <<'EOF'
 ## In flight
-- [ ] observation - Held observation (repo: firstmate) (kind: scout) (hold: watch production) (hold-kind: external)
-- [ ] prep - Prepare canary (repo: firstmate) (kind: ship)
+- [ ] observation - Held observation (repo: nexus) (kind: scout) (hold: watch production) (hold-kind: external)
+- [ ] prep - Prepare canary (repo: nexus) (kind: ship)
 
 ## Queued
-- [ ] review - Security review (repo: firstmate) (kind: ship)
-- [ ] captain-run - Run captain canary blocked-by: prep blocked-by: review (repo: firstmate) (kind: captain) (hold: captain runs canary) (hold-kind: captain)
+- [ ] review - Security review (repo: nexus) (kind: ship)
+- [ ] captain-run - Run captain canary blocked-by: prep blocked-by: review (repo: nexus) (kind: captain) (hold: captain runs canary) (hold-kind: captain)
 
 ## Done
 EOF
   fm_write_meta "$home/state/prep.meta" \
-    "window=firstmate:fm-prep" "worktree=$home/projects/prep" "project=firstmate" \
+    "window=nexus:fm-prep" "worktree=$home/projects/prep" "project=nexus" \
     "harness=codex" "kind=ship" "mode=no-mistakes"
   printf 'working: preparing main canary\n' > "$home/state/prep.status"
   fm_write_meta "$home/state/observation.meta" \
-    "window=firstmate:fm-observation" "worktree=$home/projects/observation" "project=firstmate" \
+    "window=nexus:fm-observation" "worktree=$home/projects/observation" "project=nexus" \
     "harness=codex" "kind=scout" "mode=scout"
   printf 'paused: observation is deliberately held\n' > "$home/state/observation.status"
   fakebin=$(make_fakebin "$home")
@@ -2883,11 +2883,11 @@ EOF
 ## In flight
 
 ## Queued
-- [ ] review - Security review (repo: firstmate) (kind: ship)
-- [ ] captain-run - Run captain canary blocked-by: prep blocked-by: review (repo: firstmate) (kind: captain) (hold: captain runs canary) (hold-kind: captain)
+- [ ] review - Security review (repo: nexus) (kind: ship)
+- [ ] captain-run - Run captain canary blocked-by: prep blocked-by: review (repo: nexus) (kind: captain) (hold: captain runs canary) (hold-kind: captain)
 
 ## Done
-- [x] prep - Prepare canary (repo: firstmate) (kind: ship) (done 2026-07-22)
+- [x] prep - Prepare canary (repo: nexus) (kind: ship) (done 2026-07-22)
 EOF
   rm "$home/state/prep.meta" "$home/state/prep.status" \
     "$home/state/observation.meta" "$home/state/observation.status"
@@ -2901,11 +2901,11 @@ EOF
 ## In flight
 
 ## Queued
-- [ ] captain-run - Run captain canary blocked-by: prep blocked-by: review (repo: firstmate) (kind: captain) (hold: captain runs canary) (hold-kind: captain)
+- [ ] captain-run - Run captain canary blocked-by: prep blocked-by: review (repo: nexus) (kind: captain) (hold: captain runs canary) (hold-kind: captain)
 
 ## Done
-- [x] prep - Prepare canary (repo: firstmate) (kind: ship) (done 2026-07-22)
-- [x] review - Security review (repo: firstmate) (kind: ship) (done 2026-07-22)
+- [x] prep - Prepare canary (repo: nexus) (kind: ship) (done 2026-07-22)
+- [x] review - Security review (repo: nexus) (kind: ship) (done 2026-07-22)
 EOF
   json=$(run "$home" "$fakebin" --json)
   printf '%s' "$json" | jq -e '
@@ -2922,16 +2922,16 @@ test_task_teardown_during_metadata_capture_does_not_abort_snapshot() {
   real_cp=$(command -v cp)
   cat > "$home/data/backlog.md" <<'EOF'
 ## In flight
-- [ ] a-hold - Stable local worker (repo: firstmate) (kind: ship)
+- [ ] a-hold - Stable local worker (repo: nexus) (kind: ship)
 
 ## Queued
 
 ## Done
 EOF
   fm_write_meta "$home/state/a-hold.meta" \
-    "window=fixture:a-hold" "project=firstmate" "harness=claude" "kind=ship" "mode=no-mistakes"
+    "window=fixture:a-hold" "project=nexus" "harness=claude" "kind=ship" "mode=no-mistakes"
   fm_write_meta "$home/state/z-gone.meta" \
-    "window=fixture:z-gone" "project=firstmate" "harness=claude" "kind=ship" "mode=no-mistakes"
+    "window=fixture:z-gone" "project=nexus" "harness=claude" "kind=ship" "mode=no-mistakes"
   printf 'working: stable fixture\n' > "$home/state/a-hold.status"
   cat > "$fakebin/cp" <<'SH'
 #!/usr/bin/env bash
@@ -2981,14 +2981,14 @@ test_current_state_uses_captured_status_observation() {
   mkdir -p "$worktree"
   cat > "$home/data/backlog.md" <<'EOF'
 ## In flight
-- [ ] captured-status - Captured status fixture (repo: firstmate) (kind: ship)
+- [ ] captured-status - Captured status fixture (repo: nexus) (kind: ship)
 
 ## Queued
 
 ## Done
 EOF
   fm_write_meta "$home/state/captured-status.meta" \
-    "window=fixture:captured-status" "worktree=$worktree" "project=firstmate" \
+    "window=fixture:captured-status" "worktree=$worktree" "project=nexus" \
     "harness=claude" "kind=ship" "mode=no-mistakes" "spawn_gen=stable-generation"
   printf 'working: captured state\n' > "$home/state/captured-status.status"
   record_claude_state "$home/state" captured-status idle
@@ -3030,14 +3030,14 @@ test_relaunched_task_does_not_inherit_reused_endpoint_state() {
   fakebin=$(make_fakebin "$home")
   cat > "$home/data/backlog.md" <<'EOF'
 ## In flight
-- [ ] generation-race - Generation identity fixture (repo: firstmate) (kind: ship)
+- [ ] generation-race - Generation identity fixture (repo: nexus) (kind: ship)
 
 ## Queued
 
 ## Done
 EOF
   fm_write_meta "$home/state/generation-race.meta" \
-    "window=fixture:fm-generation-race" "worktree=$worktree" "project=firstmate" \
+    "window=fixture:fm-generation-race" "worktree=$worktree" "project=nexus" \
     "harness=claude" "kind=ship" "mode=no-mistakes" "spawn_gen=old-generation"
   printf 'working: old generation\n' > "$home/state/generation-race.status"
   cat > "$fakebin/tmux" <<'SH'
@@ -3048,14 +3048,14 @@ if [ "${1:-}" = display-message ]; then
     cat > "$tmp" <<EOF
 window=fixture:fm-generation-race
 worktree=$RACE_WORKTREE
-project=firstmate
+project=nexus
 harness=claude
 kind=ship
 mode=no-mistakes
 spawn_gen=new-generation
 EOF
     mv "$tmp" "$RACE_META"
-    printf 'needs-decision[replacement]: replacement-only decision https://github.com/acme/firstmate/pull/999\n' > "$RACE_STATUS"
+    printf 'needs-decision[replacement]: replacement-only decision https://github.com/acme/nexus/pull/999\n' > "$RACE_STATUS"
     mkdir -p "$(dirname "$RACE_REPORT")"
     printf 'replacement-only report\n' > "$RACE_REPORT"
   fi
@@ -3113,20 +3113,20 @@ SH
     printf '## In flight\n'
     i=1
     while [ "$i" -le 5 ]; do
-      printf -- '- [ ] local-%s - Synthetic local worker %s (repo: firstmate) (kind: ship)\n' "$i" "$i"
+      printf -- '- [ ] local-%s - Synthetic local worker %s (repo: nexus) (kind: ship)\n' "$i" "$i"
       i=$((i + 1))
     done
     printf '\n## Queued\n\n## Done\n'
     i=1
     while [ "$i" -le 300 ]; do
-      printf -- '- [x] history-%s - Historical completed item %s https://github.com/acme/firstmate/pull/%s (repo: firstmate) (kind: ship) (done 2026-01-01)\n' "$i" "$i" "$i"
+      printf -- '- [x] history-%s - Historical completed item %s https://github.com/acme/nexus/pull/%s (repo: nexus) (kind: ship) (done 2026-01-01)\n' "$i" "$i" "$i"
       i=$((i + 1))
     done
   } > "$home/data/backlog.md"
   i=1
   while [ "$i" -le 5 ]; do
     fm_write_meta "$home/state/local-$i.meta" \
-      "window=fixture:local-$i" "worktree=$worktree" "project=firstmate" \
+      "window=fixture:local-$i" "worktree=$worktree" "project=nexus" \
       "harness=claude" "kind=ship" "mode=no-mistakes"
     printf 'working: synthetic fixture\n' > "$home/state/local-$i.status"
     i=$((i + 1))
@@ -3218,7 +3218,7 @@ test_remote_ledgers_share_one_concurrent_budget_and_fall_back_to_cache() {
 ## Queued
 
 ## Done
-- [x] remote-approved - Captain-approved delivery $approved_pr (repo: firstmate) (kind: ship) (hold-kind: captain) (merged 2026-09-03)
+- [x] remote-approved - Captain-approved delivery $approved_pr (repo: nexus) (kind: ship) (hold-kind: captain) (merged 2026-09-03)
 EOF
   write_remote_home_summary "$remote_home" 1000
   tmp="$cache_file.tmp"

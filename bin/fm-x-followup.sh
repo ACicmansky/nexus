@@ -5,7 +5,7 @@
 # An X-mode mention that spawned real work is linked to its task by fm-x-link.sh
 # (x_request/x_request_ts/x_followups plus optional reply context in
 # state/<id>.meta). When that task reaches a genuine milestone (investigation
-# done, build started, shipped, failed), firstmate composes a public-safe outcome
+# done, build started, shipped, failed), nexus composes a public-safe outcome
 # and posts it here as one of up to three follow-ups, within the window. Past the
 # window, past the cap, or after --final, this clears the link so a later call is
 # a clean no-op.
@@ -218,7 +218,7 @@ case "$COUNT" in
 esac
 
 # Not linked: this task did not originate from an X-mode mention. Detection fails;
-# a post is simply a no-op success (firstmate need not special-case it).
+# a post is simply a no-op success (nexus need not special-case it).
 if [ -z "$RID" ]; then
   if [ "$MODE" = check ]; then
     exit 1
@@ -319,7 +319,7 @@ case "$post_rc" in
     ;;
   *)
     # Post failed for another reason (network, auth, transport): leave the link
-    # so firstmate can retry on a later pass.
+    # so nexus can retry on a later pass.
     echo "fm-x-followup: follow-up post failed for $ID; left the link in place to retry" >&2
     exit 1
     ;;

@@ -81,7 +81,7 @@ case "${1:-}" in
           printf 'zsh' > "$D/command"
           [ -z "${FM_FAKE_EXIT_TRANSPORT_FAIL_AFTER_STOP:-}" ] || exit 1
           ;;
-        *'encode launch-brief'* | *'Firstmate operational input waiting: read'*)
+        *'encode launch-brief'* | *'Nexus operational input waiting: read'*)
           cat "$D/becomes" > "$D/command"
           [ -z "${FM_FAKE_LAUNCH_TRANSPORT_FAIL_AFTER_START:-}" ] || exit 1
           ;;
@@ -207,7 +207,7 @@ add_ship_task() {
 ## Captain's intent
 Exercise relaunch behavior for $id.
 
-## Firstmate spec
+## Nexus spec
 Preserve the task while replacing its agent process.
 EOF
   {
@@ -386,7 +386,7 @@ test_same_harness_relaunch_keeps_identity_and_reuses_the_endpoint() {
     || fail "the transaction journal should end complete"
   assert_grep "/exit" "$dir/fake/literal" "the previous agent should have been exited"
   assert_grep "cd -- '$dir/wt'" "$dir/fake/keys" "the replacement launch must enter the recorded worktree"
-  assert_grep "Firstmate operational input waiting: read" "$dir/fake/literal" "the replacement should have been launched"
+  assert_grep "Nexus operational input waiting: read" "$dir/fake/literal" "the replacement should have been launched"
   pass "fm-control relaunch: a same-harness relaunch replaces the agent in the same endpoint and worktree"
 }
 
@@ -437,7 +437,7 @@ test_relaunch_from_linked_home_preserves_recorded_worktree() {
   mv "$dir/linked.meta" "$dir/home/state/rl42.meta"
   printf 'committed task work\n' > "$dir/wt/task.txt"
   git -C "$dir/wt" add task.txt
-  git -C "$dir/wt" -c user.name='Firstmate Tests' -c user.email='tests@example.invalid' commit -qm task-work
+  git -C "$dir/wt" -c user.name='Nexus Tests' -c user.email='tests@example.invalid' commit -qm task-work
   head=$(git -C "$dir/wt" rev-parse HEAD)
   printf 'unfinished task work\n' >> "$dir/wt/task.txt"
   fetch_head=$(git -C "$dir/wt" rev-parse --git-path FETCH_HEAD)
@@ -600,15 +600,15 @@ test_relaunch_appends_the_progress_note_to_the_instructions() {
   launch_brief="$dir/home/data/rl2/launch-brief.md"
   first_line=$(sed -n '1p' "$launch_brief")
   [ "$first_line" = '# Current worker role contract' ] ||
-    fail "a Firstmate-worktree relaunch did not establish the crewmate identity first"
+    fail "a Nexus-worktree relaunch did not establish the crewmate identity first"
   role_line=$(grep -n '^# Current worker role contract$' "$launch_brief" | cut -d: -f1)
   task_line=$(grep -n '^# Task$' "$launch_brief" | head -1 | cut -d: -f1)
   [ "$role_line" -lt "$task_line" ] || fail "the relaunched worker identity followed its task content"
   assert_grep "$dir/home/state/rl2.inbox" "$launch_brief" \
-    "the Firstmate-worktree relaunch omitted the worker's exact steering inbox"
+    "the Nexus-worktree relaunch omitted the worker's exact steering inbox"
   assert_grep 'do not reject it as another home' "$launch_brief" \
-    "the Firstmate-worktree relaunch did not distinguish its inbox from cross-home state"
-  pass "fm-control relaunch: progress and the Firstmate-worktree worker identity reach the replacement"
+    "the Nexus-worktree relaunch did not distinguish its inbox from cross-home state"
+  pass "fm-control relaunch: progress and the Nexus-worktree worker identity reach the replacement"
 }
 
 test_relaunch_requires_a_note_for_a_ship_task() {
@@ -867,7 +867,7 @@ test_wiring_removal_failure_refuses_before_replacement_arm() {
   assert_contains "$out" "could not retire claude wiring" \
     "the failure should identify prior wiring cleanup"
   [ -e "$hook" ] || fail "the fixture should retain the undeletable prior hook"
-  assert_no_grep "Firstmate operational input waiting: read" "$dir/fake/literal" \
+  assert_no_grep "Nexus operational input waiting: read" "$dir/fake/literal" \
     "replacement launch must not be armed after wiring cleanup fails"
   [ "$(journal_field "$dir" rl29 phase)" = failed:launching ] \
     || fail "the transaction should record the partial launch failure"
@@ -1106,10 +1106,10 @@ test_promoted_scout_relaunch_receives_the_current_delivery_contract() {
     dir=$(new_case "promoted-scout-$mode" "$id")
     home="$dir/home"
     fm_git_worktree "$dir/proj" "$dir/wt" "task-$id"
-    FM_HOME="$home" "$BRIEF" "$id" firstmate --scout >/dev/null \
+    FM_HOME="$home" "$BRIEF" "$id" nexus --scout >/dev/null \
       || fail "$mode: could not scaffold the scout brief"
     brief="$home/data/$id/brief.md"
-    sed 's/{TASK}/Fix the promotion relaunch contract./; s/{FIRSTMATE_SPEC}/Preserve the current delivery mode./' \
+    sed 's/{TASK}/Fix the promotion relaunch contract./; s/{NEXUS_SPEC}/Preserve the current delivery mode./' \
       "$brief" > "$brief.filled"
     mv "$brief.filled" "$brief"
     {
@@ -1146,7 +1146,7 @@ test_promoted_scout_relaunch_receives_the_current_delivery_contract() {
       direct-PR)
         rule="1. Never push to the default branch (push only your \`fm/$id\` branch). Never merge a PR." ;;
       local-only)
-        rule="1. Never push to any remote and never open a PR. Work only on your \`fm/$id\` branch; firstmate handles the merge into local \`main\`." ;;
+        rule="1. Never push to any remote and never open a PR. Work only on your \`fm/$id\` branch; nexus handles the merge into local \`main\`." ;;
       *)
         rule='1. Never push to the default branch. Never merge a PR.' ;;
     esac
@@ -1190,7 +1190,7 @@ test_prefixed_prior_harness_wiring_is_still_retired() {
 }
 
 # muse installs no hook; its busy source is its own session event log, bound to
-# the pane by two firstmate-owned sidecars. Relaunching AWAY from muse must
+# the pane by two nexus-owned sidecars. Relaunching AWAY from muse must
 # retire that binding, or a retired incarnation's session pin outlives the agent
 # that produced it.
 test_muse_session_binding_is_retired_on_a_harness_switch() {
@@ -2013,7 +2013,7 @@ case "${1:-} ${2:-}" in
       ". '"*"'") staged=${payload#". '"}; staged=${staged%"'"}; [ ! -f "$staged" ] || payload=$(cat "$staged") ;;
     esac
     case "$payload" in
-      *'encode launch-brief'* | *'Firstmate operational input waiting: read'*)
+      *'encode launch-brief'* | *'Nexus operational input waiting: read'*)
         printf '%s\n' "$payload" > "$D/launched-command"
         : > "$D/herdr-agent-live" ;;
     esac
@@ -2073,7 +2073,7 @@ add_herdr_ship_task() {  # <case-dir> <id> [session] [surviving-pane]
 ## Captain's intent
 Exercise a herdr reclaim safely.
 
-## Firstmate spec
+## Nexus spec
 Keep the recorded endpoint when it outlives its server.
 EOF
   {

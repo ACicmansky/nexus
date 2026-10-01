@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Print the one-line session-start instruction only for a genuine firstmate
+# Print the one-line session-start instruction only for a genuine nexus
 # primary whose current harness session has not already acquired the home lock.
 # Every silence and error path exits 0 because Claude SessionStart exit 2 blocks
 # session initialization.

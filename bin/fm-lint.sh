@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# fm-lint.sh - the single owner of firstmate's lint definition.
+# fm-lint.sh - the single owner of nexus's lint definition.
 #
 # Runs its file set with ShellCheck's default severity, extended analysis,
 # ambient configuration disabled, and one exact ShellCheck version. CI selects
@@ -393,7 +393,7 @@ fm_lint_run_workflows() {
 }
 
 # Backend adapters belong behind tasks-axi. Keep direct Beads CLI invocations
-# out of firstmate's core scripts so every configured backend follows the same
+# out of nexus's core scripts so every configured backend follows the same
 # lifecycle path.
 fm_lint_run_backend_purity() {
   local findings path canonical

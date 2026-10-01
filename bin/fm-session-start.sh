@@ -17,7 +17,7 @@
 # sequencing/formatting logic added here stays local to this file. Those four
 # scripts remain fully working
 # standalone with unchanged default behavior - other flows (fm-bootstrap.sh
-# install <tools> after consent, /updatefirstmate, the afk daemon, existing
+# install <tools> after consent, /updatenexus, the afk daemon, existing
 # tests) still call them directly. The one seam this script needed -
 # bootstrap running its detect-only diagnostics without its six mutating
 # sweeps - is an opt-in FM_BOOTSTRAP_DETECT_ONLY=1 flag on fm-bootstrap.sh
@@ -401,7 +401,7 @@ subsection() { printf '\n%s\n%s\n' "$1" "$SUBRULE"; }
 
 # print_file_or_absent <path> <label>: full contents under a labeled
 # subsection, or an explicit ABSENT marker. Absence is semantically
-# meaningful for every one of these files (captain.md absent = firstmate
+# meaningful for every one of these files (captain.md absent = nexus
 # repo built-in defaults, projects.md absent = rebuild from clones, etc. -
 # AGENTS.md section 3) and must never be confused with an empty-but-present
 # file, so the two cases print differently.
@@ -632,7 +632,7 @@ agents_baseline_drifted() {  # <rebuilding-session-pid>
 }
 
 # Only run-tier source pairs with both a stale native instruction cache and a
-# working Firstmate delivery path arrive here. Claude fresh-reads on reset, and
+# working Nexus delivery path arrive here. Claude fresh-reads on reset, and
 # Codex has no tracked interactive reset delivery path.
 agents_refresh_required() {  # <rebuilding-session-pid>
   local lock_pid=$1
@@ -650,7 +650,7 @@ print_agents_refresh_if_required() {  # <rebuilding-session-pid>
   if [ -f "$FM_ROOT/AGENTS.md" ]; then
     cat <<'EOF'
 The complete on-disk AGENTS.md below supersedes the instruction copy this session
-started with. Apply it as the current Firstmate instruction contract.
+started with. Apply it as the current Nexus instruction contract.
 
 EOF
     cat "$FM_ROOT/AGENTS.md"
@@ -966,7 +966,7 @@ else
   printf 'absent\n'
 fi
 
-# Public commitments made through the myfirstmate relay. A promise to reply in a
+# Public commitments made through the mynexus relay. A promise to reply in a
 # public thread must survive compaction and restart, so it is surfaced from disk
 # here rather than from conversation memory. fm-public-followup-lib.sh owns both
 # gates: a home that never opted into the relay runs one [ -f ] test, prints no

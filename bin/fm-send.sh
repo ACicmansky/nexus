@@ -95,11 +95,11 @@
 # stage; do not move the marker behind the invocation or omit it here. Follow-up
 # fm-send-secondmate-harness-invocation-r1 owns that behavior.
 #
-# From-firstmate marker: when the resolved target is a task selector whose meta
+# From-nexus marker: when the resolved target is a task selector whose meta
 # records kind=secondmate, the message uses the live-charter-compatible
-# from-firstmate carrier owned by bin/fm-operational-input.sh so the secondmate
+# from-nexus carrier owned by bin/fm-operational-input.sh so the secondmate
 # routes its reply via its status file or a status-pointed doc instead of
-# stranding it in chat the main firstmate never reads. On the inbox plane the
+# stranding it in chat the main nexus never reads. On the inbox plane the
 # marker travels verbatim inside the recorded body. A crewmate/scout target,
 # an explicit backend-target escape-hatch target, and the --key path are never
 # marked - their behavior is unchanged.
@@ -184,7 +184,7 @@
 # (a blocked: key is ordinary steering and stays lease-guarded only), the Pi
 # supervision branch is refused outright, exactly as its prompt promises. While
 # the away-posture record exists main is parked and that one refusal relocates
-# to the branch (contract: bin/fm-lease-lib.sh); which findings firstmate may
+# to the branch (contract: bin/fm-lease-lib.sh); which findings nexus may
 # decide at all remains ask-user-authority's judgment for either actor.
 #
 # Chat is also a channel that carries keyed captain answers, so the same flag
@@ -229,7 +229,7 @@ FM_ROOT="${FM_ROOT_OVERRIDE:-$(cd "$SCRIPT_DIR/.." && pwd)}"
 fm_refuse_if_gate_agent
 
 if [ -z "${FM_HOME+x}" ] || [ -z "${FM_HOME:-}" ]; then
-  echo "error: FM_HOME is not set; fm-send refuses to resolve targets without an explicit firstmate home" >&2
+  echo "error: FM_HOME is not set; fm-send refuses to resolve targets without an explicit nexus home" >&2
   exit 1
 fi
 
@@ -391,7 +391,7 @@ fm_send_resolve_target() { # <raw-target>
     ;;
   fm-*)
     RESOLUTION_TRIED="meta=$STATE/$raw.meta; legacy-meta=$STATE/${raw#fm-}.meta; backend=none"
-    echo "error: no metadata for $raw in $STATE (tried $RESOLUTION_TRIED); pass a well-formed explicit backend target only when targeting outside this firstmate home" >&2
+    echo "error: no metadata for $raw in $STATE (tried $RESOLUTION_TRIED); pass a well-formed explicit backend target only when targeting outside this nexus home" >&2
     return 1
     ;;
   esac
@@ -525,12 +525,12 @@ if [ "$TARGET_BACKEND" != remote ]; then
   fm_backend_validate "$TARGET_BACKEND" || exit 1
 fi
 
-# Classify a from-firstmate -> secondmate request. Only a task selector resolved
+# Classify a from-nexus -> secondmate request. Only a task selector resolved
 # through this home's meta whose authoritative kind is secondmate is marked: the
 # secondmate then routes its reply via the status path (see fm-marker-lib.sh).
 # An explicit backend target (the escape hatch for endpoints outside this home)
 # and any crewmate/scout target are left unmarked, and so is the --key path.
-MARK_FROM_FIRSTMATE=0
+MARK_FROM_NEXUS=0
 PENDING_REPLY_CORR=
 PENDING_REPLY_CREATED=0
 TARGET_TASK_ID=
@@ -543,7 +543,7 @@ fm_send_known_undelivered_cleanup() {
   fi
 }
 if [ -n "$TARGET_SELECTOR" ] && [ -n "$TARGET_META" ] && [ "$(fm_meta_get "$TARGET_META" kind)" = secondmate ]; then
-  MARK_FROM_FIRSTMATE=1
+  MARK_FROM_NEXUS=1
   TARGET_TASK_ID=$(fm_send_id_from_meta "$TARGET_META")
 fi
 
@@ -603,7 +603,7 @@ if [ -n "$FIRE_AND_FORGET_ID" ]; then
       echo "error: --fire-and-forget delivery id must be 16 lowercase hex characters" >&2
       exit 1
     }
-  [ "$MARK_FROM_FIRSTMATE" = 1 ] ||
+  [ "$MARK_FROM_NEXUS" = 1 ] ||
     {
       echo "error: --fire-and-forget requires a recorded secondmate task selector" >&2
       exit 1
@@ -653,7 +653,7 @@ if [ -n "$RESOLVE_KEYS" ]; then
   # task, is a decision, and answering one is main-owned while attended. A
   # blocked: key is ordinary steering and takes no partition guard. Under the
   # away-posture record the guard passes the branch instead (relocation:
-  # bin/fm-lease-lib.sh); which findings firstmate may decide at all stays
+  # bin/fm-lease-lib.sh); which findings nexus may decide at all stays
   # ask-user-authority's judgment, for either actor.
   RESOLVE_IS_DECISION=0
   [ -z "$RESOLVE_HOLD_KEYS" ] || RESOLVE_IS_DECISION=1
@@ -742,7 +742,7 @@ fm_send_feed_resolved_holds() { # <answer-text>
     lines="${lines}${k}"$'\t'"${note}"$'\t'$'\n'
   done
   if ! printf '%s' "$lines" | "$SCRIPT_DIR/fm-captain-hold.sh" answers \
-    --source "a firstmate answer sent to $RESOLVE_TASK_ID" >/dev/null 2>&1; then
+    --source "a nexus answer sent to $RESOLVE_TASK_ID" >/dev/null 2>&1; then
     echo "error: the answer was delivered to $T, but this captain-held task could not be closed: ${RESOLVE_HOLD_KEYS}. Close it with fm-captain-hold.sh answer - do not resend the answer." >&2
     return 1
   fi
@@ -811,11 +811,11 @@ else
   # The pre-marker answer text, kept for the closing resolved note so the
   # durable ledger records the plain answer without marker or corr bytes.
   RESOLVE_ANSWER_TEXT=$MESSAGE
-  if [ "$MARK_FROM_FIRSTMATE" = 1 ] && [ -n "$FIRE_AND_FORGET_ID" ]; then
-    fm_message_mark_from_firstmate "$MESSAGE" MESSAGE
+  if [ "$MARK_FROM_NEXUS" = 1 ] && [ -n "$FIRE_AND_FORGET_ID" ]; then
+    fm_message_mark_from_nexus "$MESSAGE" MESSAGE
     MESSAGE="${FM_FROMFIRST_MARK}delivery=${FIRE_AND_FORGET_ID} ${MESSAGE#"$FM_FROMFIRST_MARK"}"
     FM_SEND_IDEMPOTENT=1
-  elif [ "$MARK_FROM_FIRSTMATE" = 1 ]; then
+  elif [ "$MARK_FROM_NEXUS" = 1 ]; then
     # Reuse an existing correlation id for recovery resends; otherwise create a
     # durable parent expectation before delivery. Transport success never
     # resolves that expectation (see fm-pending-reply-lib.sh).

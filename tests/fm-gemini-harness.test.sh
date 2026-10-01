@@ -257,7 +257,7 @@ test_gemini_wiring_stays_outside_the_worktree() {
   local out
   out=$(fm_control_harness_wiring_paths gemini /wt /state task-1)
   [ "$out" = "/state/task-1.gemini-settings.json" ] \
-    || fail "gemini's per-task wiring is its firstmate-owned settings file, got '$out'"
+    || fail "gemini's per-task wiring is its nexus-owned settings file, got '$out'"
   case "$out" in
     /wt/*) fail "gemini must never claim a path inside the worktree: '$out'" ;;
   esac

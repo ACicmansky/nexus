@@ -3,7 +3,7 @@
 #
 # These tests pin the control plane's observable behavior hermetically - a
 # stubbed session provider, no real agent - through the executable interface
-# firstmate actually calls:
+# nexus actually calls:
 #   1. Adapter contract: every verified harness gets its own verified exit
 #      command and interrupt key, delivered as bytes to the endpoint.
 #   2. Backend capability: a backend that cannot deliver the harness's
@@ -15,7 +15,7 @@
 #   5. Lifecycle states: busy interrupts first, idle does not, already-stopped
 #      is idempotent success, and an agent that does not stop fails closed.
 #   6. Marker non-regression: a control command to a kind=secondmate task
-#      carries NO from-firstmate marker and opens no pending-reply expectation,
+#      carries NO from-nexus marker and opens no pending-reply expectation,
 #      while fm-send's marking of the same task is untouched.
 set -u
 
@@ -132,7 +132,7 @@ case "${1:-}" in
         printf 'zsh' > "$D/command"
       fi
       case "$payload" in
-        *'encode launch-brief'* | *'Firstmate operational input waiting: read'*) cat "$D/becomes" > "$D/command" ;;
+        *'encode launch-brief'* | *'Nexus operational input waiting: read'*) cat "$D/becomes" > "$D/command" ;;
       esac
     else
       printf '%s\n' "$payload" >> "$D/keys"
@@ -1001,7 +1001,7 @@ test_secondmate_control_command_carries_no_marker() {
   [ "$typed" = "/exit" ] \
     || fail "a secondmate control command must be the bare exit command, got: $typed"
   case "$typed" in
-    *"$FM_FROMFIRST_MARK"*) fail "a control command must never carry the from-firstmate marker" ;;
+    *"$FM_FROMFIRST_MARK"*) fail "a control command must never carry the from-nexus marker" ;;
   esac
   case "$typed" in
     *corr=*) fail "a control command must never carry a pending-reply correlation id" ;;
@@ -1028,7 +1028,7 @@ test_fm_send_still_marks_the_same_secondmate_task() {
     "$FM_FROMFIRST_MARK"*) : ;;
     *) fail "fm-send must still mark a kind=secondmate target: $(literals "$dir")" ;;
   esac
-  pass "fm-control's arrival leaves fm-send's from-firstmate marking untouched"
+  pass "fm-control's arrival leaves fm-send's from-nexus marking untouched"
 }
 
 # Only an adapter whose runtime records an exact per-pane agent session has a

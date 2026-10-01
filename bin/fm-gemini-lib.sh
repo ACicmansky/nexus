@@ -20,7 +20,7 @@
 # because probing a stranger's binary during a liveness poll is exactly what
 # must not happen.
 #
-# Detection of firstmate's OWN harness uses these structural rules for the
+# Detection of nexus's OWN harness uses these structural rules for the
 # ancestry fallback. The GEMINI_CLI=1 environment marker in bin/fm-harness.sh
 # remains the load-bearing path for the installed bundle shape on modern Node.
 

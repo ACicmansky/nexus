@@ -93,7 +93,7 @@ test_afk_start_reclaims_stale_daemon_lock_reused_pid() {
 test_daemon_state_root_uses_fm_home() {
   local dir home override out
   dir=$(make_supercase daemon-fm-home)
-  home="$dir/firstmate-home"
+  home="$dir/nexus-home"
   override="$dir/override-state"
   mkdir -p "$home" "$override"
 
@@ -1572,7 +1572,7 @@ test_escalate_batches_into_one_digest() {
     || fail "escalate_flush failed"
   # A Claude Code primary strips U+2063 from submitted prompts, so the digest
   # travels as a record in this home's operational inbox behind a plain doorbell.
-  record=$(sed -n "s/.*: Firstmate operational input waiting: read '\([^']*\)'.*/\1/p" "$sent" | head -1)
+  record=$(sed -n "s/.*: Nexus operational input waiting: read '\([^']*\)'.*/\1/p" "$sent" | head -1)
   [ -n "$record" ] || fail "batch digest was not typed as a record-backed doorbell for the claude primary: $(cat "$sent")"
   grep -F "$FM_OPERATIONAL_MARK" "$sent" >/dev/null \
     && fail "the claude primary was typed the invisible marker it strips"
@@ -1606,7 +1606,7 @@ test_escalate_marker_preserving_primary_types_envelope() {
   grep -F "${FM_OPERATIONAL_PREFIX}v1 away-supervisor: " "$sent" >/dev/null \
     || fail "a marker-preserving primary lost the typed away-supervisor envelope"
   grep -F 'event C: done: PR 3' "$sent" >/dev/null || fail "typed digest missing event C"
-  grep -F 'Firstmate operational input waiting' "$sent" >/dev/null \
+  grep -F 'Nexus operational input waiting' "$sent" >/dev/null \
     && fail "a marker-preserving primary was sent a record-backed doorbell"
   [ ! -e "$state/operational-inbox" ] || fail "a marker-preserving primary published an operational record"
   pass "a marker-preserving primary still receives the typed U+2063 away-supervisor envelope and no record"
@@ -1632,8 +1632,8 @@ test_record_doorbell_detection() {
   missing=${doorbell%.msg\'*}-gone.msg${doorbell##*.msg}
   should_exit_afk "$state" "$missing" \
     || fail "a doorbell naming no record kept afk"
-  should_exit_afk "$state" "FIRSTMATE_OP: v1 away-supervisor: Supervisor escalate: done" \
-    || fail "a typed ASCII FIRSTMATE_OP label kept afk"
+  should_exit_afk "$state" "NEXUS_OP: v1 away-supervisor: Supervisor escalate: done" \
+    || fail "a typed ASCII NEXUS_OP label kept afk"
   rm -f "$state"/operational-inbox/*.msg
   should_exit_afk "$state" "$doorbell" \
     || fail "a doorbell whose record was pruned kept afk"
@@ -1693,7 +1693,7 @@ test_handle_wake_routes_self_and_escalate() {
 # The away-mode daemon must classify that payload the same way it classifies an
 # ordinary signal: escalate once as the decision, suppress an unchanged repeat
 # (queued-row and catch-all alike), and re-escalate when the status log grows.
-# https://github.com/kunchenguid/firstmate/issues/4096
+# https://github.com/ACicmansky/nexus/issues/4096
 test_needs_decision_queued_row_escalates_once_as_the_decision() {
   local dir state fakebin status_file payload out
   dir=$(make_supercase needs-decision-queued-row)
@@ -1915,7 +1915,7 @@ test_marker_detection() {
   marker_hex=$(printf '%s' "$FM_INJECT_MARK" | od -An -tx1 | tr -d ' \n')
   [ "$marker_hex" = e281a3 ] \
     || fail "FM_INJECT_MARK must use terminal-safe U+2063 bytes, got $marker_hex"
-  [ "$FM_OPERATIONAL_PREFIX" = "${FM_INJECT_MARK}FIRSTMATE_OP: " ] \
+  [ "$FM_OPERATIONAL_PREFIX" = "${FM_INJECT_MARK}NEXUS_OP: " ] \
     || fail "away-mode operational prefix drifted from the shared captain-boundary marker"
   # message_is_injection: marker present -> injection; absent -> real message
   message_is_injection "${FM_OPERATIONAL_PREFIX}Supervisor escalate: done" \
@@ -2199,7 +2199,7 @@ test_afk_genuine_done_still_terminal_stale() {
   local dir state out
   dir=$(make_supercase afk-genuine-done-stale)
   state="$dir/state"
-  printf 'done: PR https://example.com/pull/76 checks green; stage 1 of 4 ready for firstmate merge\n' \
+  printf 'done: PR https://example.com/pull/76 checks green; stage 1 of 4 ready for nexus merge\n' \
     > "$state/stage1-w2.status"
   out=$(FM_STATE_OVERRIDE="$state" classify_stale "sess:fm-stage1-w2" "$state")
   case "$out" in escalate\|*) ;; *) fail "genuine done: stale did not escalate: $out" ;; esac
@@ -2974,9 +2974,9 @@ test_discover_supervisor_target_herdr() {
   if out=$(FM_SUPERVISOR_TARGET='' TMUX_PANE='' HERDR_ENV='' HERDR_PANE_ID='' discover_supervisor_target); then
     fail "bare fallback should return non-zero"
   fi
-  [ "$out" = "firstmate:0" ] || fail "bare fallback should still print firstmate:0: $out"
+  [ "$out" = "nexus:0" ] || fail "bare fallback should still print nexus:0: $out"
 
-  pass "discover_supervisor_target: override > TMUX_PANE > herdr '<session>:<pane-id>' composition > firstmate:0 fallback"
+  pass "discover_supervisor_target: override > TMUX_PANE > herdr '<session>:<pane-id>' composition > nexus:0 fallback"
 }
 
 test_pane_is_busy_herdr_native_busy_state() {

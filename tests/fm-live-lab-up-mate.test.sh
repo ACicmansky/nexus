@@ -25,10 +25,10 @@ fi
 SH
 cat > "$TMP_ROOT/source/bin/fm-spawn.sh" <<'SH'
 #!/usr/bin/env bash
-tmux new-window -d -t firstmate: -n "fm-$1" -c "$FM_HOME/../mate" 'exec sleep 45' || exit 1
-pid=$(tmux display-message -p -t "firstmate:=fm-$1" '#{pane_pid}')
+tmux new-window -d -t nexus: -n "fm-$1" -c "$FM_HOME/../mate" 'exec sleep 45' || exit 1
+pid=$(tmux display-message -p -t "nexus:=fm-$1" '#{pane_pid}')
 printf '%s\n' "$pid" > "$FM_HOME/../mate/state/.lock"
-printf 'window=firstmate:fm-%s\n' "$1" > "$FM_HOME/state/$1.meta"
+printf 'window=nexus:fm-%s\n' "$1" > "$FM_HOME/state/$1.meta"
 SH
 cat > "$TMP_ROOT/fakebin/claude" <<'SH'
 #!/usr/bin/env bash

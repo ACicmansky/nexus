@@ -18,7 +18,7 @@ write_ship_brief() {  # <file> <id>
 ## Captain's intent
 Exercise trace propagation for $2.
 
-## Firstmate spec
+## Nexus spec
 Verify the spawned process receives the expected trace context.
 EOF
 }
@@ -36,7 +36,7 @@ case "$*" in
   *"#{pane_current_path}"*) printf '%s\n' "${FM_FAKE_PANE_PATH:-}"; exit 0 ;;
 esac
 case "${1:-}" in
-  display-message) printf 'firstmate\n'; exit 0 ;;
+  display-message) printf 'nexus\n'; exit 0 ;;
   list-windows)
     [ -z "${FM_FAKE_DUPLICATE_WINDOW:-}" ] || printf '%s\n' "$FM_FAKE_DUPLICATE_WINDOW"
     exit 0
@@ -205,9 +205,9 @@ run_two_level() {
   touch "$prim/state/.last-watcher-beat"
   start_trace_session "$prim" "$penv"
 
-  # Seed the secondmate home so validate_firstmate_home_for_spawn accepts it.
+  # Seed the secondmate home so validate_nexus_home_for_spawn accepts it.
   mkdir -p "$sm/bin" "$sm/data"
-  printf '# Firstmate\n' > "$sm/AGENTS.md"
+  printf '# Nexus\n' > "$sm/AGENTS.md"
   printf 'sm-%s\n' "$name" > "$sm/.fm-secondmate-home"
   printf 'charter\n' > "$sm/data/charter.md"
   git -C "$sm" init -q -b main
@@ -392,7 +392,7 @@ test_duplicate_secondmate_spawn_does_not_converge_trace_context() {
   touch "$prim/state/.last-watcher-beat"
   start_trace_session "$prim"
   mkdir -p "$sm/bin" "$sm/data"
-  printf '# Firstmate\n' > "$sm/AGENTS.md"
+  printf '# Nexus\n' > "$sm/AGENTS.md"
   printf '%s\n' "$id" > "$sm/.fm-secondmate-home"
   printf 'charter\n' > "$sm/data/charter.md"
   git -C "$sm" init -q -b main

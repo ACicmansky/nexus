@@ -79,7 +79,7 @@ new_bootstrap_world() {
   mkdir -p "$home/config" "$home/data" "$home/state" "$root/bin"
   git init -q -b main "$root"
   printf '%s\n' 'config/' > "$root/.gitignore"
-  printf '%s\n' '# Firstmate test root' > "$root/AGENTS.md"
+  printf '%s\n' '# Nexus test root' > "$root/AGENTS.md"
   printf '%s\n' '#!/usr/bin/env bash' 'exit 0' > "$root/bin/placeholder.sh"
   chmod +x "$root/bin/placeholder.sh"
   git -C "$root" add -A
@@ -211,7 +211,7 @@ new_propagation_world() {
   touch "$home/state/.last-watcher-beat"
   git init -q -b main "$root"
   printf '%s\n' 'config/' > "$root/.gitignore"
-  printf '%s\n' '# Firstmate test root' > "$root/AGENTS.md"
+  printf '%s\n' '# Nexus test root' > "$root/AGENTS.md"
   printf '%s\n' '#!/usr/bin/env bash' 'exit 0' > "$root/bin/placeholder.sh"
   chmod +x "$root/bin/placeholder.sh"
   git -C "$root" add -A
@@ -221,7 +221,7 @@ new_propagation_world() {
   printf '%s\n' sm > "$sm/.fm-secondmate-home"
   mkdir -p "$sm/config" "$sm/data" "$sm/state" "$sm/projects"
   {
-    printf 'window=firstmate:fm-sm\n'
+    printf 'window=nexus:fm-sm\n'
     printf 'kind=secondmate\n'
     printf 'harness=codex\n'
     printf 'home=%s\n' "$sm"
@@ -278,7 +278,7 @@ test_primary_budget_converges_with_exact_reread_and_safe_failures() {
     || fail "budget reread payload was not the exact destination bytes"
   assert_contains "$(inbox_record_body "$home/state/sm.inbox/001.msg")" "CONFIG_REREAD: $instruction" \
     "budget propagation did not enqueue the pointer to its exact reread generation"
-  assert_contains "$(<"$log")" "Firstmate instruction waiting: list " \
+  assert_contains "$(<"$log")" "Nexus instruction waiting: list " \
     "budget propagation did not ring the durable inbox doorbell"
   assert_contains "$(<"$log")" "'sm.inbox' steering inbox" \
     "budget propagation doorbell did not identify the durable inbox"
