@@ -64,7 +64,7 @@ The watch matches on the number and reads nothing else for identity; the recorde
 
 ## The host must be passed explicitly
 
-The poll runs from the firstmate home, in no repository.
+The poll runs from the nexus home, in no repository.
 Collected 2026-09-23:
 
 ```
@@ -102,7 +102,7 @@ The open change and a change that does not exist both emit nothing.
 
 ```
 $ bin/fm-pr-merge.sh task-a https://gerrit.example/c/proj/+/1
-error: firstmate does not submit a Gerrit change: submitting requires an attributed human approval it must not manufacture, so a human submits the change on the server
+error: nexus does not submit a Gerrit change: submitting requires an attributed human approval it must not manufacture, so a human submits the change on the server
 $ echo $?
 2
 ```

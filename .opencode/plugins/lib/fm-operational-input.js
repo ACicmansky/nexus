@@ -7,7 +7,7 @@ const adapterRoot = resolve(dirname(fileURLToPath(import.meta.url)), "../../..")
 
 // Cross-language adapter only. bin/fm-operational-input.sh owns the protocol,
 // accepted kinds, marker bytes, and serialization grammar.
-export function encodeFirstmateOperationalInput(root, kind, content) {
+export function encodeNexusOperationalInput(root, kind, content) {
   return new Promise((resolveResult, reject) => {
     const requested = `${root}/bin/fm-operational-input.sh`;
     const script = existsSync(requested)

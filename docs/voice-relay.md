@@ -107,7 +107,7 @@ A missing required value refuses with the path to write, so an unconfigured home
 Check it end to end without a microphone, using a recorded question:
 
 ```
-cd <your firstmate home>
+cd <your nexus home>
 ~/.fm-voice-venv/bin/python bin/fm-voice-relay.py --self-test <clip.pcm>
 ```
 
@@ -130,8 +130,8 @@ Covering that arithmetic says nothing about how a real output device behaves.
 Copy the two files the laptop needs, and install the one dependency:
 
 ```
-scp <desktop>:<firstmate home>/bin/fm-voice-client.py .
-scp <desktop>:<firstmate home>/bin/fm_voice_frame.py .
+scp <desktop>:<nexus home>/bin/fm-voice-client.py .
+scp <desktop>:<nexus home>/bin/fm_voice_frame.py .
 python3 -m pip install sounddevice
 ```
 
@@ -142,7 +142,7 @@ Then talk:
 
 ```
 python3 fm-voice-client.py --host <desktop> \
-  --relay <firstmate home>/bin/fm-voice-relay.py \
+  --relay <nexus home>/bin/fm-voice-relay.py \
   --relay-python ~/.fm-voice-venv/bin/python
 ```
 

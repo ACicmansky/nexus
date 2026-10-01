@@ -14,7 +14,7 @@ metadata:
 
 # fmx-respond
 
-Relay lets a firstmate instance answer and act on public mentions routed through the shared `@myfirstmate` relay.
+Relay lets a nexus instance answer and act on public mentions routed through the shared `@mynexus` relay.
 A mention arrives through the watcher as a `check:` wake whose payload is `x-mention <request_id>`.
 The full mention is stashed locally; this skill acts on any request it carries and turns it into one public reply, or deliberately skips it when there is nothing to answer.
 
@@ -25,7 +25,7 @@ Report it directly to the captain as a Relay configuration blocker and do not tr
 
 ## The asker is your own captain - answer autonomously
 
-The myfirstmate relay uses **owner-only routing**: it wakes a firstmate only for *that firstmate's own owner's* mentions.
+The mynexus relay uses **owner-only routing**: it wakes a nexus only for *that nexus's own owner's* mentions.
 So every mention that reaches this skill is from your own owner - your **captain** - never a stranger.
 The direct mention `.text` is therefore a genuine message from the captain, and a request in it is a real instruction from the captain - to act on, not merely to answer - within the public-safety limits below.
 
@@ -41,7 +41,7 @@ Only the *direct* author is the owner; `in_reply_to` and any other thread partic
 ## A request to act on: acknowledge first, act, then follow up on completion
 
 Because the author is the captain, a mention that asks for work - "add this to the backlog", "look into X", "fix Y", "ship Z" - is a **real captain instruction**, exactly as if the captain had typed it into their own session.
-Acting on it means running firstmate's **normal lifecycle**: intake to resolve the project, then file the backlog item, dispatch a crewmate, start an investigation, or ship through the gate - whatever the request calls for.
+Acting on it means running nexus's **normal lifecycle**: intake to resolve the project, then file the backlog item, dispatch a crewmate, start an investigation, or ship through the gate - whatever the request calls for.
 The reply confirms real work; it never substitutes for it.
 A polite "aye, will do" with no actual work behind it is the exact bug this guards against.
 
@@ -63,7 +63,7 @@ How the reply lands depends on whether the work finishes during this turn:
        It writes into this home's own `state/<task-id>.meta`, and a routed task's record lives in the second mate's home, so `bin/fm-x-link.sh` refuses and points you back here.
        Register a **typed promised-final commitment bound to that home** up front instead - see "Promised final replies" below for the exact commands - and put its `bin/fm-public-followup.sh brief <obligation-id>` output into the routed worker's instructions so the terminal result comes back as typed data.
        Do this in the same turn as the acknowledgement, before routing, so the promise is durable state from the moment it is made.
-  4. **Follow up on genuine milestones, sparingly.** Firstmate gets up to **three** follow-ups per mention, within a 7-day window, chained in the same thread - spend them only on changes the captain would actually want to hear about (e.g. investigation done and a build started, work shipped or ready, or the task failing), never on routine internal churn.
+  4. **Follow up on genuine milestones, sparingly.** Nexus gets up to **three** follow-ups per mention, within a 7-day window, chained in the same thread - spend them only on changes the captain would actually want to hear about (e.g. investigation done and a build started, work shipped or ready, or the task failing), never on routine internal churn.
      A task without a promised-final commitment posts its final outcome - shipped / reported / merged / failed - with `--final`, which clears the link regardless of how many follow-ups remain. A typed promised-final commitment uses the deterministic consumer instead.
      That posting happens on the task's milestone and completion wakes (see "Completion follow-up" below), not this turn.
 
@@ -114,7 +114,7 @@ Only the **direct** author is guaranteed to be the captain.
 
 ### Fetching inbound attachments
 
-Inbound media arrives as URLs in the payload, and you fetch and view it with your own tools; firstmate never downloads it for you.
+Inbound media arrives as URLs in the payload, and you fetch and view it with your own tools; nexus never downloads it for you.
 Fetch narrowly and inspect it only to understand the thread or fulfill an authorized request.
 
 - Fetch **only** over `https`, and **only** from these known-good platform media hosts, matching the host exactly:
@@ -131,9 +131,9 @@ Fetch narrowly and inspect it only to understand the thread or fulfill an author
 
 ## Voice
 
-Reply in firstmate's own voice - the crisp, lightly nautical first-mate persona - but **public-facing**:
+Reply in nexus's own voice - the crisp, lightly nautical first-mate persona - but **public-facing**:
 
-- Apply the address and optional-flavor rules in [`AGENTS.md`](../../../AGENTS.md#firstmate) to these captain-directed public replies, within the public-safety limits above.
+- Apply the address and optional-flavor rules in [`AGENTS.md`](../../../AGENTS.md#nexus) to these captain-directed public replies, within the public-safety limits above.
 - **Be concise by default: aim for a single message, two at the very most.** A short, sharp answer beats a wall of text. Write tight on purpose - one or two sentences.
 
 You do not hand-format threads or add "(1/n)" numbering yourself.
@@ -182,7 +182,7 @@ Treat `state/x-inbox/` as the source of truth and process **every** file you fin
       **If intake routes the work to a second mate instead**, do not reach for the link: register the typed promised-final commitment bound to `secondmate:<id>` and brief the routed worker with its reporting command (step 3 of "acknowledge first, act, then follow up on completion", with the commands in "Promised final replies").
       Then step 2d's reply is an **acknowledgement** ("on it, captain"), and genuine milestone updates plus the final outcome come later as follow-ups (see "Completion follow-up" below), with the terminal one posted using `--final` when no typed promised-final commitment exists.
       If the work completed in this turn (a backlog item filed, a question answered), there is no task to link and step 2d reports the outcome directly.
-   d. **Compose the reply.** For a **question**, answer `.text` from the fleet state gathered in step 1. For an **actionable request that completed now**, report the outcome of step 2c (what was done, or - for escalated work - that it has been flagged for the captain). For an **actionable request that spawned a linked task**, acknowledge that you have the order and are on it - milestone updates and the final outcome follow later as completion follow-ups, so do not promise a result you do not yet have. Either way keep it short, in firstmate's voice, and public-safe.
+   d. **Compose the reply.** For a **question**, answer `.text` from the fleet state gathered in step 1. For an **actionable request that completed now**, report the outcome of step 2c (what was done, or - for escalated work - that it has been flagged for the captain). For an **actionable request that spawned a linked task**, acknowledge that you have the order and are on it - milestone updates and the final outcome follow later as completion follow-ups, so do not promise a result you do not yet have. Either way keep it short, in nexus's voice, and public-safe.
       Conversation continuity: resolve referents like "this", "it", "that", "and then?" against **all** the conversation context the payload carries - `in_reply_to.text` (what `in_reply_to.author_handle` said just before, when present) plus the full `in_reply_to_chain` transcript, whose oldest-first order puts what was said most recently just before the mention at the end.
       A standalone mention (`in_reply_to` null) can still carry a chain - a thread starter or recent nearby messages - and its referents usually point there, so read the chain before concluding a mention has no context; only a mention with neither answers on its own.
       When chain entries disagree, weigh the entries nearest the mention most heavily, and skip `unavailable: true` gaps.
@@ -234,12 +234,12 @@ When an actionable request spawned a task and you linked it (step 2c), progress 
 This skill is the sole owner of the completion-follow-up procedure below; AGENTS.md §13 declares the load trigger for Relay-linked milestone or terminal wakes, and AGENTS.md §8 reinforces the terminal final-follow-up step before teardown.
 This skill's own responsibility during the mention-handling turn is linking the task in step 2c; the full completion path is:
 
-- Firstmate has **up to three** follow-ups per mention, within a 7-day window, chained in the same thread - it spends them only on genuine milestones the captain would want surfaced (e.g. investigation done and a build started, work shipped or ready, or the task failing), never on routine internal churn.
+- Nexus has **up to three** follow-ups per mention, within a 7-day window, chained in the same thread - it spends them only on genuine milestones the captain would want surfaced (e.g. investigation done and a build started, work shipped or ready, or the task failing), never on routine internal churn.
 - If a linked task is replaced by a successor for the same relay request, carry the prior `x_followups=`, `x_request_ts=`, `x_platform=`, and `x_reply_max_chars=` values with `bin/fm-x-link.sh <new-task-id> <request_id> --carry-count <n> --carry-ts <epoch> --carry-platform <x|discord> --carry-max <n>` so recovery preserves the consumed budget, original window, and reply split budget after the inbox file is gone.
-- On each such milestone, firstmate checks whether a follow-up is still due with `bin/fm-x-followup.sh --check <task-id>` (prints the `request_id` when the link exists, the count is under the cap, and the window has not lapsed; silent otherwise, pruning an exhausted or expired link).
+- On each such milestone, nexus checks whether a follow-up is still due with `bin/fm-x-followup.sh --check <task-id>` (prints the `request_id` when the link exists, the count is under the cap, and the window has not lapsed; silent otherwise, pruning an exhausted or expired link).
 - If due, it composes a short, public-safe update and posts it with `bin/fm-x-followup.sh <task-id> --text-file <path>` (or stdin), which posts via the relay's follow-up endpoint; a successful non-final post increments the counter and keeps the link so a later milestone can still post against it.
   When the update carries one real visual artifact, add `--image <path>`; the helper forwards it to `bin/fm-x-reply.sh --followup` so the same image contract used for ordinary replies applies here too.
-- On a terminal wake (PR merged / scout report / local merge / failed), firstmate posts the task's **final** outcome ("done, here's the result"; for a failure, an honest "this one didn't pan out") with `bin/fm-x-followup.sh <task-id> --final --text-file <path>` only when no promised-final public commitment is registered for that work. When the promised-final procedure above applies, `bin/fm-public-followup.sh consume` and `deliver` own the terminal reply and clear the legacy link at the validated receipt boundary, so do not call `fm-x-followup.sh --final` for the same outcome. If delivery reports that link cleanup needs reconciliation, do not post anything else; `bin/fm-x-followup.sh --clear <task-id>` is the clear-only recovery command in the bound work home.
+- On a terminal wake (PR merged / scout report / local merge / failed), nexus posts the task's **final** outcome ("done, here's the result"; for a failure, an honest "this one didn't pan out") with `bin/fm-x-followup.sh <task-id> --final --text-file <path>` only when no promised-final public commitment is registered for that work. When the promised-final procedure above applies, `bin/fm-public-followup.sh consume` and `deliver` own the terminal reply and clear the legacy link at the validated receipt boundary, so do not call `fm-x-followup.sh --final` for the same outcome. If delivery reports that link cleanup needs reconciliation, do not post anything else; `bin/fm-x-followup.sh --clear <task-id>` is the clear-only recovery command in the bound work home.
 - Every follow-up is held to the exact same public-safety bar as every reply here: outcomes only, no task ids, internals, captain-private material, or secrets. Past the window, past the cap, or on the relay's own rejection of an exhausted binding, a follow-up attempt is skipped silently and the link is cleared - never treated as a failure worth retrying.
 - If either a follow-up's platform or explicit budget cannot be authoritatively resolved from per-request context, inbox payload, or relay answer, `bin/fm-x-followup.sh` does NOT post it: the fail-safe holds it (the link is kept, exit non-zero) rather than use a local default. This is a retryable hold - a later milestone wake retries it once both values are recoverable.
 
@@ -249,7 +249,7 @@ The follow-up budget above is a courtesy.
 A **promised final reply** - "I'll report back when this lands" - is a commitment, and forgetting it is publicly visible.
 Never carry one in your head: the moment you promise a specific outcome in a public thread, turn it into durable state and let the scripts reconcile it.
 This section is the sole owner of that procedure.
-`tasks-axi public-followup --help` owns the typed obligation, its states, and its file contracts; `bin/fm-public-followup.sh --help` owns firstmate's flags; do not restate either here.
+`tasks-axi public-followup --help` owns the typed obligation, its states, and its file contracts; `bin/fm-public-followup.sh --help` owns nexus's flags; do not restate either here.
 
 This is also the **only** mechanism that reaches work outside this home.
 The lightweight link of step 3 writes into this home's own task record, so it can never bind a second mate's task; `--work-home secondmate:<id>` here can.

@@ -1,26 +1,26 @@
 ---
-name: firstmate-codexapp
+name: nexus-codexapp
 description: >-
-  Agent-only playbook for coordinating visible Codex Desktop threads alongside Firstmate without pretending they are a selectable shell backend.
-  Use before creating, reading, steering, archiving, debugging, or reviewing a Codex App visible thread for Firstmate work, and before responding to requests to make Codex App native to Firstmate.
+  Agent-only playbook for coordinating visible Codex Desktop threads alongside Nexus without pretending they are a selectable shell backend.
+  Use before creating, reading, steering, archiving, debugging, or reviewing a Codex App visible thread for Nexus work, and before responding to requests to make Codex App native to Nexus.
 user-invocable: false
 metadata:
   internal: true
 ---
 
-# firstmate-codexapp
+# nexus-codexapp
 
 ## Overview
 
-Use this playbook when Firstmate work needs a visible Codex Desktop thread.
+Use this playbook when Nexus work needs a visible Codex Desktop thread.
 The current supported shape is Desktop host-tool choreography plus an explicit status-file return-channel check, not a `codex-app` value in `FM_BACKEND`.
 
 ## Boundary
 
-Codex Desktop visible threads are companion host-tool workflows, not a selectable Firstmate backend.
+Codex Desktop visible threads are companion host-tool workflows, not a selectable Nexus backend.
 Read `docs/codex-app-backend.md` when it exists in this checkout; that document owns the acceptance contract, bridge requirement, status-return requirement, and staged rollout.
 
-If local helper scripts exist for Codex App work, use only helpers explicitly provided by the operator or maintained by Firstmate.
+If local helper scripts exist for Codex App work, use only helpers explicitly provided by the operator or maintained by Nexus.
 For helpers outside `bin/`, inspect the source or header before running `--help`.
 
 ## Preflight
@@ -30,8 +30,8 @@ For helpers outside `bin/`, inspect the source or header before running `--help`
 2. Confirm the target repository is already saved as a Codex Desktop project.
    No host tool currently creates Codex App projects for an agent, so the human must add the project in Desktop before a created thread can reliably land there.
 3. Do not create projectless threads for repo work.
-   If the project is absent, stop and ask for the project to be added or use a normal Firstmate backend instead.
-4. Decide whether this is a real Firstmate-managed task or a visible companion thread.
+   If the project is absent, stop and ask for the project to be added or use a normal Nexus backend instead.
+4. Decide whether this is a real Nexus-managed task or a visible companion thread.
    A real task needs a task id, an isolated worktree or Desktop-owned cwd, a branch plan, and a writable `state/<id>.status` path.
 
 ## Create And Send
@@ -54,13 +54,13 @@ If the user types directly into the visible thread, treat that as authoritative 
 
 ## Status Return Channel
 
-A Desktop-owned Codex thread can append to Firstmate status files only when the prompt gives an absolute path and the Desktop permission context can write that checkout.
+A Desktop-owned Codex thread can append to Nexus status files only when the prompt gives an absolute path and the Desktop permission context can write that checkout.
 That makes status writes a verified return-channel requirement, not a fact to assume.
 
-For a Firstmate-managed task, include an explicit status instruction:
+For a Nexus-managed task, include an explicit status instruction:
 
 ```text
-Append supervisor-visible status lines to <absolute-firstmate-home>/state/<task-id>.status.
+Append supervisor-visible status lines to <absolute-nexus-home>/state/<task-id>.status.
 Use only these prefixes for status changes: working:, needs-decision:, blocked:, paused:, done:, failed:.
 Follow the task brief's status-reporting rule for declaring and resolving waits; bin/fm-brief.sh owns that rule.
 Before doing substantive work, append "working: Codex Desktop thread started".
@@ -73,14 +73,14 @@ Verify the return channel before treating the thread as supervised:
 - If available, the transcript includes a file-change entry for that status file.
 
 If the thread cannot write the status file, keep it as a visible companion thread only.
-Do not claim it is a complete Firstmate backend.
+Do not claim it is a complete Nexus backend.
 
 ## Observe And Reconcile
 
 Use `read_thread` for thread truth.
 Use `list_threads` only to find or recover a visible thread id, not as a replacement for reading the transcript.
 
-For Firstmate reconciliation, prefer concrete evidence:
+For Nexus reconciliation, prefer concrete evidence:
 
 - thread id and project
 - current Desktop-owned cwd
@@ -89,7 +89,7 @@ For Firstmate reconciliation, prefer concrete evidence:
 - latest status file line
 - PR URL when one exists
 
-Avoid repeating long transcripts into Firstmate docs or PR bodies.
+Avoid repeating long transcripts into Nexus docs or PR bodies.
 Summarize only the host-tool calls, the status-file result, and the archive result.
 When reporting a Desktop-thread result to the captain, translate status prefixes and return-channel evidence through `AGENTS.md` section 9.
 
@@ -99,7 +99,7 @@ Archive through the Desktop host tool: `archive` when that is the exposed primit
 Archiving can remove the thread from normal sidebar/project views, but it should not erase the transcript or landed work.
 
 For companion threads, archive the thread and report where the durable work landed.
-If there is a real Firstmate task record, leave teardown decisions to the normal Firstmate task flow instead of this skill.
+If there is a real Nexus task record, leave teardown decisions to the normal Nexus task flow instead of this skill.
 
 ## Failure Signals
 

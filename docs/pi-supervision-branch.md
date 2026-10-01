@@ -497,7 +497,7 @@ That includes watcher-failure alarms, which are never offered to the branch.
 
 The captain accepted the normal provider prompt-caching strategy:
 
-- A byte-identical branch prefix generated once per firstmate version.
+- A byte-identical branch prefix generated once per nexus version.
 - The same tool set in the same order on every request.
 - One shared `prompt_cache_key` per home for all branch sessions.
   It is set in a `before_provider_request` hook, and only for providers whose requests already carry that field.
@@ -575,7 +575,7 @@ A leftover `state/.afk` flag declines nothing.
   `bin/fm-afk-return.sh` lists them under "waiting on you".
 - Main's standing authority relocates to the branch, and nothing more.
   [Authority relocation](#authority-relocation) below gives the details.
-- The branch prompt's fixed "Postures" section states these rules once per firstmate version, so the prefix stays byte-stable.
+- The branch prompt's fixed "Postures" section states these rules once per nexus version, so the prefix stays byte-stable.
   The per-wake tail is the only dynamic content.
 
 ### Authority relocation
@@ -600,7 +600,7 @@ Each relocated script keeps its own gate, enforcing exactly what a script can ch
 | --- | --- |
 | `bin/fm-pr-merge.sh` | Merges any pull request green at its live head, synchronously, under the record lock, and refuses `--allow-red` and `--allow-missing` while away, so the green gate is absolute in this posture; which pull request the words meant is the branch's reading. |
 | `bin/fm-spawn.sh` | Dispatches only queued work whose blockers cleared - already queued, or filed by the branch because the words explicitly call for it; refuses a fresh ordinary spawn for either actor once the home holds as many ordinary task records as the record's spend cap (relaunches and secondmates exempt). |
-| `bin/fm-send.sh --resolve-key` | Answers a decision the words pre-answer, or one `ask-user-authority`'s judgment (carried verbatim in the branch prompt) lets firstmate decide. |
+| `bin/fm-send.sh --resolve-key` | Answers a decision the words pre-answer, or one `ask-user-authority`'s judgment (carried verbatim in the branch prompt) lets nexus decide. |
 | `bin/fm-merge-local.sh` | Never relocated. |
 
 The merge-authority record and the outcome row's summary are the audit trail.
@@ -608,7 +608,7 @@ The return brief renders the words verbatim beside that account.
 
 ### The authority invariant
 
-Being away changes how the captain is informed and what happens at a captain-owned decision point, never firstmate's authority set.
+Being away changes how the captain is informed and what happens at a captain-owned decision point, never nexus's authority set.
 `tests/fm-branch-supervision.test.sh`, `tests/fm-pr-merge.test.sh`, and `tests/fm-send-resolve-key.test.sh` pin this invariant.
 It sets these limits:
 

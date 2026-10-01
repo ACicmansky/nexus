@@ -6,22 +6,22 @@ const operationalInputScript =
   process.env.FM_OPERATIONAL_INPUT_SCRIPT ||
   resolve(dirname(fileURLToPath(import.meta.url)), "../../../bin/fm-operational-input.sh");
 
-export const FIRSTMATE_CURRENT_OPERATIONAL_KINDS = [
+export const NEXUS_CURRENT_OPERATIONAL_KINDS = [
   "session-start",
   "watcher",
   "turn-end-guard",
   "away-supervisor",
-  "from-firstmate",
+  "from-nexus",
   "launch-brief",
   "branch-outcome",
 ] as const;
 
-export type FirstmateCurrentOperationalKind =
-  (typeof FIRSTMATE_CURRENT_OPERATIONAL_KINDS)[number];
+export type NexusCurrentOperationalKind =
+  (typeof NEXUS_CURRENT_OPERATIONAL_KINDS)[number];
 
 type OperationalInputCommand = "encode" | "classify" | "kind";
 
-export function firstmateShellInvocation(
+export function nexusShellInvocation(
   script: string,
   args: readonly string[],
 ): { command: string; args: string[] } {
@@ -35,7 +35,7 @@ export function firstmateShellInvocation(
 // below so the two can never drift.
 function operationalInputArgs(
   command: OperationalInputCommand,
-  kind?: FirstmateCurrentOperationalKind,
+  kind?: NexusCurrentOperationalKind,
 ): string[] {
   return command === "encode" ? [command, kind ?? ""] : [command];
 }
@@ -52,9 +52,9 @@ function operationalInputAnswer(
 function runOperationalInputCommand(
   command: OperationalInputCommand,
   content: string,
-  kind?: FirstmateCurrentOperationalKind,
+  kind?: NexusCurrentOperationalKind,
 ): string | undefined {
-  const invocation = firstmateShellInvocation(
+  const invocation = nexusShellInvocation(
     operationalInputScript,
     operationalInputArgs(command, kind),
   );
@@ -70,12 +70,12 @@ function runOperationalInputCommand(
   }
 }
 
-function encodeFailure(kind: FirstmateCurrentOperationalKind): Error {
-  return new Error(`could not encode Firstmate operational input kind ${kind}`);
+function encodeFailure(kind: NexusCurrentOperationalKind): Error {
+  return new Error(`could not encode Nexus operational input kind ${kind}`);
 }
 
-export function encodeFirstmateOperationalInput(
-  kind: FirstmateCurrentOperationalKind,
+export function encodeNexusOperationalInput(
+  kind: NexusCurrentOperationalKind,
   content: string,
 ): string {
   const encoded = runOperationalInputCommand("encode", content, kind);
@@ -97,12 +97,12 @@ export type OperationalInputRunner = (
   options: { input: string },
 ) => Promise<{ status: number | null; stdout: string }>;
 
-export async function encodeFirstmateOperationalInputWith(
+export async function encodeNexusOperationalInputWith(
   run: OperationalInputRunner,
-  kind: FirstmateCurrentOperationalKind,
+  kind: NexusCurrentOperationalKind,
   content: string,
 ): Promise<string> {
-  const invocation = firstmateShellInvocation(
+  const invocation = nexusShellInvocation(
     operationalInputScript,
     operationalInputArgs("encode", kind),
   );
@@ -112,11 +112,11 @@ export async function encodeFirstmateOperationalInputWith(
   return encoded;
 }
 
-export function classifyFirstmateOperationalText(content: string): string | undefined {
+export function classifyNexusOperationalText(content: string): string | undefined {
   return runOperationalInputCommand("classify", content);
 }
 
-export function classifyFirstmateCurrentOperationalText(
+export function classifyNexusCurrentOperationalText(
   content: string,
 ): string | undefined {
   return runOperationalInputCommand("kind", content);
@@ -130,10 +130,10 @@ const LEGACY_CALM_OPERATIONAL_PREFIX = "\u2063Supervisor escalate (";
 // Single owner of "may Calm presentation hide this exact input?", shared by the
 // transcript-row and queued-row adapters so the two can never disagree about a message.
 // Text without the U+2063 marker answers here without spawning the classifier.
-export function isFirstmateOperationalPresentationText(text: string): boolean {
+export function isNexusOperationalPresentationText(text: string): boolean {
   if (!text.includes("\u2063")) return false;
   return (
-    classifyFirstmateCurrentOperationalText(text) !== undefined ||
+    classifyNexusCurrentOperationalText(text) !== undefined ||
     text.startsWith(LEGACY_CALM_OPERATIONAL_PREFIX)
   );
 }

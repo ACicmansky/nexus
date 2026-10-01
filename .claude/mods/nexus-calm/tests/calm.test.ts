@@ -1,11 +1,11 @@
-// firstmate-calm under `claude plugin test`: the Calm toggle, its persisted per-home
+// nexus-calm under `claude plugin test`: the Calm toggle, its persisted per-home
 // preference, and the transcript rows Calm hides and restores.
 import { describe, expect, test, type Engine } from "claude-code/testing";
 import {
   assistantMessage,
   calmCommand,
   doorbell,
-  fromFirstmate,
+  fromNexus,
   HOME,
   isHidden,
   isStock,
@@ -154,7 +154,7 @@ describe("/calm", () => {
     expect(path!).toEndWith("/config/calm");
     expect(path!.startsWith(HOME)).toBe(false);
     // Three levels above the plugin folder: the tracked code root, above `.claude/`.
-    expect(path!).not.toContain("firstmate-calm/");
+    expect(path!).not.toContain("nexus-calm/");
     expect(path!).not.toContain("/.claude/");
     expect(path!).not.toContain("/mods/");
   });
@@ -169,23 +169,23 @@ describe("operational user rows", () => {
     operational("launch-brief", "# Task"),
     operational("branch-outcome", "note"),
     operational("watcher", "multi\nline\n\nbody"),
-    fromFirstmate("please look at the report"),
+    fromNexus("please look at the report"),
     // An unknown kind under the current prefix is the untyped legacy envelope.
-    "\u2063FIRSTMATE_OP: unknown shape",
+    "\u2063NEXUS_OP: unknown shape",
     "Run `bin/fm-session-start.sh` now, exactly once, before executing any other instructions.",
-    "FIRSTMATE WATCHER WAKE: signal: x\n\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.",
+    "NEXUS WATCHER WAKE: signal: x\n\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.",
     "\u2063Supervisor escalate (needs you)",
     // A current prefix with no readable kind or body is the untyped legacy envelope.
     operational("watcher", "").replace(/ $/, ""),
   ];
   const visibleTexts = [
     "hello there",
-    "'\u2063FIRSTMATE_OP: v1 watcher: quoted'",
-    "FIRSTMATE_OP: v1 watcher: ascii only",
-    "look: \u2063FIRSTMATE_OP: v1 watcher: text before the marker",
-    "[fm-from-firstmate]\u2063",
-    "\u2063FIRSTMATE_OP: ",
-    "FIRSTMATE WATCHER WAKE: \n\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.",
+    "'\u2063NEXUS_OP: v1 watcher: quoted'",
+    "NEXUS_OP: v1 watcher: ascii only",
+    "look: \u2063NEXUS_OP: v1 watcher: text before the marker",
+    "[fm-from-nexus]\u2063",
+    "\u2063NEXUS_OP: ",
+    "NEXUS WATCHER WAKE: \n\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.",
   ];
 
   test("hides every canonically classified operational input while on", async ($, on) => {
@@ -210,7 +210,7 @@ describe("operational user rows", () => {
   });
 
   // A harness that strips U+2063 from submitted prompts receives a plain doorbell naming
-  // a record that holds the envelope; only the record makes the row Firstmate's.
+  // a record that holds the envelope; only the record makes the row Nexus's.
   const inbox = `${HOME}/state/operational-inbox`;
   const backed = `${inbox}/1790000000-0123456789abcdef.msg`;
   const unbacked = `${inbox}/1790000000-fedcba9876543210.msg`;
@@ -219,7 +219,7 @@ describe("operational user rows", () => {
   test("hides a doorbell only when the record it names holds a current envelope", async ($, on) => {
     const { files, journal } = world(on, { preference: "on\n" });
     files.set(backed, operational("away-supervisor", "Supervisor escalate: done: PR 1"));
-    files.set(asciiRecord, "FIRSTMATE_OP: v1 away-supervisor: ascii only");
+    files.set(asciiRecord, "NEXUS_OP: v1 away-supervisor: ascii only");
     expect(isHidden(await $.ui.render(userMessage(doorbell(backed))))).toBe(true);
     expect(isStock(await $.ui.render(userMessage(doorbell(unbacked))))).toBe(true);
     expect(isStock(await $.ui.render(userMessage(doorbell(asciiRecord))))).toBe(true);

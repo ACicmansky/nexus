@@ -1,4 +1,4 @@
-// Firstmate Calm presentation policy for the Claude Code mod, kept free of the engine.
+// Nexus Calm presentation policy for the Claude Code mod, kept free of the engine.
 //
 // This module owns the decisions ../hooks/register.ts applies through `$`: where the
 // shared per-home Calm preference lives and how its value reads, which assistant text is
@@ -10,9 +10,9 @@
 // captain-facing contract and docs/configuration.md
 // the persisted preference schema. Everything here is pure so tests run it under Node.
 import {
-  classifyFirstmateOperationalText,
-  firstmateOperationalDoorbellPath,
-  firstmateOperationalRecordKind,
+  classifyNexusOperationalText,
+  nexusOperationalDoorbellPath,
+  nexusOperationalRecordKind,
 } from "./fm-operational-input.ts";
 import {
   CALM_PRESERVE_MIN_CHARS,
@@ -21,7 +21,7 @@ import {
 
 export { CALM_PRESERVE_MIN_CHARS } from "./fm-calm-preservation.ts";
 
-/** The environment variables that select the effective Firstmate home, as the mod reads them. */
+/** The environment variables that select the effective Nexus home, as the mod reads them. */
 export type CalmHomeEnvironment = {
   readonly FM_HOME?: string | undefined;
   readonly FM_ROOT_OVERRIDE?: string | undefined;
@@ -36,7 +36,7 @@ function parentDirectory(path: string): string {
 }
 
 /**
- * The tracked Firstmate code root the mod belongs to: three levels above the plugin
+ * The tracked Nexus code root the mod belongs to: three levels above the plugin
  * folder, whether Claude Code names it through `.claude/skills/<name>`,
  * `.agents/skills/<name>`, or its physical `.claude/mods/<name>` home, which all sit
  * at that same depth.
@@ -137,9 +137,9 @@ export function classifyRestoredTranscript(rows: readonly CalmSessionRow[]): {
   return { workingNotes: [...notes], finalReplies: [...finalReplies] };
 }
 
-/** Whether a user row's text is a canonically classified Firstmate operational input. */
+/** Whether a user row's text is a canonically classified Nexus operational input. */
 export function userTextIsOperational(text: string): boolean {
-  return classifyFirstmateOperationalText(text) !== undefined;
+  return classifyNexusOperationalText(text) !== undefined;
 }
 
 /**
@@ -148,10 +148,10 @@ export function userTextIsOperational(text: string): boolean {
  * alone proves nothing; `recordIsOperational` decides from the record's content.
  */
 export function userTextOperationalRecord(text: string): string | undefined {
-  return firstmateOperationalDoorbellPath(text);
+  return nexusOperationalDoorbellPath(text);
 }
 
 /** Whether a doorbell's record, as read (undefined when unreadable), holds a current envelope. */
 export function recordIsOperational(content: string | undefined): boolean {
-  return content !== undefined && firstmateOperationalRecordKind(content) !== undefined;
+  return content !== undefined && nexusOperationalRecordKind(content) !== undefined;
 }

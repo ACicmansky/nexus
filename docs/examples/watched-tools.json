@@ -1,8 +1,8 @@
 {
   "tools": [
     {
-      "name": "firstmate",
-      "git": { "repo": "/absolute/path/to/firstmate", "remote": "origin" }
+      "name": "nexus",
+      "git": { "repo": "/absolute/path/to/nexus", "remote": "origin" }
     },
     {
       "name": "agents-on-the-go",

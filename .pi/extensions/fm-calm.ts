@@ -1,4 +1,4 @@
-// Firstmate's home-persistent Pi transcript presentation toggle.
+// Nexus's home-persistent Pi transcript presentation toggle.
 //
 // Verified against Pi 0.81.1, 0.82.0, and 0.84.4, which expose built-in ToolDefinitions, per-slot
 // renderers, renderShell: "self", session_start replacement reasons, agent_start and
@@ -61,8 +61,8 @@ import {
 import {
   calmPresentationHides,
   calmPresentationIsActive,
-  FIRSTMATE_CALM_PRESENTATION_EVENT,
-  registerFirstmateSyntheticPresentation,
+  NEXUS_CALM_PRESENTATION_EVENT,
+  registerNexusSyntheticPresentation,
   setCalmPresentation,
   setCalmStockExportRendering,
 } from "./lib/fm-calm-visibility.ts";
@@ -119,7 +119,7 @@ function installCalmPresentationAdapter(name: string, install: () => void): void
     install();
   } catch (error) {
     const reason = error instanceof Error ? error.message : String(error);
-    console.error(`Firstmate Calm: ${name} presentation adapter unavailable, skipping. ${reason}`);
+    console.error(`Nexus Calm: ${name} presentation adapter unavailable, skipping. ${reason}`);
   }
 }
 
@@ -192,13 +192,13 @@ export default function (pi: ExtensionAPI) {
   };
 
   const publishPresentationState = (): void => {
-    pi.events.emit(FIRSTMATE_CALM_PRESENTATION_EVENT, {
+    pi.events.emit(NEXUS_CALM_PRESENTATION_EVENT, {
       active: calmPresentationIsActive(),
       stockExportRendering: exportRendering,
     });
   };
 
-  registerFirstmateSyntheticPresentation(pi);
+  registerNexusSyntheticPresentation(pi);
 
   // Every on-screen tool row Calm currently presents, keyed by the row-local state Pi
   // hands its render slots, so Calm can repaint exactly those rows without touching
@@ -236,7 +236,7 @@ export default function (pi: ExtensionAPI) {
     const standardShells = new WeakMap<object, StandardShellState>();
 
     if (!originalRenderCall || !originalRenderResult) {
-      throw new Error(`Firstmate calm mode requires both render slots for Pi built-in tool ${original.name}`);
+      throw new Error(`Nexus calm mode requires both render slots for Pi built-in tool ${original.name}`);
     }
 
     const shellStateFor = (
@@ -354,7 +354,7 @@ export default function (pi: ExtensionAPI) {
       registered = pi.getAllTools();
     } catch (error) {
       const reason = error instanceof Error ? error.message : String(error);
-      console.error(`Firstmate Calm: built-in ownership check unavailable, claiming every built-in unconditionally. ${reason}`);
+      console.error(`Nexus Calm: built-in ownership check unavailable, claiming every built-in unconditionally. ${reason}`);
       return [];
     }
     return wrappedBuiltIns.filter((tool) => {
@@ -379,11 +379,11 @@ export default function (pi: ExtensionAPI) {
     const names = contested.map((tool) => `"${tool.name}"`).join(", ");
     const plural = contested.length > 1;
     ui.notify(
-      `Firstmate Calm: the ${names} built-in tool${plural ? "s are" : " is"} already provided by another extension, so Calm may not fully function for ${plural ? "them" : "it"} this session.`,
+      `Nexus Calm: the ${names} built-in tool${plural ? "s are" : " is"} already provided by another extension, so Calm may not fully function for ${plural ? "them" : "it"} this session.`,
       "warning",
     );
     for (const tool of contested) {
-      console.error(`Firstmate Calm: skipped claiming built-in "${tool.name}" because another extension already owns it.`);
+      console.error(`Nexus Calm: skipped claiming built-in "${tool.name}" because another extension already owns it.`);
     }
   }
 
@@ -400,14 +400,14 @@ export default function (pi: ExtensionAPI) {
       registered = pi.getAllTools();
     } catch (error) {
       const reason = error instanceof Error ? error.message : String(error);
-      console.error(`Firstmate Calm: built-in ownership check unavailable. ${reason}`);
+      console.error(`Nexus Calm: built-in ownership check unavailable. ${reason}`);
       return;
     }
     for (const tool of wrappedBuiltIns) {
       const owner = registered.find((info) => info.name === tool.name)?.sourceInfo;
       if (owner && owner.source !== "builtin" && realpathOrSelf(owner.path) !== extensionRealFile) {
         console.error(
-          `Firstmate Calm: another extension (${owner.path}) also claimed the built-in "${tool.name}" tool and won; Calm's presentation for it is unavailable this session.`,
+          `Nexus Calm: another extension (${owner.path}) also claimed the built-in "${tool.name}" tool and won; Calm's presentation for it is unavailable this session.`,
         );
       }
     }
@@ -426,7 +426,7 @@ export default function (pi: ExtensionAPI) {
     workingShipAnimation.reset();
     applyWorkingPresentation(ctx.ui, true);
     ctx.ui.setHiddenThinkingLabel(calmPresentationIsActive() ? "" : undefined);
-    ctx.ui.setStatus("firstmate-calm", undefined);
+    ctx.ui.setStatus("nexus-calm", undefined);
     removeTerminalInputHandler?.();
     removeTerminalInputHandler = ctx.ui.onTerminalInput((data) => {
       if (!getKeybindings().matches(data, "tui.input.submit")) return undefined;
@@ -457,7 +457,7 @@ export default function (pi: ExtensionAPI) {
         // rows that consult Calm live in render(), such as operational user rows,
         // need without appending anything to the transcript.
         repaintCalmToolRows();
-        ctx.ui.setStatus("firstmate-calm", undefined);
+        ctx.ui.setStatus("nexus-calm", undefined);
       }, 0);
       return undefined;
     });
@@ -480,7 +480,7 @@ export default function (pi: ExtensionAPI) {
   });
 
   pi.registerCommand("calm", {
-    description: "Toggle Firstmate's supported conversation-only transcript presentation.",
+    description: "Toggle Nexus's supported conversation-only transcript presentation.",
     handler: async (_args, ctx) => {
       const active = !calmPresentationIsActive();
       persistCalmPreference(active);
@@ -491,7 +491,7 @@ export default function (pi: ExtensionAPI) {
       // Pi re-runs every assistant row's layout from this call even when the label is
       // unchanged, which is what makes a toggle apply to rows already on screen.
       ctx.ui.setHiddenThinkingLabel(active ? "" : undefined);
-      ctx.ui.setStatus("firstmate-calm", undefined);
+      ctx.ui.setStatus("nexus-calm", undefined);
       refreshCalmPendingOperationalRows();
 
       const expanded = ctx.ui.getToolsExpanded();

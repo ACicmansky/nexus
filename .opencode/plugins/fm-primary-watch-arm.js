@@ -1,7 +1,7 @@
 import { spawn, spawnSync } from "node:child_process";
 import { existsSync, readFileSync, readdirSync, realpathSync } from "node:fs";
 import { resolve } from "node:path";
-import { encodeFirstmateOperationalInput } from "./lib/fm-operational-input.js";
+import { encodeNexusOperationalInput } from "./lib/fm-operational-input.js";
 
 // Supervision host: a home opted in with config/supervision-host
 // (docs/configuration.md "Supervision host" owns the gate, which
@@ -14,7 +14,7 @@ import { encodeFirstmateOperationalInput } from "./lib/fm-operational-input.js";
 // line as soon as it is verified, so readiness and the handling handoff work
 // as they do for the arm, with a longer readiness budget for the host's own
 // startup. On a home that does not run the host nothing below changes.
-const COORDINATOR_KEY = "__firstmateOpenCodeWatchArm";
+const COORDINATOR_KEY = "__nexusOpenCodeWatchArm";
 // 35s on Windows so the budget stays above arm's MSYS confirm default (30s in
 // bin/fm-watch-arm.sh): a slow but successful Git Bash cold start must not be
 // SIGTERMed mid-confirmation. Conditioned on win32 so other platforms keep 12s.
@@ -247,7 +247,7 @@ function observeArmOutput(hostMode, stdout, stderr, settleReadiness) {
 }
 
 async function sendPrompt(paths, client, sessionID, text) {
-  const encoded = await encodeFirstmateOperationalInput(paths.root, "watcher", text);
+  const encoded = await encodeNexusOperationalInput(paths.root, "watcher", text);
   await client.session.promptAsync({
     path: { id: sessionID },
     body: {

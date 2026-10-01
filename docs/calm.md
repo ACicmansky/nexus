@@ -1,6 +1,6 @@
 # Calm mode
 
-Calm is Firstmate's conversation-only transcript presentation toggle.
+Calm is Nexus's conversation-only transcript presentation toggle.
 This page is for operators who turn Calm on and need to know what it hides and keeps visible on Pi and on Claude Code, and which file owns each part of that behavior.
 
 ## Harness support and default
@@ -11,7 +11,7 @@ This page is for operators who turn Calm on and need to know what it hides and k
 | Claude Code | Available behind that harness's default-off early-access function-hooks flag, as the [Claude Code](#claude-code) section below describes. |
 
 Calm is off by default.
-The last `/calm` choice persists for the effective Firstmate home across session starts and resumes on either harness.
+The last `/calm` choice persists for the effective Nexus home across session starts and resumes on either harness.
 Both harnesses keep that choice in the one shared preference file that [`configuration.md`](configuration.md#calm-preference-configcalm) owns.
 
 ## Shared preservation rule for assistant text
@@ -66,8 +66,8 @@ Calm hides these rows:
 - Collapsed thinking labels.
 - The mid-turn assistant working-note blocks governed by the [shared preservation rule](#shared-preservation-rule-for-assistant-text) above.
 - The shells for the Pi built-in tool names Calm owns.
-- Firstmate-owned tool shells listed in the [Pi tool audit](calm-mode-feasibility.md#firstmate-pi-tool-audit).
-- Canonically classified Firstmate operational user rows.
+- Nexus-owned tool shells listed in the [Pi tool audit](calm-mode-feasibility.md#nexus-pi-tool-audit).
+- Canonically classified Nexus operational user rows.
 
 Pi applies the preservation rule independently to each text block.
 A short working note can therefore hide beside preserved substantive content in the same message.
@@ -80,14 +80,14 @@ The operational inputs Calm classifies remain ordinary user-role messages.
 Pi's transcript layout renders their complete rows at zero height.
 The session-start nudge remains on its existing non-displayed custom-message path.
 
-### Queued Firstmate inputs on Pi
+### Queued Nexus inputs on Pi
 
-While a turn runs, Calm also keeps those Firstmate inputs out of Pi's queued-message listing.
+While a turn runs, Calm also keeps those Nexus inputs out of Pi's queued-message listing.
 The captain's own queued messages stay listed.
 Escape and the dequeue key return only the captain's queued messages to the editor.
-Hidden Firstmate inputs stay queued in their original order and are never shown as raw text or dropped.
-When Escape, or navigating the session tree, stops a run with Firstmate inputs still queued, Pi either drains them itself or Calm starts one new turn to deliver them.
-When Calm starts that turn, it shows the one-line notice `Firstmate supervision continues in a new turn.`
+Hidden Nexus inputs stay queued in their original order and are never shown as raw text or dropped.
+When Escape, or navigating the session tree, stops a run with Nexus inputs still queued, Pi either drains them itself or Calm starts one new turn to deliver them.
+When Calm starts that turn, it shows the one-line notice `Nexus supervision continues in a new turn.`
 Inputs held behind a running compaction stay there until Pi sends them after compaction, so they start and announce no turn of their own.
 
 ### What stays unchanged on Pi
@@ -95,7 +95,7 @@ Inputs held behind a running compaction stay there until Pi sends them after com
 Outside Pi's same-name built-in override collision described in [Pi compatibility](#pi-compatibility) below, Calm changes presentation only.
 Calm's built-in wrappers preserve Pi's execution behavior.
 Input delivery, ordering, model context, session storage, diagnostics, and `/export` and `/share` operation remain unchanged.
-Every hidden Firstmate input remains available to the model and in serialized session data and exported artifacts.
+Every hidden Nexus input remains available to the model and in serialized session data and exported artifacts.
 Legacy operational custom messages remain in session data and Pi's sidebar tree; depending on the Pi version, the main HTML transcript either omits them or includes them as rows hidden by default.
 Toggling Calm off restores ordinary rendering, and `Ctrl+O` expansion state is preserved.
 
@@ -156,10 +156,10 @@ How Calm handles that shared slot depends on whether Calm was already on when th
 - [`calm-mode-feasibility.md`](calm-mode-feasibility.md) owns the version-scoped renderer taxonomy, built-in override constraints, and empirical evidence.
 - [`configuration.md`](configuration.md#calm-preference-configcalm) owns the persisted preference file and resolution rules.
 - `.pi/extensions/lib/fm-calm-visibility.ts` owns the visibility policy.
-- `.claude/mods/firstmate-calm/lib/fm-calm-preservation.ts` owns the shared substantive mid-turn text rule, which Pi imports through its tracked symlink.
+- `.claude/mods/nexus-calm/lib/fm-calm-preservation.ts` owns the shared substantive mid-turn text rule, which Pi imports through its tracked symlink.
 - `.pi/extensions/lib/fm-calm-operational-user-layout.ts` owns the zero-height operational-user row adapter.
 - `.pi/extensions/lib/fm-calm-pending-operational-layout.ts` owns the queued-row adapter and its session capability check.
-- `.pi/extensions/lib/fm-calm-working-ship.ts` owns Pi's animated working presentation over the sprite geometry both harnesses share in `.claude/mods/firstmate-calm/lib/fm-calm-working-ship-sprite.ts`.
+- `.pi/extensions/lib/fm-calm-working-ship.ts` owns Pi's animated working presentation over the sprite geometry both harnesses share in `.claude/mods/nexus-calm/lib/fm-calm-working-ship-sprite.ts`.
 
 ### Pi regression entry points
 
@@ -175,16 +175,16 @@ FM_PI_LIVE_E2E=1 tests/fm-pi-primary-live-e2e.test.sh
 
 ### The Calm mod
 
-Calm on Claude Code is the mod under `.claude/mods/firstmate-calm`, whose plugin name is `fm`.
+Calm on Claude Code is the mod under `.claude/mods/nexus-calm`, whose plugin name is `fm`.
 The mod is a Claude Code plugin whose whole behavior lives in one function-hooks module.
-The trusted project auto-loads the mod through the `.claude/skills/firstmate-calm` entry (a symlink into `.claude/mods`), so no `--plugin-dir` or marketplace install is needed.
+The trusted project auto-loads the mod through the `.claude/skills/nexus-calm` entry (a symlink into `.claude/mods`), so no `--plugin-dir` or marketplace install is needed.
 
 ### Enabling function hooks
 
 Claude Code's early-access function-hooks surface is off by default.
 Claude Code can load modules through its rollout flag, or per session with `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS=1`.
 The mod independently requires that environment variable to equal `1` before doing anything.
-Firstmate never sets that flag in any project or user settings.
+Nexus never sets that flag in any project or user settings.
 Enabling it is each captain's own explicit opt-in.
 
 Without that exact value, the mod is a complete no-op, even if Claude Code's rollout flag loads the module:
@@ -240,7 +240,7 @@ A home whose outcome store predates the copy gains one at its next locked sessio
 On later reads, if the copy skips sequence numbers since the last seen outcome, one line counts the missing outcomes.
 The display copy's row and byte bounds are owned by [`fm-branch-outcome.sh`](../bin/fm-branch-outcome.sh); older outcomes and oversized rows cannot always be displayed by the mod, while the outcome store and main's delivery remain authoritative.
 Claude Code keeps each note in the session as a display-only entry and restores it on `claude --continue`, so the mod remembers in its own plugin store how far each session has followed the outcomes, and a resumed session replays only outcomes it has not shown.
-Claude Code keys that store by plugin name, so a session that showed notes before the plugin was renamed from `firstmate-calm` to `fm` and is resumed afterwards replays its still-due notes once.
+Claude Code keys that store by plugin name, so a session that showed notes before the plugin was renamed from `nexus-calm` to `fm` and is resumed afterwards replays its still-due notes once.
 The mod only reads outcome and host state: the drain owns off-Pi read-cursor advancement, and main explicitly acknowledges captain outcomes as processed.
 Only a home that runs the supervision host has outcomes to show.
 
@@ -250,8 +250,8 @@ Tool rows, tool result blocks, and folded tool groups draw at zero height, so a 
 
 A user row draws at zero height when the canonical operational-input parser recognizes its text as one of these:
 
-- A Firstmate session-start, watcher, turn-end guard, away-supervisor, launch-brief, or branch-outcome envelope.
-- A from-firstmate routed message.
+- A Nexus session-start, watcher, turn-end guard, away-supervisor, launch-brief, or branch-outcome envelope.
+- A from-nexus routed message.
 - One of the narrow pre-protocol shapes kept for old transcripts.
 
 Other user rows, including near misses such as a quoted or ASCII-only marker, stay visible unless backed by an operational record as the next section describes.
@@ -261,12 +261,12 @@ Assistant text follows the [shared per-block preservation rule](#shared-preserva
 ### Record-backed operational doorbell
 
 Claude Code removes the U+2063 that starts those envelopes from every submitted prompt.
-Because of that, Firstmate delivers its away-mode escalations to a Claude Code primary as the record-backed doorbell `bin/fm-operational-input.sh` owns.
+Because of that, Nexus delivers its away-mode escalations to a Claude Code primary as the record-backed doorbell `bin/fm-operational-input.sh` owns.
 The doorbell is a plain line naming a record under the home's `state/operational-inbox` that holds the envelope.
 
 Calm reads that record through the mod's file API and hides the doorbell row only when the record holds a current envelope.
 A doorbell-shaped line naming no such record therefore stays visible.
-A verbatim copy of a live doorbell line, pasted back while its record still exists, is treated as Firstmate's and hides.
+A verbatim copy of a live doorbell line, pasted back while its record still exists, is treated as Nexus's and hides.
 Record verdicts are cached until a drawing invalidation (including a `/calm` toggle), which rechecks pruned records on redraw.
 
 ### What stays unchanged on Claude Code
@@ -283,7 +283,7 @@ Evidence for 2.1.280 and the record-backed doorbell is also in its [2026-09-25 r
 - The function-hooks surface is early access and default-off.
   Claude Code states that its API may change between releases without notice.
   The mod is verified on Claude Code 2.1.272, 2.1.280, 2.1.282, 2.1.283, and 2.1.284 and refuses nothing newer.
-- Firstmate's typed producers bound for a Claude Code pane ride the record-backed doorbell, so they hide like any operational row.
+- Nexus's typed producers bound for a Claude Code pane ride the record-backed doorbell, so they hide like any operational row.
   Those producers are the away-mode daemon's escalations and a worker's launch brief.
   Only an envelope that reaches Claude Code some other way, as bare typed or launch-prompt text, arrives without its U+2063 and stays visible.
 - Every record write prunes operational-inbox records once they reach about seven days of elapsed age (the boundary is approximate).

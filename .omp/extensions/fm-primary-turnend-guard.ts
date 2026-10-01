@@ -1,4 +1,4 @@
-// Firstmate turn-end guard, pre-tool seatbelts, and native session-start
+// Nexus turn-end guard, pre-tool seatbelts, and native session-start
 // delivery for the omp (Oh My Pi) primary.
 //
 // A port of .pi/extensions/fm-primary-turnend-guard.ts with the turn-end
@@ -34,8 +34,8 @@ import { fileURLToPath } from "node:url";
 // Shared with the Pi extensions; the owner resolves bin/fm-operational-input.sh
 // relative to its own location, which is this same repository root.
 import {
-  classifyFirstmateCurrentOperationalText,
-  encodeFirstmateOperationalInput,
+  classifyNexusCurrentOperationalText,
+  encodeNexusOperationalInput,
 } from "../../.pi/extensions/lib/fm-operational-input.ts";
 
 // The omp extension API surface this file uses, declared locally: omp ships no
@@ -129,7 +129,7 @@ type SessionstartResult =
   | { kind: "ready"; raw: string }
   | { kind: "empty" | "failed" | "ineligible" | "cancelled" };
 type SessionstartMessage = {
-  customType: "firstmate-sessionstart-nudge";
+  customType: "nexus-sessionstart-nudge";
   content: string;
   display: false;
   details: { kind: "session-start" };
@@ -429,11 +429,11 @@ function sessionstartMessage(
   try {
     // The wrapper already returns an encoded nudge on a context-preserving
     // open, so only an unencoded digest or fallback needs the marker added.
-    const content = classifyFirstmateCurrentOperationalText(raw)
+    const content = classifyNexusCurrentOperationalText(raw)
       ? raw
-      : encodeFirstmateOperationalInput("session-start", raw);
+      : encodeNexusOperationalInput("session-start", raw);
     return {
-      customType: "firstmate-sessionstart-nudge",
+      customType: "nexus-sessionstart-nudge",
       content,
       display: false,
       details: { kind: "session-start" },
@@ -602,7 +602,7 @@ export default function (pi: ExtensionAPI) {
     if (result.code !== 2) return undefined;
     let content: string;
     try {
-      content = encodeFirstmateOperationalInput(
+      content = encodeNexusOperationalInput(
         "turn-end-guard",
         "TURN WOULD END BLIND - supervision is off. " +
           "The watcher cycle is missing, failed, or unhealthy. Follow the harness recovery instruction below before ending the turn.\n\n" +

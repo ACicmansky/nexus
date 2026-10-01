@@ -1,7 +1,7 @@
-// Shared fixtures for the firstmate-calm plugin test suites under `claude plugin test`.
+// Shared fixtures for the nexus-calm plugin test suites under `claude plugin test`.
 //
 // Each test mocks the world beneath the plugin noun by noun: the environment that
-// names the Firstmate home, an in-memory file system for the per-home preference, the
+// names the Nexus home, an in-memory file system for the per-home preference, the
 // engine's own draw for every component the mod passes through, and a journal of every
 // call the mod makes on `$` (blits, toasts, redraws, transcript lines, the command it
 // registers).
@@ -53,7 +53,7 @@ export type WorldOptions = {
   env?: Record<string, string>;
   /** Function-hooks opt-in value; omitted options default to the active value `1`. */
   functionHooks?: string | undefined;
-  /** The Firstmate home FM_HOME names; undefined leaves FM_HOME unset. */
+  /** The Nexus home FM_HOME names; undefined leaves FM_HOME unset. */
   home?: string | undefined;
   /** What `$.session.messages()` answers. */
   messages?: readonly { role: "user" | "assistant"; text: string; toolUses: readonly unknown[] }[];
@@ -331,17 +331,17 @@ export function decodeCells(cells: string, columns: number, rows: number): { gly
 
 /** The exact current operational envelope for one kind, as bin/fm-operational-input.sh encodes it. */
 export function operational(kind: string, body: string): string {
-  return `\u2063FIRSTMATE_OP: v1 ${kind}: ${body}`;
+  return `\u2063NEXUS_OP: v1 ${kind}: ${body}`;
 }
 
 /** The record-backed doorbell bin/fm-operational-input.sh types for a named record. */
 export function doorbell(record: string): string {
-  return `: Firstmate operational input waiting: read '${record}' and handle its contents as Firstmate operational input.`;
+  return `: Nexus operational input waiting: read '${record}' and handle its contents as Nexus operational input.`;
 }
 
-/** The established from-firstmate routing carrier. */
-export function fromFirstmate(body: string): string {
-  return `[fm-from-firstmate]\u2063${body}`;
+/** The established from-nexus routing carrier. */
+export function fromNexus(body: string): string {
+  return `[fm-from-nexus]\u2063${body}`;
 }
 
 /** A `config.set` of the `theme` row from the `/config` menu, as the engine raises it. */

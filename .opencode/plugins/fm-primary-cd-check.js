@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { spawn } from "node:child_process";
 
 // PreToolUse seatbelt for OpenCode: block a stray persistent top-level `cd` in
-// the primary firstmate checkout before the agent's bash tool relocates the
+// the primary nexus checkout before the agent's bash tool relocates the
 // shell out of the home (see bin/fm-cd-pretool-check.sh and docs/cd-guard.md).
 // This mirrors fm-primary-pretool-check.js, calling the cd-guard owner instead
 // of the watcher-arm one. tool.execute.before can block by throwing (verified

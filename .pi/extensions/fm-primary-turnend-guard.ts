@@ -5,9 +5,9 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import {
-  classifyFirstmateCurrentOperationalText,
-  encodeFirstmateOperationalInput,
-  firstmateShellInvocation,
+  classifyNexusCurrentOperationalText,
+  encodeNexusOperationalInput,
+  nexusShellInvocation,
 } from "./lib/fm-operational-input.ts";
 
 let guardFollowupActive = false;
@@ -113,7 +113,7 @@ type SessionstartResult =
   | { kind: "ready"; raw: string }
   | { kind: "empty" | "failed" | "ineligible" | "cancelled" };
 type SessionstartMessage = {
-  customType: "firstmate-sessionstart-nudge";
+  customType: "nexus-sessionstart-nudge";
   content: string;
   display: false;
   details: { kind: "session-start" };
@@ -264,7 +264,7 @@ function runSessionstartHook(generation: SessionstartGeneration): Promise<Sessio
             "--pi-prerequisite",
           ],
         }
-      : firstmateShellInvocation(
+      : nexusShellInvocation(
           runner,
           ["--source", generation.source, "--pi-prerequisite"],
         );
@@ -418,11 +418,11 @@ function sessionstartMessage(
   try {
     // The wrapper already returns an encoded nudge on a context-preserving
     // open, so only an unencoded digest or fallback needs the marker added.
-    const content = classifyFirstmateCurrentOperationalText(raw)
+    const content = classifyNexusCurrentOperationalText(raw)
       ? raw
-      : encodeFirstmateOperationalInput("session-start", raw);
+      : encodeNexusOperationalInput("session-start", raw);
     return {
-      customType: "firstmate-sessionstart-nudge",
+      customType: "nexus-sessionstart-nudge",
       content,
       display: false,
       details: { kind: "session-start" },
@@ -448,7 +448,7 @@ async function claimSessionstartMessage(
 
 function runGuard(): Promise<{ code: number; stderr: string }> {
   return new Promise((resolveResult) => {
-    const invocation = firstmateShellInvocation(`${root}/bin/fm-turnend-guard.sh`, []);
+    const invocation = nexusShellInvocation(`${root}/bin/fm-turnend-guard.sh`, []);
     let child: ChildProcess;
     try {
       child = spawn(invocation.command, invocation.args, {
@@ -478,7 +478,7 @@ function runGuard(): Promise<{ code: number; stderr: string }> {
 // script owns its own decision and is inert outside the real primary checkout.
 function runChecker(script: string, command: string): Promise<{ code: number; stderr: string }> {
   return new Promise((resolveResult) => {
-    const invocation = firstmateShellInvocation(
+    const invocation = nexusShellInvocation(
       `${root}/bin/${script}`,
       ["--command", command],
     );
@@ -611,7 +611,7 @@ export default function (pi: ExtensionAPI) {
 
     guardFollowupActive = true;
     try {
-      const content = encodeFirstmateOperationalInput(
+      const content = encodeNexusOperationalInput(
         "turn-end-guard",
         "TURN WOULD END BLIND - supervision is off. " +
           "The watcher cycle is missing, failed, or unhealthy. Follow the harness recovery instruction below before ending the turn.\n\n" +

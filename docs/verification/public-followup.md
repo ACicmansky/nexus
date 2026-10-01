@@ -2,7 +2,7 @@
 
 Audience: maintainer verification.
 
-This record supports seven active guarantees for promised public replies made through the myfirstmate relay:
+This record supports seven active guarantees for promised public replies made through the mynexus relay:
 
 1. A promised final reply survives compaction and restart, reconciles from disk alone, and lands in the original thread exactly once.
 2. A home that never opted into the relay pays nothing for any of it.
@@ -102,7 +102,7 @@ ok - empty reachable remote collection remains a healthy no-op
 ok - remote brief rejects traversal and empty route path components
 ok - a local work home's emit path is unchanged
 ok - a duplicate report from a remote work home stays a no-op
-ok - staging requires the matching secondmate firstmate home
+ok - staging requires the matching secondmate nexus home
 ```
 
 The restart case is the end-to-end proof of guarantee 1.
@@ -141,7 +141,7 @@ It leaves the remote state directory WRITABLE, so the refusal can only come from
 The writability precondition narrows the wedge window but cannot close it, because the parent can turn non-writable between that check and lock creation and a live holder is indistinguishable from it at the acquire; the ordinary unbounded wait retries forever, so before the bounded acquire this path hung with nothing reported instead of returning the reconciliation refusal.
 The case asserts the refusal, the retained registration, the absent receipt, the untouched remote link, and that the call returns at all, which is the observable difference from a wait that never ends.
 The final case makes the transport unreachable and asserts the close is refused with the registration retained, the remote link untouched, and unknown completion named rather than reported as a definite failure.
-A remote home running an older Firstmate copy does not recognize the guarded clear flag and therefore fails closed through the same retained-for-reconciliation message; operators must update that home before retrying, and there is deliberately no unguarded fallback.
+A remote home running an older Nexus copy does not recognize the guarded clear flag and therefore fails closed through the same retained-for-reconciliation message; operators must update that home before retrying, and there is deliberately no unguarded fallback.
 
 ## Reporting a terminal result from a remote work home
 

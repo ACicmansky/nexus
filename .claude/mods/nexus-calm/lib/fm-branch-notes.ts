@@ -1,4 +1,4 @@
-// Firstmate supervision notes for the Claude Code mod, kept free of the engine.
+// Nexus supervision notes for the Claude Code mod, kept free of the engine.
 //
 // Pi renders each supervision outcome in the transcript: a sailboat note for a visible
 // routine outcome and a sequence-keyed anchor entry for a captain outcome
@@ -16,7 +16,7 @@ export const BRANCH_NOTES_REPLAY_LIMIT = 20;
 /** How many sessions' last shown sequence the mod's store keeps, newest kept. */
 export const BRANCH_NOTES_SESSIONS_KEPT = 20;
 
-export type FirstmateStateEnvironment = {
+export type NexusStateEnvironment = {
   readonly FM_HOME?: string | undefined;
   readonly FM_ROOT_OVERRIDE?: string | undefined;
   readonly FM_STATE_OVERRIDE?: string | undefined;
@@ -32,7 +32,7 @@ export type OutcomeRow = {
 };
 
 /** The home's state directory, resolved as the Pi extension resolves it. */
-export function firstmateStateDirectory(env: FirstmateStateEnvironment, pluginRoot: string): string {
+export function nexusStateDirectory(env: NexusStateEnvironment, pluginRoot: string): string {
   return env.FM_STATE_OVERRIDE || `${env.FM_HOME || env.FM_ROOT_OVERRIDE || calmCodeRootFromPluginRoot(pluginRoot)}/state`;
 }
 

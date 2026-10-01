@@ -1,4 +1,4 @@
-// Firstmate primary watcher bridge for omp (Oh My Pi).
+// Nexus primary watcher bridge for omp (Oh My Pi).
 //
 // A port of .pi/extensions/fm-primary-pi-watch.ts for the omp fork. The arm,
 // successor, retry, and replacement-handoff logic follows the Pi contract;
@@ -68,7 +68,7 @@ import { Type } from "typebox";
 // The operational-input encoder is shared with the omp extensions; its owner
 // resolves bin/fm-operational-input.sh relative to its own location, which is
 // the same repository root this file lives in.
-import { encodeFirstmateOperationalInput } from "../../.pi/extensions/lib/fm-operational-input.ts";
+import { encodeNexusOperationalInput } from "../../.pi/extensions/lib/fm-operational-input.ts";
 
 // The omp extension API surface this file uses. omp is a Pi fork and ships no
 // separately installable type package, so the contract is declared locally
@@ -177,10 +177,10 @@ type ReplacementCoordinator = {
   deliveries: Map<string, ActionableDeliveryClaim>;
 };
 type ReplacementCoordinatorGlobal = typeof globalThis & {
-  __firstmateOmpWatchReplacements?: Map<string, ReplacementCoordinator>;
+  __nexusOmpWatchReplacements?: Map<string, ReplacementCoordinator>;
 };
 const replacementCoordinatorGlobal = globalThis as ReplacementCoordinatorGlobal;
-const replacementCoordinators = replacementCoordinatorGlobal.__firstmateOmpWatchReplacements ??= new Map<string, ReplacementCoordinator>();
+const replacementCoordinators = replacementCoordinatorGlobal.__nexusOmpWatchReplacements ??= new Map<string, ReplacementCoordinator>();
 function replacementCoordinatorFor(handoff: string): ReplacementCoordinator {
   const existing = replacementCoordinators.get(handoff);
   if (existing) return existing;
@@ -566,9 +566,9 @@ export default function (pi: ExtensionAPI) {
     pending?: PendingActionableClose,
   ): Promise<boolean> {
     if (!generationIsLive(owner)) return false;
-    const content = encodeFirstmateOperationalInput(
+    const content = encodeNexusOperationalInput(
       "watcher",
-      `FIRSTMATE WATCHER WAKE: ${message}\n\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.`,
+      `NEXUS WATCHER WAKE: ${message}\n\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.`,
     );
     if (pending) owner.unconsumedWakes.set(pending.token, { content, pending });
     try {
@@ -937,7 +937,7 @@ export default function (pi: ExtensionAPI) {
   function startArm(owner: SessionGeneration, predecessorArmPid = ""): ArmResult {
     if (!generationIsLive(owner)) return { ok: false, message: shuttingDownMessage };
     const ownership = lockOwnership();
-    if (ownership === "other") return { ok: false, message: "watcher: read-only - session lock is held by another firstmate session" };
+    if (ownership === "other") return { ok: false, message: "watcher: read-only - session lock is held by another nexus session" };
     if (ownership === "missing") {
       return {
         ok: false,
@@ -1123,7 +1123,7 @@ export default function (pi: ExtensionAPI) {
   });
 
   pi.registerCommand?.("fm-watch-arm-omp", {
-    description: "Arm firstmate watcher supervision through the omp extension instead of foreground bash.",
+    description: "Arm nexus watcher supervision through the omp extension instead of foreground bash.",
     handler: async (_args, ctx) => {
       const result = activateOwnedWatch(generation);
       ctx?.ui?.notify?.(result.message, result.ok ? "info" : "warning");
@@ -1132,7 +1132,7 @@ export default function (pi: ExtensionAPI) {
 
   pi.registerTool?.({
     name: "fm_watch_arm_omp",
-    label: "Arm firstmate watcher",
+    label: "Arm nexus watcher",
     description: "Start the first required omp watcher cycle, or repair one only after a notification says the cycle is missing, failed, or unhealthy. Do not call after ordinary work or ordinary notifications; the omp extension re-arms automatically. Never run bin/fm-watch-arm.sh through bash.",
     promptSnippet: "Start the first required omp watcher cycle or repair a cycle reported missing, failed, or unhealthy; ordinary re-arming is automatic.",
     promptGuidelines: [

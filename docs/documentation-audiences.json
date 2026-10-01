@@ -35,7 +35,7 @@
   ],
   "requiredOwnerPointers": [
     {
-      "source": ".agents/skills/firstmate-coding-guidelines/SKILL.md",
+      "source": ".agents/skills/nexus-coding-guidelines/SKILL.md",
       "target": "docs/documentation-audiences.md"
     },
     {
@@ -141,15 +141,15 @@
       "audience": "agent-runtime"
     },
     {
-      "path": ".agents/skills/firstmate-codexapp/SKILL.md",
+      "path": ".agents/skills/nexus-codexapp/SKILL.md",
       "audience": "agent-runtime"
     },
     {
-      "path": ".agents/skills/firstmate-coding-guidelines/SKILL.md",
+      "path": ".agents/skills/nexus-coding-guidelines/SKILL.md",
       "audience": "agent-runtime"
     },
     {
-      "path": ".agents/skills/firstmate-orca/SKILL.md",
+      "path": ".agents/skills/nexus-orca/SKILL.md",
       "audience": "agent-runtime"
     },
     {
@@ -257,7 +257,7 @@
       "audience": "agent-runtime"
     },
     {
-      "path": ".agents/skills/updatefirstmate/SKILL.md",
+      "path": ".agents/skills/updatenexus/SKILL.md",
       "audience": "agent-runtime"
     },
     {
@@ -345,7 +345,7 @@
       "audience": "operator-example"
     },
     {
-      "path": "docs/examples/process-event-extension/firstmate-extension.json",
+      "path": "docs/examples/process-event-extension/nexus-extension.json",
       "audience": "operator-example"
     },
     {

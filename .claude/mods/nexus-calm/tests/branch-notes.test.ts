@@ -1,4 +1,4 @@
-// firstmate-calm under `claude plugin test`: the supervision notes, one dim transcript
+// nexus-calm under `claude plugin test`: the supervision notes, one dim transcript
 // line per outcome the store's tail copy gains and per latch change, replayed at session
 // start, shown whether Calm is on or off, and never marking anything read.
 import { describe, expect, test } from "claude-code/testing";

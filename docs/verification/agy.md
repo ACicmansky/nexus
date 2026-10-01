@@ -1,6 +1,6 @@
 # Verification: the agy (Antigravity CLI) crewmate/scout adapter
 
-Active empirical facts for firstmate's agy adapter.
+Active empirical facts for nexus's agy adapter.
 The skill tree rooted at [`.agents/skills/harness-adapters/SKILL.md`](../../.agents/skills/harness-adapters/SKILL.md) owns the operating facts through [`references/harness/agy.md`](../../.agents/skills/harness-adapters/references/harness/agy.md); this record owns how they were established and what is still unproven.
 
 ## Subject
@@ -11,9 +11,9 @@ The skill tree rooted at [`.agents/skills/harness-adapters/SKILL.md`](../../.age
 | Verified | 2026-09-10 |
 | Binary | `/home/andpod/.local/bin/agy`, an ELF 64-bit Go-compiled single executable |
 | Platform | Linux x64 (Arch, kernel 7.2.3) |
-| Backend | Herdr, in an isolated non-`default` lab session (`fm-lab-firstmate-agy-ad-*` via `bin/fm-herdr-lab.sh`); the live `default` session was unchanged throughout |
+| Backend | Herdr, in an isolated non-`default` lab session (`fm-lab-nexus-agy-ad-*` via `bin/fm-herdr-lab.sh`); the live `default` session was unchanged throughout |
 
-Every command below ran inside the disposable firstmate task worktree or the named Herdr lab session.
+Every command below ran inside the disposable nexus task worktree or the named Herdr lab session.
 No captain fleet state was touched.
 
 ## Detection: ancestry only, no marker
@@ -46,7 +46,7 @@ A first launch in a fresh worktree shows this dialog:
 ```
 Accessing workspace:
 
-/home/andpod/.treehouse/firstmate-7bab20/1/firstmate/agy-probe-tmp
+/home/andpod/.treehouse/nexus-7bab20/1/nexus/agy-probe-tmp
 
 Do you trust the contents of this project?
 
@@ -127,7 +127,7 @@ Sending `/quit` plus Enter exited the process; the pane closed under the `exec` 
 ## Backend liveness: Herdr recognizes agy, tmux names it
 
 ```
-$ herdr agent get w2:p1 --session fm-lab-firstmate-agy-ad-1599574-8823
+$ herdr agent get w2:p1 --session fm-lab-nexus-agy-ad-1599574-8823
 {"result":{"agent":{"agent":"agy","agent_status":"idle",...,"agent_session":{"agent":"agy","kind":"id","source":"herdr:antigravity_cli",...}}}}
 ```
 

@@ -1,4 +1,4 @@
-// Firstmate's harness-neutral Calm working-ship sprite.
+// Nexus's harness-neutral Calm working-ship sprite.
 //
 // This module owns the sprite geometry, the bounce track, the two linked animation
 // cadences, and the freeze/resume state that every Calm working presentation shares.

@@ -1,11 +1,11 @@
 # Remote second mates
 
-This page covers how to set up, provision, run, and retire a second mate whose Firstmate home lives on another host.
+This page covers how to set up, provision, run, and retire a second mate whose Nexus home lives on another host.
 It is for operators who run a remote second mate and for anyone checking its transport and safety behavior.
 
-Remote second mates place a whole persistent Firstmate home on another SSH-reachable host.
+Remote second mates place a whole persistent Nexus home on another SSH-reachable host.
 The primary still owns routing and supervision, while the remote home owns its own projects, backlog, and workers.
-Firstmate does not support placing an individual worker remotely or failing a remote route over to a local replacement.
+Nexus does not support placing an individual worker remotely or failing a remote route over to a local replacement.
 
 ## Find a topic
 
@@ -37,7 +37,7 @@ Every path that provisions or launches one refuses a host that is not ready for 
 
 1. Configure an SSH alias in the primary account's normal OpenSSH configuration.
 2. Use ordinary public-key authentication, strict host-key verification, and a dedicated remote account where practical.
-3. Do not enable agent forwarding for Firstmate.
+3. Do not enable agent forwarding for Nexus.
 
 `fm-on.sh` adds its own protections:
 
@@ -48,12 +48,12 @@ Its [script header](../bin/fm-on.sh) owns the keepalive defaults and environment
 
 ### Remote clone and entrypoint
 
-1. Clone Firstmate on the remote host at an absolute code-root path.
+1. Clone Nexus on the remote host at an absolute code-root path.
 2. Expose that clone's fixed entrypoint on the account's non-interactive SSH `PATH`, for example:
 
 ```sh
 mkdir -p ~/.local/bin
-ln -s /absolute/path/to/firstmate/bin/fm-remote-entrypoint.sh ~/.local/bin/fm-remote-entrypoint.sh
+ln -s /absolute/path/to/nexus/bin/fm-remote-entrypoint.sh ~/.local/bin/fm-remote-entrypoint.sh
 ```
 
 The entrypoint accepts encoded argv for genuine executable `bin/fm-*.sh` files only.
@@ -70,7 +70,7 @@ The entrypoint authorizes that bootstrap in one of two ways:
 
 ### The remote job worker
 
-After setup, every other command goes through Firstmate's account-owned remote job worker.
+After setup, every other command goes through Nexus's account-owned remote job worker.
 Each such command takes these steps:
 
 1. It verifies the worker.
@@ -78,7 +78,7 @@ Each such command takes these steps:
 3. It waits for its result.
 4. It relays stdout, stderr, and the exit status separately.
 
-On macOS the worker is `dev.firstmate.remote-job`, an Aqua-scoped LaunchAgent at `~/Library/LaunchAgents/dev.firstmate.remote-job.plist` with logs under `~/Library/Logs/`.
+On macOS the worker is `dev.nexus.remote-job`, an Aqua-scoped LaunchAgent at `~/Library/LaunchAgents/dev.nexus.remote-job.plist` with logs under `~/Library/Logs/`.
 After that bootstrap, every non-doctor `fm-on.sh` target runs through that worker in the remote account's GUI session.
 It never runs in the SSH process or a Herdr pane.
 Linux uses the same queue and worker protocol without the Aqua-session requirement.
@@ -112,7 +112,7 @@ A caller cancels its job instead of abandoning it when, before the job completes
 
 As a result, retries never convoy behind abandoned work.
 
-A worker stops itself once its configured code root stops being a Firstmate checkout, so a worker started from a worktree cannot outlive that worktree.
+A worker stops itself once its configured code root stops being a Nexus checkout, so a worker started from a worktree cannot outlive that worktree.
 `bin/fm-remote-job-reap-orphans.sh` clears any worker already left behind that way.
 It never touches a worker whose checkout still exists.
 
@@ -184,7 +184,7 @@ This has two consequences:
 ### Wrappers for version-managed tools
 
 The filesystem discovery normally finds tools installed by nvm, asdf, or mise without starting their shell hooks.
-When a required tool remains discoverable only through one of those managers, `fm-remote-doctor.sh --fix` may create a Firstmate-owned wrapper in `~/.local/bin` that executes its selected absolute target.
+When a required tool remains discoverable only through one of those managers, `fm-remote-doctor.sh --fix` may create a Nexus-owned wrapper in `~/.local/bin` that executes its selected absolute target.
 It never overwrites a wrapper or other file it does not own, and it never installs a package.
 An operator can use the same wrapper shape when a tool needs a manual selection:
 
@@ -242,10 +242,10 @@ The script's own header owns the full line protocol.
 bin/fm-on.sh <secondmate-id|ssh-alias> fm-remote-doctor.sh --fix
 ```
 
-Over the plain SSH doctor bootstrap, it writes and reloads two Firstmate-owned launch agents on macOS:
+Over the plain SSH doctor bootstrap, it writes and reloads two Nexus-owned launch agents on macOS:
 
-- `dev.firstmate.remote-job`.
-- `dev.firstmate.herdr.fm-remote`.
+- `dev.nexus.remote-job`.
+- `dev.nexus.herdr.fm-remote`.
 
 Both are scoped with `LimitLoadToSessionType=Aqua` and bootstrapped in `gui/<uid>`.
 
@@ -273,7 +273,7 @@ It acts on whichever server owns the `fm-remote` socket:
 | --- | --- |
 | Nothing | Execs the server in the foreground under launchd. |
 | An Aqua-born server | Exits 0. |
-| Any other (foreign) server | Stops the foreign server and takes the session over, closing its panes so the parent firstmate relaunches its mates into the Aqua-born server. |
+| Any other (foreign) server | Stops the foreign server and takes the session over, closing its panes so the parent nexus relaunches its mates into the Aqua-born server. |
 
 `KeepAlive={SuccessfulExit=false}` lets that exit 0 rest instead of respawning against a held socket.
 The guard's header owns the decision table, and [`bin/fm-remote-herdr-owner-lib.sh`](../bin/fm-remote-herdr-owner-lib.sh) owns the birth markers it reads.
@@ -284,14 +284,14 @@ The guard's header owns the decision table, and [`bin/fm-remote-herdr-owner-lib.
 
 - It starts the same workers directly on Linux.
 - It recreates the `~/.local/bin/fm-remote-entrypoint.sh` symlink when it is absent.
-- It creates only Firstmate-owned required-tool wrappers that it can prove resolve to a version-manager target.
+- It creates only Nexus-owned required-tool wrappers that it can prove resolve to a version-manager target.
   It stops after one harness satisfies the at-least-one requirement, which is the harness line of the [required remote tools](#required-remote-tools).
 
 Its limits:
 
-- It never installs packages or overwrites a non-Firstmate file at a reserved wrapper path.
+- It never installs packages or overwrites a non-Nexus file at a reserved wrapper path.
 - The dedicated Herdr launch agent owns only the remote-secondmate `fm-remote` server.
-  It does not inspect, rewrite, start, stop, or require the user's interactive `default` session or its `dev.firstmate.herdr` launch agent.
+  It does not inspect, rewrite, start, stop, or require the user's interactive `default` session or its `dev.nexus.herdr` launch agent.
 - It re-derives every check from the host afterwards, so what it prints is the state after the repair rather than the intent of one.
 
 ### Steps only a person can take
@@ -303,8 +303,8 @@ These steps are never automated and are always reported rather than silently att
 - Installing any missing required tool that no safe wrapper can resolve.
 - Each worker runtime's own `/login`, and any keychain password prompt that login needs.
 
-Firstmate never writes an auto-login password, never changes FileVault, and never stores an account password.
-A file at `~/.local/bin/fm-remote-entrypoint.sh` that is not Firstmate's own symlink is reported for the operator to inspect and is never overwritten.
+Nexus never writes an auto-login password, never changes FileVault, and never stores an account password.
+A file at `~/.local/bin/fm-remote-entrypoint.sh` that is not Nexus's own symlink is reported for the operator to inspect and is never overwritten.
 
 ### Required remote tools
 
@@ -325,7 +325,7 @@ bin/fm-remote-home-seed.sh <id> <ssh-alias> <remote-root> <remote-home> {<projec
 
 | Argument | Meaning |
 | --- | --- |
-| `<remote-root>` | The remote Firstmate code clone that supplies tracked scripts. |
+| `<remote-root>` | The remote Nexus code clone that supplies tracked scripts. |
 | `<remote-home>` | A separate absolute path for the persistent secondmate home that must not overlap the code root. |
 
 ### Project origins
@@ -365,7 +365,7 @@ The seed takes these steps:
 1. It records `host:`, `root:`, and `home:` in `data/secondmates.md`.
 2. It gates the host on readiness.
 3. It sends a bounded manifest.
-4. It lets the remote host clone its own Firstmate home and project origins.
+4. It lets the remote host clone its own Nexus home and project origins.
 
 It does not copy project trees or the primary process environment.
 In the primary home, its durable registration effects are limited to that route and the charter brief under `data/<id>`.
@@ -630,11 +630,11 @@ Letting the far side re-resolve it would silently move the mate onto another run
 SSH exit 255 leaves completion unknown and the route preserved, exactly as every other verb here.
 Move a live remote second mate onto a newly pinned harness, model, or effort with [`bin/fm-remote-secondmate-relaunch.sh`](../bin/fm-remote-secondmate-relaunch.sh) rather than calling `relaunch` through `fm-on.sh` directly: the host-local relaunch it drives can only rewrite the host's own endpoint record, so this wrapper reads the confirmed identity back from that record afterward and republishes the primary's own route metadata to match, the same way launch already records a fresh route.
 
-### Firstmate code convergence
+### Nexus code convergence
 
-Session start and every remote launch converge the persistent remote home on the primary's own default-branch commit rather than on the Firstmate copy that host keeps.
-The [`secondmate-provisioning` skill](../.agents/skills/secondmate-provisioning/SKILL.md) owns the guarded convergence contract, including the distinct `/updatefirstmate` behavior, and [`bin/fm-remote-secondmate-control.sh`](../bin/fm-remote-secondmate-control.sh) owns the commit-import mechanics.
-Neither session start nor launch moves the host's own Firstmate copy.
+Session start and every remote launch converge the persistent remote home on the primary's own default-branch commit rather than on the Nexus copy that host keeps.
+The [`secondmate-provisioning` skill](../.agents/skills/secondmate-provisioning/SKILL.md) owns the guarded convergence contract, including the distinct `/updatenexus` behavior, and [`bin/fm-remote-secondmate-control.sh`](../bin/fm-remote-secondmate-control.sh) owns the commit-import mechanics.
+Neither session start nor launch moves the host's own Nexus copy.
 An unsafe or unavailable target is reported and left untouched.
 A completed sync reports which watched instruction paths its advance changed.
 The primary needs that fact because it cannot diff a checkout it cannot read.

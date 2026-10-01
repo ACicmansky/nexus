@@ -1,4 +1,4 @@
-// firstmate-calm under `claude plugin test`: the sailboat that replaces the stock
+// nexus-calm under `claude plugin test`: the sailboat that replaces the stock
 // working row while Calm is on, its cadence on the mocked clock, its size against the
 // viewport, and how it lets go of a site the surface no longer draws.
 import { describe, expect, test } from "claude-code/testing";
@@ -20,7 +20,7 @@ describe("the working ship", () => {
     world(on, { preference: "on\n" });
     const raster = rasterOf(await $.ui.render(spinner("agent-main", { columns: 40, rows: 24 })));
     expect(raster).toBeDefined();
-    expect(raster!.key).toBe("firstmate-calm-working-ship");
+    expect(raster!.key).toBe("nexus-calm-working-ship");
     expect(raster!.columns).toBe(38);
     expect(raster!.rows).toBe(2);
     const { glyphs, foregrounds, backgrounds } = decodeCells(raster!.cells, 38, 2);
@@ -50,7 +50,7 @@ describe("the working ship", () => {
     const first = decodeCells(raster.cells, 38, 2);
     await clock.advance(TICK);
     expect(journal.blits).toHaveLength(1);
-    expect(journal.blits[0]).toMatchObject({ requestId: "agent-main", key: "firstmate-calm-working-ship", columns: 38, rows: 2 });
+    expect(journal.blits[0]).toMatchObject({ requestId: "agent-main", key: "nexus-calm-working-ship", columns: 38, rows: 2 });
     const afterOne = decodeCells(journal.blits[0]!.cells, 38, 2);
     expect(afterOne.glyphs[1]!.indexOf(HULL)).toBe(0);
     expect(afterOne.glyphs[1]).not.toBe(first.glyphs[1]);
@@ -67,7 +67,7 @@ describe("the working ship", () => {
     await $.ui.render(spinner());
     await clock.advance(TICK);
     expect(journal.blits).toHaveLength(1);
-    denyBlits("nothing of firstmate-calm is mounted there");
+    denyBlits("nothing of nexus-calm is mounted there");
     await clock.advance(TICK);
     expect(journal.blits).toHaveLength(2);
     await clock.advance(TICK * 5);

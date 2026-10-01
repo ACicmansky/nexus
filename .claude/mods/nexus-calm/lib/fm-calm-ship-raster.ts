@@ -20,7 +20,7 @@ import type {
 } from "./fm-calm-working-ship-sprite.ts";
 
 /** The Raster's `key` inside the Spinner drawing, what `$.ui.blit` names to repaint it. */
-export const CALM_SHIP_RASTER_KEY = "firstmate-calm-working-ship";
+export const CALM_SHIP_RASTER_KEY = "nexus-calm-working-ship";
 
 /** Claude Code's Raster width limit, per RasterProps. */
 export const CALM_SHIP_RASTER_MAX_COLUMNS = 512;

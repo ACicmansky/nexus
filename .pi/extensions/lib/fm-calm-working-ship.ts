@@ -1,4 +1,4 @@
-// Firstmate's Calm-only animated working presentation for Pi.
+// Nexus's Calm-only animated working presentation for Pi.
 //
 // Calm replaces Pi's stock working row with a tiny SSHHIP-derived boat while one
 // logical agent run is active. The sprite geometry, bounce track, two animation
@@ -44,7 +44,7 @@ const ANSI_FOREGROUND: Record<Exclude<CalmWorkingShipColor, "plain">, string> = 
 // Restores the default foreground so color never bleeds into padding or later frames.
 const RESET = "\u001b[39m";
 
-export const CALM_WORKING_SHIP_WIDGET_KEY = "firstmate-calm-working-ship";
+export const CALM_WORKING_SHIP_WIDGET_KEY = "nexus-calm-working-ship";
 
 export type CalmWorkingShipAnimation = Omit<CalmWorkingShipSprite, "frame"> & {
   /** Render one frame that exactly fits `width`, clamping the track to it first. */

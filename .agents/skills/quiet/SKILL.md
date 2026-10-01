@@ -11,7 +11,7 @@ metadata:
 
 # quiet
 
-Quiet supervision mode (kunchenguid/firstmate#2356): the same token-saving
+Quiet supervision mode (ACicmansky/nexus#2356): the same token-saving
 daemon tradeoff as `/afk`, made explicit for a captain who is staying,
 watching the session, and does not want to exit the mode just by chatting.
 
@@ -69,7 +69,7 @@ point of this mode (AGENTS.md section 8's away-mode stub, quiet branch).
 
 ## Orthogonal to approval authority
 
-Quiet mode changes how aggressively firstmate surfaces things, never who approves what.
+Quiet mode changes how aggressively nexus surfaces things, never who approves what.
 A PR ready for merge keeps the merge authority from `AGENTS.md` section 7, and a needs-decision finding keeps the `ask-user-authority` policy.
 
 The captain is present, so quiet mode holds nothing for a return.

@@ -39,28 +39,28 @@ const CALM_VISIBLE_CLASSES = new Set<CalmTranscriptClass>([
 
 // Legacy session entries from Calm versions before 2026-07-23 retain this
 // presentation type. New operational input stays user-role and is never rerouted.
-export const FIRSTMATE_SYNTHETIC_PRESENTATION_TYPE = "firstmate-synthetic-input-presentation";
-export const FIRSTMATE_CALM_PRESENTATION_EVENT = "firstmate:calm-presentation";
+export const NEXUS_SYNTHETIC_PRESENTATION_TYPE = "nexus-synthetic-input-presentation";
+export const NEXUS_CALM_PRESENTATION_EVENT = "nexus:calm-presentation";
 
 export type CalmPresentationState = {
   active: boolean;
   stockExportRendering: boolean;
 };
 
-export const FIRSTMATE_SYNTHETIC_KINDS = [
+export const NEXUS_SYNTHETIC_KINDS = [
   "session-start",
   "watcher",
   "turn-end-guard",
   "away-supervisor",
-  "from-firstmate",
+  "from-nexus",
   "launch-brief",
   "legacy-operational",
 ] as const;
 
-export type FirstmateSyntheticKind = (typeof FIRSTMATE_SYNTHETIC_KINDS)[number];
-type FirstmateSyntheticPresentation = {
+export type NexusSyntheticKind = (typeof NEXUS_SYNTHETIC_KINDS)[number];
+type NexusSyntheticPresentation = {
   content: string;
-  kind: FirstmateSyntheticKind;
+  kind: NexusSyntheticKind;
 };
 
 let calm = false;
@@ -86,9 +86,9 @@ export function calmPresentationHides(itemClass: CalmTranscriptClass): boolean {
   return calm && !stockExportRendering && !calmTranscriptClassIsVisible(itemClass);
 }
 
-export function registerFirstmateSyntheticPresentation(pi: ExtensionAPI): void {
-  pi.registerEntryRenderer<FirstmateSyntheticPresentation>(
-    FIRSTMATE_SYNTHETIC_PRESENTATION_TYPE,
+export function registerNexusSyntheticPresentation(pi: ExtensionAPI): void {
+  pi.registerEntryRenderer<NexusSyntheticPresentation>(
+    NEXUS_SYNTHETIC_PRESENTATION_TYPE,
     (entry) => {
       if (calmPresentationHides("synthetic-user")) return undefined;
       const data = entry.data;

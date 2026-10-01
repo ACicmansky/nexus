@@ -1,4 +1,4 @@
-// Firstmate Calm for Claude Code: the hooks module of the Calm mod, whose plugin name is `fm`.
+// Nexus Calm for Claude Code: the hooks module of the Calm mod, whose plugin name is `fm`.
 //
 // A Claude Code "mod" is a plugin whose behavior lives in one hooks module. Claude Code
 // may load this module through its rollout flag or `CLAUDE_CODE_ENABLE_FUNCTION_HOOKS`,
@@ -32,7 +32,7 @@
 // latch, and `$.ui.log` appends one dim line per new outcome or latch change, never
 // sent to the model. The first tail copy a session sees, at `session.start` or later,
 // replays the outcomes unread or unprocessed at `session.start` that this session has
-// not already shown. The mod only reads the Firstmate home: the drain remains the one
+// not already shown. The mod only reads the Nexus home: the drain remains the one
 // presenter that marks outcomes read.
 // ../lib/fm-branch-notes.ts owns every line and which rows are due.
 //
@@ -65,7 +65,7 @@ import {
   workingNoteKey,
 } from "../lib/fm-calm-presentation.ts";
 import {
-  firstmateStateDirectory,
+  nexusStateDirectory,
   hostHealthNote,
   newOutcomeNotes,
   parseHostHealth,
@@ -265,7 +265,7 @@ async function readIfChanged(
 
 /** Replay the due outcomes, then follow the store from its current tail. */
 async function startNotes($: EngineInterface): Promise<void> {
-  const state = firstmateStateDirectory(
+  const state = nexusStateDirectory(
     {
       FM_HOME: await $.env.get("FM_HOME"),
       FM_ROOT_OVERRIDE: await $.env.get("FM_ROOT_OVERRIDE"),
@@ -376,7 +376,7 @@ export const register: Register = (on) => {
     await startNotes($).catch(() => undefined);
     await $.command.register({
       name: CALM_COMMAND,
-      description: "Toggle Firstmate's Calm transcript presentation and working ship.",
+      description: "Toggle Nexus's Calm transcript presentation and working ship.",
     });
     return next(e);
   });

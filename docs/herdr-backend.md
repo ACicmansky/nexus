@@ -1,10 +1,10 @@
 # Herdr runtime backend
 
-This page covers running Firstmate workers on the Herdr runtime backend: setup, where tasks appear, how they are cleaned up, how input reaches them, and how their liveness is read.
-Operators who choose Herdr, or who verify Firstmate against it, need it.
+This page covers running Nexus workers on the Herdr runtime backend: setup, where tasks appear, how they are cleaned up, how input reaches them, and how their liveness is read.
+Operators who choose Herdr, or who verify Nexus against it, need it.
 
 Herdr is an agent-native terminal backend with native per-pane agent state and push events.
-Firstmate requires Herdr protocol 14 or newer.
+Nexus requires Herdr protocol 14 or newer.
 Broad backend verification covers versions 0.7.1, 0.7.3, 0.7.4, 0.7.5, and 0.8.0.
 Protocol-16 features remain gated by availability.
 Default-on presentation spaces have a higher floor of Herdr 0.8.0 for the reason given under [Presentation spaces](#presentation-spaces).
@@ -40,7 +40,7 @@ Prerequisites:
 - `python3` only for optional protocol-16 presentation-space ordering and native event subscription.
 
 Herdr is dual-licensed AGPL-3.0-or-later or commercial.
-Firstmate invokes its CLI as a separate process.
+Nexus invokes its CLI as a separate process.
 
 ### Selecting Herdr
 
@@ -48,7 +48,7 @@ Select Herdr in any of these ways:
 
 - Local `config/backend` containing `herdr`.
 - `FM_BACKEND=herdr` for one launch.
-- An explicit request to Firstmate.
+- An explicit request to Nexus.
 
 A remote second-mate agent is the one case with no choice: it always runs on Herdr, and [`remote-secondmates.md`](remote-secondmates.md) owns that requirement and the readiness its host must meet.
 
@@ -96,12 +96,12 @@ Removing or upgrading the shadowing client is the durable fix.
 
 ## Watching and task containers
 
-The ordinary topology puts one task tab per endpoint in the exact workspace of the Firstmate or secondmate that launches it.
+The ordinary topology puts one task tab per endpoint in the exact workspace of the Nexus or secondmate that launches it.
 When the launcher has no Herdr workspace to inherit, the adapter maintains one durable home-labeled workspace instead.
 
 | Home | Workspace label |
 | --- | --- |
-| Primary | `firstmate` |
+| Primary | `nexus` |
 | Secondmate | `2ndmate-<secondmate-id>`, derived from its validated `.fm-secondmate-home` marker |
 
 A secondmate launched by the primary receives a narrowly scoped home override during container creation.
@@ -122,7 +122,7 @@ Later task creation does not intentionally steal focus.
 Herdr does not enforce workspace or tab label uniqueness, so a label can never decide where a worker goes.
 
 Herdr 0.7.5 exports `HERDR_ENV`, `HERDR_PANE_ID`, `HERDR_SESSION`, `HERDR_SOCKET_PATH`, `HERDR_TAB_ID`, and `HERDR_WORKSPACE_ID` into every process it manages a pane for.
-A Firstmate or secondmate agent's own commands inherit them.
+A Nexus or secondmate agent's own commands inherit them.
 Older injection shapes are unverified, so a claimed launcher pane without the injected socket identity cannot be trusted.
 
 With presentation spaces disabled, a crewmate or scout is created in the exact workspace that identity currently resolves to.
@@ -141,16 +141,16 @@ That covers:
 - A workspace missing from the session.
 - A pane belonging to another named session or Herdr server.
 
-### Firstmate running outside Herdr
+### Nexus running outside Herdr
 
-Firstmate running outside Herdr entirely has no launcher workspace to inherit, so its workers use this home's own labeled workspace, created on first use.
+Nexus running outside Herdr entirely has no launcher workspace to inherit, so its workers use this home's own labeled workspace, created on first use.
 That path needs the home label to identify exactly one workspace.
 Two workspaces sharing it are an unresolvable placement and refuse rather than adopting either.
 
-Avoid naming a personal workspace `firstmate` or `2ndmate-<id>` for that reason.
+Avoid naming a personal workspace `nexus` or `2ndmate-<id>` for that reason.
 Also avoid it because the adapter cannot distinguish that label collision from its own container.
 
-An older secondmate workspace using `firstmate-<id>` is not migrated automatically.
+An older secondmate workspace using `nexus-<id>` is not migrated automatically.
 Rename it manually before expecting new tasks or recovery to use it.
 
 ### Recovery and existing tasks
@@ -250,7 +250,7 @@ A presentation journal is the per-task record in this home's `state/` that binds
 Only a fresh task with neither metadata nor an existing presentation journal is eligible for projected creation.
 Creation proceeds in this order:
 
-1. Firstmate atomically publishes a three-field version 1 journal containing a random 128-bit base64url token, before asking Herdr to create anything.
+1. Nexus atomically publishes a three-field version 1 journal containing a random 128-bit base64url token, before asking Herdr to create anything.
 2. After the new workspace converges to one exact task endpoint beneath one exact parent workspace id, the journal advances to a version 2 binding.
    That binding records the physical home, named session, endpoint, parent, and immutable expected labels.
 
@@ -262,13 +262,13 @@ Neither token, title, nor journal authorizes send, capture, task ownership, Tree
 ### Owning parent and tabs
 
 The owning parent is the launcher's own exact workspace, resolved from the same identity the flat path uses.
-It falls back to a unique home-label lookup only for a Firstmate outside Herdr.
+It falls back to a unique home-label lookup only for a Nexus outside Herdr.
 Projected children are never collapsed back into that parent.
 The parent is the placement and ordering reference the projection is bound under.
 
 The normal `fm-<id>` task tab is created in the exact new workspace returned by Herdr.
 Only the exact seeded default tab returned by the same workspace-create response can be pruned.
-Before and after create, prune, order, abort cleanup, and normal cleanup, Firstmate verifies exact workspace, tab, pane, and active-focus ids.
+Before and after create, prune, order, abort cleanup, and normal cleanup, Nexus verifies exact workspace, tab, pane, and active-focus ids.
 An ambiguous response grants no mutation or cleanup authority.
 
 ### Ordering
@@ -288,7 +288,7 @@ Existing legacy child labels may extend an already adjacent block read-only but 
 A foreign, ambiguous, detached, or manually interleaved child makes ordering skip with a warning rather than rewriting the layout.
 
 Ordering failure never fails the task spawn.
-Firstmate does not retry, adopt, reuse, close, delete, or rename anything in response to an unavailable method, lock contention, ambiguous socket, lost response, failed move, or verification mismatch.
+Nexus does not retry, adopt, reuse, close, delete, or rename anything in response to an unavailable method, lock contention, ambiguous socket, lost response, failed move, or verification mismatch.
 The worker remains on the ordinary flat or Herdr-current-order path.
 
 ### Cleanup and focus safety
@@ -362,7 +362,7 @@ Once the exact pane is confirmed gone, teardown retires the task's own journal w
 
 Recovery is deliberately conservative and presentation-only.
 An existing journal suppresses another projected create.
-Before any recovery mutation, Firstmate holds both the task spawn lock and the named-session presentation lock.
+Before any recovery mutation, Nexus holds both the task spawn lock and the named-session presentation lock.
 
 A same-identity version 2 binding may replace one exact agent-free restart husk in place.
 A husk is a restored same-labeled tab with a missing pane or no registered agent, as [Restart and liveness behavior](#restart-and-liveness-behavior) describes.
@@ -409,7 +409,7 @@ A candidate must meet all of these conditions:
 - The task's ordinary metadata must be absent.
 - The candidate must have exactly one tab and exactly one pane.
 
-Firstmate then cleans up the candidate in this order:
+Nexus then cleans up the candidate in this order:
 
 1. Acquire the existing task-id spawn lock, and then the shared named-session presentation lock.
 2. Inside both locks, take one exact snapshot.
@@ -485,13 +485,13 @@ Any of these preserves the candidate and lets session startup continue with at m
 ## Default-tab prune safety
 
 `herdr workspace create` seeds one default tab.
-Firstmate prunes it only after a real task tab exists and only when the same create response supplied the seeded tab id.
+Nexus prunes it only after a real task tab exists and only when the same create response supplied the seeded tab id.
 An adopted workspace never supplies that id and can never enter the prune path, regardless of labels or tab count.
-Immediately before close, Firstmate rechecks the exact tab, expected seed label, and native agent state.
+Immediately before close, Nexus rechecks the exact tab, expected seed label, and native agent state.
 A working seed pane is never closed.
 
 This created-versus-adopted gate is a destructive safety boundary.
-A prior label heuristic could adopt a captain-owned workspace named `firstmate` and close its live seed-shaped tab.
+A prior label heuristic could adopt a captain-owned workspace named `nexus` and close its live seed-shaped tab.
 The current structural gate removes label inference from cleanup authority.
 `tests/fm-backend-herdr-prune-safety-e2e.test.sh` reproduces the collision in an isolated named session and proves the adopted pane remains untouched.
 
@@ -520,11 +520,11 @@ An environment variable alone is not reliable when another Herdr server is runni
 
 When the selected named server is not running, the adapter launches it without these inherited values:
 
-- Firstmate home and directory overrides.
+- Nexus home and directory overrides.
 - Harness identity markers.
 - The supervision-model override.
 
-Herdr passes its server startup environment to every later pane, so retaining those values could misroute panes for another Firstmate home or harness.
+Herdr passes its server startup environment to every later pane, so retaining those values could misroute panes for another Nexus home or harness.
 An already-running server is reused without restart or environment changes.
 Explicit named-session routing and unrelated launch environment remain intact.
 
@@ -546,7 +546,7 @@ Before that Enter, the adapter continues only when the selected composer shows t
 Every herdr adapter composer read (`fm_backend_herdr_composer_state`, `fm_backend_herdr_composer_content`) captures the full visible viewport, never a bounded tail, while the shared inbox pending-line confirmation read (bin/fm-task-inbox-lib.sh) stays a bounded tail on every backend: an overlay Claude renders between the composer and the pane bottom - the slash-command popup is the verified shape - pushes the composer outside a tail window, and the composer is by definition inside the viewport.
 Dated measurement: docs/verification/runtime-backends.md "Claude exit behind the slash-command popup".
 
-That comparison ignores whitespace and U+2063, the invisible mark that starts operational inputs and ends the from-firstmate label.
+That comparison ignores whitespace and U+2063, the invisible mark that starts operational inputs and ends the from-nexus label.
 It ignores U+2063 because Claude's Herdr read-back never shows it.
 
 A composer that holds a shorter suffix, or a placeholder plus a literal remainder, does not receive Enter.
@@ -650,8 +650,8 @@ This prevents a dead agent pane from receiving and possibly executing an escalat
 
 ### Operational input markers
 
-The current operational envelope starts with U+2063 and `FIRSTMATE_OP: `.
-The separate routed-request carrier uses `[fm-from-firstmate]` plus U+2063.
+The current operational envelope starts with U+2063 and `NEXUS_OP: `.
+The separate routed-request carrier uses `[fm-from-nexus]` plus U+2063.
 U+2063 survives Herdr terminal input as text, unlike the legacy ASCII control separator that could erase the visible routing label.
 Claude Code itself then removes it from the submitted prompt, so a Claude Code primary receives away-mode escalations as the owner's record-backed doorbell instead.
 `bin/fm-operational-input.sh` owns current operational construction and parsing, and the AFK skill owns legacy away-input compatibility.
@@ -806,7 +806,7 @@ A fresh entry clears stale transient escalation caches, while durable queue and 
 
 ## Destructive lab safety
 
-Never use ambient `herdr server stop` for Firstmate verification.
+Never use ambient `herdr server stop` for Nexus verification.
 An environment-only session selection can silently reach a different running server.
 The ambient stop command has no explicit target.
 
@@ -828,7 +828,7 @@ Tests use thin compatibility wrappers in `tests/herdr-test-safety.sh` and never 
 
 - Presentation ordering needs protocol 16 and Python and is best-effort only.
 - Mutable labels can collide; they are never placement or destructive authority.
-- A Firstmate outside Herdr cannot resolve a launcher workspace, so a colliding home label refuses new spawns until the collision is cleared.
+- A Nexus outside Herdr cannot resolve a launcher workspace, so a colliding home label refuses new spawns until the collision is cleared.
 - Ghost and placeholder recognition uses ANSI de-emphasis when available; an unstyled glyph row carrying trailing non-idle text fails safely to `unknown`.
 - Only tmux and Herdr can host the away-mode supervisor terminal.
 

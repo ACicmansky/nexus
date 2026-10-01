@@ -1,4 +1,4 @@
-// Firstmate primary watcher bridge for Pi.
+// Nexus primary watcher bridge for Pi.
 //
 // Session-generation ownership (stated once here):
 // Pi emits session_shutdown for ordinary same-process replacements (/new, /resume,
@@ -41,7 +41,7 @@ import { fileURLToPath } from "node:url";
 import type { ExtensionAPI, Theme } from "@earendil-works/pi-coding-agent";
 import { Box, Container, Text, type Component } from "@earendil-works/pi-tui";
 import { Type } from "typebox";
-import { registerFirstmateTool } from "./lib/fm-native-contract.ts";
+import { registerNexusTool } from "./lib/fm-native-contract.ts";
 import {
   afkPostureRecordPresent,
   branchOfferForWake,
@@ -51,9 +51,9 @@ import {
 import {
   type CalmPresentationState,
   calmTranscriptClassIsVisible,
-  FIRSTMATE_CALM_PRESENTATION_EVENT,
+  NEXUS_CALM_PRESENTATION_EVENT,
 } from "./lib/fm-calm-visibility.ts";
-import { encodeFirstmateOperationalInput } from "./lib/fm-operational-input.ts";
+import { encodeNexusOperationalInput } from "./lib/fm-operational-input.ts";
 
 type ArmResult = {
   ok: boolean;
@@ -180,10 +180,10 @@ type ReplacementCoordinator = {
   deliveries: Map<string, ActionableDeliveryClaim>;
 };
 type ReplacementCoordinatorGlobal = typeof globalThis & {
-  __firstmatePiWatchReplacements?: Map<string, ReplacementCoordinator>;
+  __nexusPiWatchReplacements?: Map<string, ReplacementCoordinator>;
 };
 const replacementCoordinatorGlobal = globalThis as ReplacementCoordinatorGlobal;
-const replacementCoordinators = replacementCoordinatorGlobal.__firstmatePiWatchReplacements ??= new Map<string, ReplacementCoordinator>();
+const replacementCoordinators = replacementCoordinatorGlobal.__nexusPiWatchReplacements ??= new Map<string, ReplacementCoordinator>();
 function replacementCoordinatorFor(handoff: string): ReplacementCoordinator {
   const existing = replacementCoordinators.get(handoff);
   if (existing) return existing;
@@ -556,7 +556,7 @@ export default function (pi: ExtensionAPI) {
     active: false,
     stockExportRendering: false,
   };
-  pi.events?.on?.(FIRSTMATE_CALM_PRESENTATION_EVENT, (data) => {
+  pi.events?.on?.(NEXUS_CALM_PRESENTATION_EVENT, (data) => {
     const next = data as Partial<CalmPresentationState>;
     calmPresentation = {
       active: next.active === true,
@@ -574,9 +574,9 @@ export default function (pi: ExtensionAPI) {
     pending?: PendingActionableClose,
   ): Promise<boolean> {
     if (!generationIsLive(owner)) return false;
-    const content = encodeFirstmateOperationalInput(
+    const content = encodeNexusOperationalInput(
       "watcher",
-      `FIRSTMATE WATCHER WAKE: ${message}\n\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.`,
+      `NEXUS WATCHER WAKE: ${message}\n\nRun bin/fm-wake-drain.sh first and handle the queued wake. Watcher continuity is extension-owned.`,
     );
     if (pending) owner.unconsumedWakes.set(pending.token, { content, pending });
     try {
@@ -961,7 +961,7 @@ export default function (pi: ExtensionAPI) {
   function startArm(owner: SessionGeneration, predecessorArmPid = ""): ArmResult {
     if (!generationIsLive(owner)) return { ok: false, message: shuttingDownMessage };
     const ownership = lockOwnership();
-    if (ownership === "other") return { ok: false, message: "watcher: read-only - session lock is held by another firstmate session" };
+    if (ownership === "other") return { ok: false, message: "watcher: read-only - session lock is held by another nexus session" };
     if (ownership === "missing") {
       return {
         ok: false,
@@ -1138,16 +1138,16 @@ export default function (pi: ExtensionAPI) {
   });
 
   pi.registerCommand?.("fm-watch-arm-pi", {
-    description: "Arm firstmate watcher supervision through the Pi extension instead of foreground bash.",
+    description: "Arm nexus watcher supervision through the Pi extension instead of foreground bash.",
     handler: async (_args, ctx) => {
       const result = activateOwnedWatch(generation);
       ctx.ui.notify(result.message, result.ok ? "info" : "warning");
     },
   });
 
-  registerFirstmateTool(pi, {
+  registerNexusTool(pi, {
     name: "fm_watch_arm_pi",
-    label: "Arm firstmate watcher",
+    label: "Arm nexus watcher",
     description: "Start the first required Pi watcher cycle, or repair one only after a notification says the cycle is missing, failed, or unhealthy. Do not call after ordinary work or ordinary notifications; the Pi extension re-arms automatically. Never run bin/fm-watch-arm.sh through bash.",
     promptSnippet: "Start the first required Pi watcher cycle or repair a cycle reported missing, failed, or unhealthy; ordinary re-arming is automatic.",
     promptGuidelines: [
