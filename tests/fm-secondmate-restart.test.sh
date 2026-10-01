@@ -641,7 +641,7 @@ test_persist_waits_are_polled_together() {
   exit_line=$(grep -n '^/exit$' "$dir/fake/literal" | head -1 | cut -d: -f1)
   nudge_line=$(grep -n '^: Firstmate instruction waiting: ' "$dir/fake/literal" | tail -1 | cut -d: -f1)
   [ -n "$exit_line" ] && [ -n "$nudge_line" ] && [ "$exit_line" -lt "$nudge_line" ] \
-    || fail "the first mate's timeout held the confirmed second mate behind it: $out"
+    || fail "Nexus's timeout held the confirmed second mate behind it: $out"
   pass "T10 pending persist answers are polled as one fleet"
 }
 
