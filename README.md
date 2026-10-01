@@ -1,4 +1,4 @@
-<h1 align="center">firstmate</h1>
+<h1 align="center">nexus</h1>
 <p align="center">
   <a
     href="https://img.shields.io/badge/platform-macOS%20%7C%20Linux-blue?style=flat-square"
@@ -21,7 +21,7 @@
 <h3 align="center">Talk to one agent. Ship with a crew.</h3>
 
 <p align="center">
-  <img alt="firstmate - talk to one agent, ship with a crew" src="assets/banner.png" width="100%" />
+  <img alt="nexus - talk to one agent, ship with a crew" src="assets/banner.png" width="100%" />
 </p>
 
 ## What it is
@@ -29,30 +29,99 @@
 You can run one coding agent easily.
 But the moment you want three project tasks done in parallel - fixes, investigations, plans, audits - you become a tab-juggler: babysitting sessions, copy-pasting context between repos, forgetting which terminal had the failing test.
 
-firstmate flips the model.
-You talk to a single agent - the first mate - and it runs the crew for you: spawning autonomous agents in a visible session backend, giving each a clean git worktree, supervising them to completion, and handing you finished PRs, approved local merges, or standalone investigation reports.
-For larger fleets, you can opt in to persistent secondmates: second mates that are still ordinary direct reports, but run from their own isolated firstmate homes on this machine or another SSH-reachable host.
+Nexus flips the model.
+You talk to a single agent - Nexus - and it runs the crew for you: spawning autonomous agents in a visible session backend, giving each a clean git worktree, supervising them to completion, and handing you finished PRs, approved local merges, or standalone investigation reports.
+For larger fleets, you can opt in to persistent secondmates: second mates that are still ordinary direct reports, but run from their own isolated Nexus homes on this machine or another SSH-reachable host.
 
-firstmate is not a model, not a harness, not a skill, not an MCP server, and not a CLI.
-firstmate is an agent distro for running a crew of agents.
+Nexus is not a model, not a harness, not a skill, not an MCP server, and not a CLI.
+Nexus is an agent distro for running a crew of agents.
 An agent distro is a portable directory of instructions, skills, tooling, policies, and state conventions that turns a general-purpose agent into a specialized one.
-There is no app to install: the cloned repo is the distro - `AGENTS.md`, bundled firstmate skills, and helper scripts that any terminal coding agent can follow.
-Launching a supported harness inside it for your primary session instantiates your first mate - and makes you the captain.
+There is no app to install: the cloned repo is the distro - `AGENTS.md`, bundled Nexus skills, and helper scripts that any terminal coding agent can follow.
+Launching a supported harness inside it for your primary session instantiates Nexus - and sets your command plane.
 
 ## Features
 
-- **One liaison** - you talk only to the first mate; it dispatches, supervises, escalates only real decisions, and reports plain outcomes.
-- **A visible crew** - every crewmate works in its own tmux window or Herdr tab, or in an experimental Zellij tab, experimental cmux workspace, or experimental Orca terminal you can watch or type into; the first mate reconciles.
+- **One liaison** - you talk only to Nexus; it dispatches, supervises, escalates only real decisions, and reports plain outcomes.
+- **A visible crew** - every crewmate works in its own tmux window or Herdr tab, or in an experimental Zellij tab, experimental cmux workspace, or experimental Orca terminal you can watch or type into; Nexus reconciles.
 - **Disposable worktrees** - each task runs in a clean [treehouse](https://github.com/kunchenguid/treehouse) git worktree, or an Orca-managed worktree when `backend=orca`, so parallel work on one repo never collides.
 - **Two task shapes** - ship tasks deliver authorized changes; scout tasks leave standalone investigation reports when the intake contract warrants separate research.
 - **Explicit project modes** - each project ships via `no-mistakes`, `direct-PR`, or `local-only`, with an optional `+yolo` merge-autonomy flag, an optional `branch=<prefix>` override for the default `fm/` ship-branch prefix, and an optional `forge=gerrit` binding under which the worker publishes a Gerrit change instead of opening a pull request.
-- **Optional secondmates** - opt in to persistent second mates that run from isolated firstmate homes with their own `FM_HOME`, state, projects, and session lock, either locally or as a whole home on an SSH-reachable host, with guarded updates and recovery that never turns an unavailable remote route into a local replacement.
-- **Event-driven, zero-token supervision** - a bash watcher sleeps on the fleet and wakes the first mate only when something needs you; verified primary harnesses also get a turn-end backstop that blocks or follows up on a blind stop when work is under way and supervision is not live.
-- **Optional Relay** - opt in with one local `.env` pairing token so firstmate can answer your public mentions on X and Discord alike, act on normal reversible mention requests through the same lifecycle as chat requests, acknowledge spawned work, and post up to three public-safe completion follow-ups within seven days for genuine milestones and the final outcome without changing non-Relay behavior; a final reply promised in a thread becomes durable state that is reconciled from disk, so a restart or a compacted conversation cannot lose it; dry-run preview records would-be replies and dismissals locally before go-live.
-- **Strict project boundary** - the first mate is read-only over your projects except for the narrow guarded and captain-approved operations authorized by [hard rule 1](AGENTS.md#1-identity-and-prime-directives), including fleet sync's guarded safe branch pruning; crewmates make every other project change behind the configured merge authority.
+- **Optional secondmates** - opt in to persistent second mates that run from isolated Nexus homes with their own `FM_HOME`, state, projects, and session lock, either locally or as a whole home on an SSH-reachable host, with guarded updates and recovery that never turns an unavailable remote route into a local replacement.
+- **Event-driven, zero-token supervision** - a bash watcher sleeps on the fleet and wakes Nexus only when something needs you; verified primary harnesses also get a turn-end backstop that blocks or follows up on a blind stop when work is under way and supervision is not live.
+- **Optional Relay** - opt in with one local `.env` pairing token so Nexus can answer your public mentions on X and Discord alike, act on normal reversible mention requests through the same lifecycle as chat requests, acknowledge spawned work, and post up to three public-safe completion follow-ups within seven days for genuine milestones and the final outcome without changing non-Relay behavior; a final reply promised in a thread becomes durable state that is reconciled from disk, so a restart or a compacted conversation cannot lose it; dry-run preview records would-be replies and dismissals locally before go-live.
+- **Strict project boundary** - Nexus is read-only over your projects except for the narrow guarded and captain-approved operations authorized by [hard rule 1](AGENTS.md#1-identity-and-prime-directives), including fleet sync's guarded safe branch pruning; crewmates make every other project change behind the configured merge authority.
 - **Restart-proof** - all state lives on disk and in the active session backend (tmux by hard default, herdr or cmux when selected or auto-detected, zellij/orca when explicitly selected); the next session reconciles after a restart, while ordinary supervision recovers confirmed-dead secondmate agents without waiting for one.
+- **Modular personas & behavioral themes** - configure how agents address you and how your crew communicates (Star Trek, Helldivers 2, Matrix, Cyberpunk, Ghost in the Shell, Minimal, etc.); easily extensible via markdown files in `personas/`.
 
 Full detail on every feature lives in [docs/architecture.md](docs/architecture.md).
+
+## Personas & Behavioral Themes
+
+Nexus decouples orchestration mechanics from any single behavioral metaphor. You can configure how your supervisor and worker agents communicate, how they address you, and what flavor they bring to operations.
+
+### Switching Themes
+
+Switch personas at any time using the theme CLI:
+
+```sh
+# View current theme and list all available personas
+./bin/fm-theme.sh current
+./bin/fm-theme.sh list
+
+# Switch to a new theme
+./bin/fm-theme.sh set star-trek
+./bin/fm-theme.sh set helldivers
+./bin/fm-theme.sh set matrix
+```
+
+Alternatively:
+- **Set persistent config:** `echo "helldivers" > config/theme`
+- **Override per shell session:** `export FM_THEME=cyberpunk`
+- **Or just ask in chat:** *"Nexus, switch theme to Star Trek"*
+
+### Available Personas
+
+| Theme | User Title | Supervisor Role | Worker (Ship / Scout) | Flavor & Greetings |
+|---|---|---|---|---|
+| `star-trek` *(active)* | Captain | Number One | Engineering Officer / Science Officer | *"Make it so"*, *"Engage"*, *"All decks reporting nominal"* |
+| `helldivers` | Commander | Democracy Officer | Helldiver / Scout Diver | *"For Super Earth!"*, *"Managed Democracy is secure"* |
+| `matrix` | The One | Operator | Specialist / Scout Program | *"Signal clear"*, *"Ready to jack in"* |
+| `cyberpunk` | Fixer | Solo / Netrunner | Edgerunner / Recon Solo | *"ICE cleared, grid quiet"*, *"Eddies on the table"* |
+| `ghost-in-the-shell`| Chief | Section 9 Major | Field Specialist / Net Diver | *"Stand by for dive"*, *"Net is vast and infinite"* |
+| `secret-agent` | Director | Handler | Field Operative / Recon Agent | *"Mission parameters confirmed"*, *"Eyes only"* |
+| `ninja` | Sensei | Shinobi Leader | Genin / Shadow Scout | *"Shadows silent"*, *"The task is completed"* |
+| `samurai` | Daimyo | Hatamoto | Samurai / Shinobi Scout | *"Honor served"*, *"The path is clear"* |
+| `knight` | Sire | Seneschal | Knight Errant / Scout Knight | *"Fortress stands vigilant"*, *"For the realm"* |
+| `kitchen` | Chef | Sous Chef | Line Cook / Prep Cook | *"Yes, Chef!"*, *"Service running smoothly"* |
+| `rastaman` | Bredren | Elder Rootsman | Worker Bredren / Watchman | *"Respect, all irie"*, *"Everything bless"* |
+| `mob` | Don | Consigliere | Enforcer / Scout | *"The family business is running smooth"* |
+| `space-western` | Guildmaster | Gunslinger | Guild Hunter / Tracker | *"This is the way"*, *"Bounty secured"* |
+| `mad-scientist` | Mastermind | Igor | Assistant / Field Collector | *"The apparatus hums with dark genius"* |
+| `noir` | Chief | Gumshoe | Detective / Investigator | *"Case is open, rain never stops"* |
+| `apollo` | Flight | CAPCOM | Booster / Telemetry Officer | *"Go for launch, telemetry nominal"* |
+| `minimal` | Lead | Orchestrator | Worker / Researcher | Concise, clean, zero roleplay flavor |
+| `nautical` | Captain | First Mate | Shipwright / Scout | Classic maritime default |
+
+### Adding Custom Personas
+
+To add a persona, create a markdown file in `personas/<theme-name>.md` with YAML frontmatter:
+
+```markdown
+---
+name: "Witcher"
+user_title: "Master Witcher"
+supervisor_role: "Vesemir"
+worker_builder: "Witcher of the Wolf"
+worker_researcher: "Tracker"
+idle_ack: "Master Witcher, the path is clear of monsters."
+---
+
+## Supervisor Role
+You assist the Master Witcher in tracking bounties and coordinating Witchers...
+
+## Voice and Demeanor
+Pragmatic, dry, seasoned, light grim fantasy seasoning.
+```
 
 ## Quick Start
 
@@ -62,12 +131,12 @@ Full detail on every feature lives in [docs/architecture.md](docs/architecture.m
 - Git and the GitHub CLI, authenticated through `gh auth login`.
 - The CLI and dependencies for your selected runtime backend; tmux is the reference default.
 
-The first mate detects and offers to install supported missing tools after you approve.
+Nexus detects and offers to install supported missing tools after you approve.
 Backend-specific setup is linked in [Documentation](#documentation).
 
 ### Recommended harnesses
 
-**Claude Code, Grok, and Pi are equal co-primary recommendations** for running the primary firstmate session, with `pi-signed` supported as Pi's distinct signed-wrapper identity.
+**Claude Code, Grok, and Pi are equal co-primary recommendations** for running the primary Nexus session, with `pi-signed` supported as Pi's distinct signed-wrapper identity.
 Claude Code uses a tracked Stop hook for tokenless watcher re-arm and rewake, Grok uses background-notify wake cycles, and Pi uses its tracked primary watcher extension.
 All three have verified turn-end guard paths when launched with their documented setup.
 Pick whichever one matches your subscription and workflow.
@@ -81,8 +150,14 @@ Launch it with `--trust`, or none of its project hooks load; it also has no turn
 
 ```sh
 gh auth login
-git clone https://github.com/kunchenguid/firstmate
-cd firstmate
+git clone https://github.com/ACicmansky/nexus.git
+cd nexus
+
+# Optional: choose runtime backend (tmux is default, or choose herdr)
+echo "herdr" > config/backend
+
+# Optional: choose your persona theme (default is star-trek)
+./bin/fm-theme.sh set star-trek
 ```
 
 Then launch one of the co-primary harnesses; AGENTS.md takes over from there:
@@ -119,9 +194,9 @@ Start `omp` with this checkout as its working directory: it auto-discovers the t
 
 For Grok, `--trust` is needed once per clone so project hooks and the turn-end guard load; `/hooks-trust` inside Grok works too.
 For Pi, approve the project trust prompt once per clone on first launch so the tracked `.pi/extensions/*.ts` files auto-load.
-The `/calm` toggle on Pi, and on Claude Code behind its default-off early-access function-hooks flag, hides supported transcript chrome, including canonically classified Firstmate operational user rows, and uses a Calm-only animated working boat during active runs while preserving all model context and session data.
+The `/calm` toggle on Pi, and on Claude Code behind its default-off early-access function-hooks flag, hides supported transcript chrome, including canonically classified Nexus operational user rows, and uses a Calm-only animated working boat during active runs while preserving all model context and session data.
 Calm changes only presentation, not the user-role delivery, ordering, authority, persistence, or exports of the operational inputs it hides.
-The preference persists for the effective Firstmate home, and toggling it off restores ordinary rendering.
+The preference persists for the effective Nexus home, and toggling it off restores ordinary rendering.
 [Calm's current behavior and supported limits](docs/calm.md) are separate from its [version-scoped maintainer evidence](docs/calm-mode-feasibility.md).
 Pi's `/supervision-model` command pins a cheaper model and a shallower reasoning effort for the supervision branch alone, from the eligible models and thinking levels Pi itself reports, and with no pin the branch normally follows your own conversation's model and effort; see the [configuration schema](docs/configuration.md#pi-supervision-branch-model-and-effort-configsupervision-branch-model-configsupervision-branch-effort).
 
@@ -130,7 +205,7 @@ Pi's `/supervision-model` command pins a cheaper model and a shallower reasoning
 ```sh
 > ahoy! look at my github project xyz, then fix the flaky login test and add dark mode
 
-# firstmate checks its toolchain (asking your consent before installing anything),
+# Nexus checks its toolchain (asking your consent before installing anything),
 # clones the project under projects/ and spawns two isolated workers in the active backend.
 # Minutes later:
 
@@ -151,8 +226,8 @@ Setup guides for tmux (the default) and every other supported backend (herdr, ze
                   │  chat: requests, decisions, "merge it"
                   ▼
  ┌─────────────────────────────────────┐
- │ firstmate            (this repo)    │
- │ reads projects/ + firstmate routes  │
+ │ nexus                (this repo)    │
+ │ reads projects/ + Nexus routes      │
  │ writes guarded backlog/briefs/state │
  └──┬──────────────┬───────────────┬───┘
     │ backend sends / status files │
@@ -169,7 +244,7 @@ Setup guides for tmux (the default) and every other supported backend (herdr, ze
      └─ scout: report at data/<id>/report.md ► decision inventory ► relay findings ► teardown
 ```
 
-You chat with the first mate.
+You chat with Nexus.
 It routes each request to a crewmate in its own session endpoint and git worktree, supervises the fleet with a zero-token event-driven watcher, and brings you finished PRs, approved local merges, or investigation reports.
 Optional secondmates extend this to persistent local or whole-home remote second mates, dispatch profiles let you steer which harness handles which task, and opt-in Relay lets the same fleet answer public mentions.
 `codex-app` is not a runtime backend yet; [docs/codex-app-backend.md](docs/codex-app-backend.md) owns the Codex App boundary.
@@ -178,7 +253,7 @@ Full architecture - the supervision engine, worktree isolation, secondmates, dis
 
 ## Built-in skills
 
-Firstmate ships these user-invocable built-in skills.
+Nexus ships these user-invocable built-in skills.
 Claude and grok use the slash form shown here; codex uses the same names with `$`, such as `$afk`.
 
 | Skill              | What it does                                                                                                                                  |
@@ -187,7 +262,7 @@ Claude and grok use the slash form shown here; codex uses the same names with `$
 | `/quiet`           | Keep routine wakes off main while staying and chatting; requested actions proceed now rather than waiting for your return. Where Pi's branch or an [attended supervision host](docs/supervision-host.md#quiet-mode) already does this, it only says so; otherwise it starts the quiet daemon, which stays active through ordinary chat until `/quiet off` |
 | `/ahoy`            | Recap visible session events since the prior real captain message plus visibly unanswered captain decisions, then guide the captain through any open decisions one at a time in agent-judged impact order; fall back to Bearings when invoked as the session's first real captain message |
 | `/bearings`        | Generate a concise four-section chat digest from bounded fleet state, including registered remote-home ledgers and measured follow-up for owned contributions; use `/bearings file` to also replace today's dated report in `data/`, and add `include PRs` for live GitHub enrichment |
-| `/updatefirstmate` | Guardedly update the running firstmate and its secondmates - fast-forward, or reconcile a redundant post-squash-merge divergence - then persist and restart every live mate successfully left on the target commit - including already-current homes - with an honest re-read nudge only when restart cannot be proven |
+| `/updatefirstmate` | Guardedly update the running Nexus and its secondmates - fast-forward, or reconcile a redundant post-squash-merge divergence - then persist and restart every live mate successfully left on the target commit - including already-current homes - with an honest re-read nudge only when restart cannot be proven |
 | `/stow`            | Sweep the session for uncaptured durable knowledge, persist the open work records this session knows are unfiled or now wrong, curate tiered startup memory with decay and cold archival, enforce each home's budget or surface the required decision, cascade to registered second mates, and report what is safe to reset |
 
 Bearings invocation examples:
@@ -198,17 +273,17 @@ Bearings invocation examples:
 - `/bearings file` replaces today's `data/status-report-<YYYY-MM-DD>.md` from scratch and links it from the four-section chat digest.
 - `/bearings file include PRs` combines the dated report with live PR enrichment.
 
-Agent-only reference skills live under `.agents/skills/` and are loaded by firstmate at the trigger points named in [`AGENTS.md`](AGENTS.md).
+Agent-only reference skills live under `.agents/skills/` and are loaded by Nexus at the trigger points named in [`AGENTS.md`](AGENTS.md).
 
 ### Two-tier skill layout
 
-Firstmate's skills live in two separate places with different audiences:
+Nexus's skills live in two separate places with different audiences:
 
-- `.agents/skills/` - agent-loaded skills (this section's table, plus firstmate's agent-only reference skills). Every one of these assumes a live firstmate home and is meaningless, or actively misleading, installed anywhere else, so each carries `metadata.internal: true` in its frontmatter. That flag hides them from installer discovery (tools like the [skills.sh](https://skills.sh) `npx skills add` installer) without affecting how firstmate itself loads them - frontmatter metadata is inert to the agent's own skill loader.
-- `skills/` - public, installer-facing skills meant to be installed standalone into any project, independent of firstmate.
-  Each one is a self-contained skill with no dependency on firstmate's paths, tools, or vocabulary.
+- `.agents/skills/` - agent-loaded skills (this section's table, plus Nexus's agent-only reference skills). Every one of these assumes a live Nexus home and is meaningless, or actively misleading, installed anywhere else, so each carries `metadata.internal: true` in its frontmatter. That flag hides them from installer discovery (tools like the [skills.sh](https://skills.sh) `npx skills add` installer) without affecting how Nexus itself loads them - frontmatter metadata is inert to the agent's own skill loader.
+- `skills/` - public, installer-facing skills meant to be installed standalone into any project, independent of Nexus.
+  Each one is a self-contained skill with no dependency on Nexus's paths, tools, or vocabulary.
   Today that is `skills/stow`, a generic session-knowledge-sweep skill that routes findings by explicit instruction first, then existing local conventions, then a private `.stow-notes.md` fallback, and curates tiered entries through decay, local archival, and user-approved on-demand offload proposals.
-  It intentionally shares no code with the firstmate-internal `.agents/skills/stow` it is named after, so the two can evolve independently.
+  It intentionally shares no code with the Nexus-internal `.agents/skills/stow` it is named after, so the two can evolve independently.
 
 ## Documentation
 
@@ -248,10 +323,10 @@ MIT - see [LICENSE](LICENSE).
 
 ## Star History
 
-<a href="https://www.star-history.com/?repos=kunchenguid%2Ffirstmate&type=date&legend=top-left">
+<a href="https://www.star-history.com/?repos=ACicmansky%2Fnexus&type=date&legend=top-left">
  <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=kunchenguid/firstmate&type=date&theme=dark&legend=top-left" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=kunchenguid/firstmate&type=date&legend=top-left" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=kunchenguid/firstmate&type=date&legend=top-left" />
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=ACicmansky/nexus&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=ACicmansky/nexus&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=ACicmansky/nexus&type=date&legend=top-left" />
  </picture>
 </a>
